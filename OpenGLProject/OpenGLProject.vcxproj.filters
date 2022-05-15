@@ -21,7 +21,13 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="program.cpp">
+    <ClCompile Include="Class\Program\program.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Class\MyPolygon\myPolygon.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Class\MyModel\myModel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -41,7 +47,13 @@
     <ClInclude Include="main.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="program.h">
+    <ClInclude Include="Class\Program\program.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Class\MyPolygon\myPolygon.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Class\MyModel\myModel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

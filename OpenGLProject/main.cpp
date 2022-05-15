@@ -16,18 +16,12 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "Class/Program/program.h"
+#include "Class/MyPolygon/myPolygon.h"
 #include "main.h"
-#include "program.h"
+#include <vector>
 
 using namespace std;
-
-
-float verts[] = {
-	 -0.5f,-0.5f,
-	  0.0f, 0.5f,
-	  0.5f,-0.5f
-};
-float point[] = { 0.5, 0.5 };
 
 int main()
 {
@@ -35,7 +29,7 @@ int main()
 	if (!glfwInit())
 	{
 		OutputDebugStringW(L"FATAL: failed to initialize glfw\n");
-		return 1;
+		exit(1);
 	}
 
 	//initialize window
@@ -43,108 +37,112 @@ int main()
 	if (window == NULL)
 	{
 		OutputDebugStringW(L"FATAL: failed to initialize glfw window\n");
-		return 1;
+		exit(1);
 	}
 	glfwShowWindow(window);
 	glfwMakeContextCurrent(window);
-	gladLoadGL();
 	glfwSetKeyCallback(window, key_callback);
 
 	//initialize glad
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
 		OutputDebugStringW(L"FATAL: failed to initialize glad\n");
-		return 1;
+		exit(1);
 	}
 
 	//initialize OpenGL
-	glClearColor(0, 0, 0, 1); //set clear colour
-	//set up vertex buffer?
-	GLuint VBO;
-	glad_glGenBuffers(1, &VBO); //generate vertex buffer object
-	glad_glBindBuffer(GL_ARRAY_BUFFER, VBO); //and bind 
-	glad_glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(verts), verts, GL_STATIC_DRAW);
+	gladLoadGL();
+
+	glClearColor(1, 1, 1, 1); //set clear colour
+
+	//set up polygons
+	std::vector<MyPolygon> polygons;
+	float verts1[] = {
+		0.0f,  0.0f,
+		0.5f,  0.0f,
+		0.5f,  0.5f,
+		0.0f,  0.5f
+	};
+	polygons.push_back(MyPolygon(
+		verts1,
+		8,
+		glm::vec2(-0.5f, -0.5f),
+		0.0f
+	));
+
+	float verts2[] = {
+		0.0f,  0.0f,
+		0.5f,  0.0f,
+		0.5f,  0.5f,
+		0.0f,  0.2f
+	};
+	polygons.push_back(MyPolygon(
+		verts2,
+		8,
+		glm::vec2(0.5f, 0.5f),
+		0.0f
+	));
+
+	float verts3[] = {
+		0.0f,  0.0f,
+		0.5f,  0.0f,
+		0.5f,  0.5f
+	};
+	polygons.push_back(MyPolygon(
+		verts3,
+		6,
+		glm::vec2(0.0f, 0.0f),
+		0.0f
+	));
 
 	//vertex attrib array (default values? I guess this is just required?) 
 	glad_glEnableVertexAttribArray(0);
 	glad_glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);
 
-	//compile shaders (checking for failure)
-	Program myFirstShader(
-		"Shaders/MyFirstShader/myFirst.frag",
-		"Shaders/MyFirstShader/myFirst.vert"
-	);
+	//compile shader(s), checking for failure
 	Program myFirstTransform(
 		"Shaders/MyFirstTransform/myFirstTransform.frag",
 		"Shaders/MyFirstTransform/myFirstTransform.vert"
 	);
 
-
-	//apply a translation transform
-	myFirstTransform.use();
-	glm::mat4 trans = glm::mat4(1.0f);
-	trans = glm::rotate( //generate the matrix
-		trans,
-		glm::radians(90.0f),
-		glm::vec3(0.0f, 0.0f, 1.0f)
-	);
-	GLint myFirstTransformLocation = glad_glGetUniformLocation(myFirstTransform.handle, "transform");
-	if(myFirstTransformLocation==-1)
+	//use the transformation shader, ready to insert values into the uniform
+	myFirstTransform.Use();
+	GLint projectionLocation = glad_glGetUniformLocation(myFirstTransform.handle, "projection");
+	if(projectionLocation ==-1)
 	{
 		OutputDebugStringW(L"FATAL: couldn't get uniform handle\n");
-		return 1;
+		exit(1);
 	}
-	glad_glUniformMatrix4fv( //pass it to the shader
-		myFirstTransformLocation,
-		1,
-		GL_FALSE,
-		glm::value_ptr(trans)
-	);
+
+	GLint viewLocation = glad_glGetUniformLocation(myFirstTransform.handle, "view");
+	if (viewLocation == -1)
+	{
+		OutputDebugStringW(L"FATAL: couldn't get uniform handle\n");
+		exit(1);
+	}
+
+	GLint modelLocation = glad_glGetUniformLocation(myFirstTransform.handle, "model");
+	if (modelLocation == -1)
+	{
+		OutputDebugStringW(L"FATAL: couldn't get uniform handle\n");
+		exit(1);
+	}
 
 	while (!glfwWindowShouldClose(window))
 	{
 		glad_glClear(GL_COLOR_BUFFER_BIT); //clear the frame
 
-		//draw the first tri
-		myFirstShader.use();
-		glad_glDrawArrays(GL_TRIANGLES, 0, 3);
-
-
-		glad_glUniformMatrix4fv( //pass it to the shader
-			myFirstTransformLocation,
-			1,
-			GL_FALSE,
-			glm::value_ptr(trans)
-		);
-
-		//spin the tri
-		trans = glm::rotate( //generate the matrix
-			trans,
-			glm::radians(1.0f),
-			glm::vec3(1.0f, 0.0f, 0.0f)
-		);
-
-		trans = glm::rotate( //generate the matrix
-			trans,
-			glm::radians(1.0f),
-			glm::vec3(0.0f, 1.0f, 0.0f)
-		);
-
-		//draw the second (transformed) tri
-		myFirstTransform.use();
-		glad_glUniformMatrix4fv( //pass the updated value to the shader
-			myFirstTransformLocation,
-			1,
-			GL_FALSE,
-			glm::value_ptr(trans)
-		);
-		glad_glDrawArrays(GL_TRIANGLES, 0, 3);
+		for (auto &polygon : polygons)
+			polygon.Draw(projectionLocation, viewLocation, modelLocation);
+		
 
 		//glfw boilerplate
 		glfwSwapBuffers(window);
 		glfwPollEvents();
-	}
 
+		Sleep(FRAME_DELAY);
+	}
+	
 	//free resources
 	glfwTerminate(); //all glfw resources
 	//vertex buffer
