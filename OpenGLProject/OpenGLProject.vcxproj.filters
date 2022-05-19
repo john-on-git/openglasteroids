@@ -24,7 +24,7 @@
     <ClCompile Include="Class\Program\program.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Class\MyPolygon\myPolygon.cpp">
+    <ClCompile Include="Class\MyWorldThing\myWorldThing.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Class\MyModel\myModel.cpp">
@@ -50,7 +50,7 @@
     <ClInclude Include="Class\Program\program.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Class\MyPolygon\myPolygon.h">
+    <ClInclude Include="Class\MyWorldThing\myWorldThing.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Class\MyModel\myModel.h">

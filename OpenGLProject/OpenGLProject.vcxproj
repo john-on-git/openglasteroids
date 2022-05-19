@@ -150,11 +150,11 @@
     <ClCompile Include="glad.c" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Class\Program\program.cpp" />
-    <ClCompile Include="Class\MyPolygon\myPolygon.cpp" />
+    <ClCompile Include="Class\MyWorldThing\myWorldThing.cpp" />
     <ClCompile Include="Class\MyModel\myModel.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Class\MyPolygon\myPolygon.h" />
+    <ClInclude Include="Class\MyWorldThing\myWorldThing.h" />
     <ClInclude Include="Libraries\include\glad\glad.h" />
     <ClInclude Include="Libraries\include\GLFW\glfw3.h" />
     <ClInclude Include="Libraries\include\GLFW\glfw3native.h" />

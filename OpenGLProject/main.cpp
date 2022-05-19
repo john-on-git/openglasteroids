@@ -17,7 +17,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "Class/Program/program.h"
-#include "Class/MyPolygon/myPolygon.h"
+#include "Class/myWorldThing/myWorldThing.h"
 #include "main.h"
 #include <vector>
 
@@ -50,54 +50,64 @@ int main()
 		exit(1);
 	}
 
-	//initialize OpenGL
-	gladLoadGL();
-
 	glClearColor(1, 1, 1, 1); //set clear colour
 
 	//set up polygons
-	std::vector<MyPolygon> polygons;
+	std::vector<MyWorldThing> worldThings;
 	float verts1[] = {
-		0.0f,  0.0f,
-		0.5f,  0.0f,
-		0.5f,  0.5f,
-		0.0f,  0.5f
+		0.0f, 0.0f, 0.0f, 0.0f,
+		0.5f, 0.0f, 0.0f, 0.0f,
+		0.5f, 0.5f, 0.0f, 0.0f,
+		0.0f, 0.5f, 0.0f, 0.0f
 	};
-	polygons.push_back(MyPolygon(
+	worldThings.push_back(MyWorldThing(
 		verts1,
-		8,
-		glm::vec2(-0.5f, -0.5f),
-		0.0f
+		4,
+		glm::vec3(-0.5f, -0.5f, 0.0f),
+		glm::vec4(0.0f, 0.0f, 0.0f, 0.0f)
 	));
 
 	float verts2[] = {
-		0.0f,  0.0f,
-		0.5f,  0.0f,
-		0.5f,  0.5f,
-		0.0f,  0.2f
+		0.0f, 0.0f, 0.0f, 0.0f,
+		0.5f, 0.0f, 0.0f, 0.0f,
+		0.5f, 0.5f, 0.0f, 0.0f,
+		0.0f, 0.2f, 0.0f, 0.0f
 	};
-	polygons.push_back(MyPolygon(
+	worldThings.push_back(MyWorldThing(
 		verts2,
-		8,
-		glm::vec2(0.5f, 0.5f),
-		0.0f
+		4,
+		glm::vec3(0.5f, 0.5f, 0.0f),
+		glm::vec4(0.0f, 0.0f, 0.0f, 0.0f)
 	));
 
 	float verts3[] = {
-		0.0f,  0.0f,
-		0.5f,  0.0f,
-		0.5f,  0.5f
+		0.0f, 0.0f, 0.0f, 0.0f,
+		0.5f, 0.0f, 0.0f, 0.0f,
+		0.5f, 0.5f, 0.0f, 0.0f,
 	};
-	polygons.push_back(MyPolygon(
+	worldThings.push_back(MyWorldThing(
 		verts3,
-		6,
-		glm::vec2(0.0f, 0.0f),
-		0.0f
+		3,
+		glm::vec3(0.0f, 0.0f, 0.0f),
+		glm::vec4(0.0f, 0.0f, 0.0f, 0.0f)
 	));
 
-	//vertex attrib array (default values? I guess this is just required?) 
+	//init vertex buffer
+	GLsizei vboSize = MyModel().totalVertices * sizeof(float[4]);
+
+	GLuint VBO = 0;
+	glad_glGenBuffers(vboSize, &VBO);
+	glad_glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glad_glBufferData(GL_ARRAY_BUFFER, vboSize, NULL, GL_STATIC_DRAW); //internet said to do this
+
+	for (auto& polygon : worldThings)
+		polygon.model.MoveToBuffer();
+
+
+	//vertex attrib array (default values? I guess this is just required?)
+	//19.5.21 error was because I put this before VBO init!
 	glad_glEnableVertexAttribArray(0);
-	glad_glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);
+	glad_glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, NULL);
 
 	//compile shader(s), checking for failure
 	Program myFirstTransform(
@@ -128,13 +138,21 @@ int main()
 		exit(1);
 	}
 
+	/*char *bufferDataCheck = new char[vboSize];
+	glad_glGetBufferSubData(GL_ARRAY_BUFFER, 0, vboSize, bufferDataCheck);
+	for(int i=0;i<vboSize;i++)
+	{
+		printf("[");
+		printf("%hhx", bufferDataCheck[i]);
+		printf("] ");
+	}*/
+
 	while (!glfwWindowShouldClose(window))
 	{
 		glad_glClear(GL_COLOR_BUFFER_BIT); //clear the frame
 
-		for (auto &polygon : polygons)
-			polygon.Draw(projectionLocation, viewLocation, modelLocation);
-		
+		for (auto &thing : worldThings)
+			thing.Draw(projectionLocation, viewLocation, modelLocation);
 
 		//glfw boilerplate
 		glfwSwapBuffers(window);

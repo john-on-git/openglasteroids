@@ -14,27 +14,27 @@
 #include <windows.h>
 
 #include "../MyModel/myModel.h"
-#include "myPolygon.h"
+#include "myWorldThing.h"
 
-MyPolygon::MyPolygon()
+MyWorldThing::MyWorldThing()
 {
-	OutputDebugStringW(L"FATAL: called invalid constructor MyPolygon()\n");
+	OutputDebugStringW(L"FATAL: called invalid constructor MyWorldThing()\n");
 	exit(1);
 }
-MyPolygon::MyPolygon(float verts[], unsigned int length, glm::vec2 position, float angle)
+MyWorldThing::MyWorldThing(float verts[], unsigned int length, glm::vec3 position, glm::vec4 angle)
 {
 	this->model = MyModel(verts, length);
 	this->position = position;
 	this->angle = angle;
 }
-MyPolygon::MyPolygon(std::string modelPath, glm::vec2 position, float angle)
+MyWorldThing::MyWorldThing(std::string modelPath, glm::vec3 position, glm::vec4 angle)
 {
 	this->model = MyModel(modelPath);
 	this->position = position;
 	this->angle = angle;
 }
 
-void MyPolygon::Draw(GLint projectionLocation, GLint viewLocation, GLint modelLocation)
+void MyWorldThing::Draw(GLint projectionLocation, GLint viewLocation, GLint modelLocation)
 {
 	glm::mat4 //new identity matrices
 		projectionMatrix	= glm::mat4(1.0f),
@@ -42,11 +42,15 @@ void MyPolygon::Draw(GLint projectionLocation, GLint viewLocation, GLint modelLo
 		modelMatrix			= glm::mat4(1.0f);
 	
 	//calculate model matrix
-	modelMatrix = glm::translate(modelMatrix, glm::vec3(position, 0));	//translate to the polygon's position
+	modelMatrix = glm::translate(modelMatrix, position);	//translate to the polygon's position
 	modelMatrix = glm::rotate( //generate the matrix
 		modelMatrix,
-		glm::radians(angle),
-		glm::vec3(0.0f, 0.0f, 1.0f)
+		glm::radians(angle[0]),
+		glm::vec3(
+			angle[1],
+			angle[2],
+			angle[3]
+		)
 	);
 
 	//pass matrices to shader
@@ -68,7 +72,7 @@ void MyPolygon::Draw(GLint projectionLocation, GLint viewLocation, GLint modelLo
 		GL_FALSE,
 		glm::value_ptr(modelMatrix)
 	);
-	model.BindBuffer();
+
 	glad_glDrawArrays(GL_TRIANGLE_STRIP, 0, this->model.nVertices); 
 	/*
 	doesn't work, because it's not immediate rendering
@@ -78,4 +82,6 @@ void MyPolygon::Draw(GLint projectionLocation, GLint viewLocation, GLint modelLo
 	https://stackoverflow.com/questions/23603228/draw-multiple-objects-from-different-buffers-arrays-switching
 	that's enough OpenGL for one day, I think
 	*/
+
+	//why is it still not working ;o;
 }

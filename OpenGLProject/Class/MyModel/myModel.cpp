@@ -4,25 +4,26 @@
 
 #include "myModel.h"
 
+unsigned long int MyModel::totalVertices = 0; //counter for total required for buffer
+
 MyModel::MyModel()
 {
 	this->nVertices = -1;
-	this->VBO = -1;
+	this->startVertices = -1;
+	verts = NULL;
 }
-MyModel::MyModel(float verts[], unsigned int nVerts)
+MyModel::MyModel(float vertsIn[], unsigned int nVerts)
 {
-	float(*verts4D)[4] = new float[nVerts][4];
-	this->nVertices = nVerts; 
-	glad_glGenBuffers(1, &(VBO)); //instantiate my buffer
+	this->startVertices = totalVertices; //set start
+	this->nVertices = nVerts; //duration
+	this->totalVertices += nVerts; //update total
 
-	for (int i=0, ii=0;i<nVerts;i++, ii+=2)
-		verts4D[i][0] = verts[ii],
-		verts4D[i][1] = verts[ii+1],
-		verts4D[i][2] = 0.0f,
-		verts4D[i][3] = 0.0f;
-	
-	BindBuffer(); 
-	glad_glBufferData(GL_ARRAY_BUFFER, nVerts * sizeof(float[4]), verts4D, GL_STATIC_DRAW); //add verts to buffer
+	verts = new float[nVerts][4]; //copy verts over to this model
+	for (unsigned int i = 0, ii = 0;i < nVerts;i++, ii += 4)
+		verts[i][0] = vertsIn[ii],
+		verts[i][1] = vertsIn[ii + 1],
+		verts[i][2] = vertsIn[ii + 2],
+		verts[i][3] = vertsIn[ii + 3];
 }
 MyModel::MyModel(std::string path)
 {
@@ -31,7 +32,13 @@ MyModel::MyModel(std::string path)
 	//TODO load the model
 }
 
-void MyModel::BindBuffer()
+/// <summary>
+/// move this model's verts to the VBO
+/// </summary>
+void MyModel::MoveToBuffer()
 {
-	glad_glBindBuffer(GL_ARRAY_BUFFER, VBO); //set my buffer as the bound buffer
+	glad_glBufferSubData(GL_ARRAY_BUFFER, this->startVertices, this->nVertices * sizeof(float[4]), this->verts); //add verts to buffer
+
+	free(verts);
+	verts = NULL;
 }
