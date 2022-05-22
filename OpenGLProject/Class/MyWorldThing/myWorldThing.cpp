@@ -21,67 +21,76 @@ MyWorldThing::MyWorldThing()
 	OutputDebugStringW(L"FATAL: called invalid constructor MyWorldThing()\n");
 	exit(1);
 }
-MyWorldThing::MyWorldThing(float verts[], unsigned int length, glm::vec3 position, glm::vec4 angle)
+MyWorldThing::MyWorldThing(float verts[], unsigned int length, glm::vec3 position, glm::vec3 angle, GLint VAO)
 {
-	this->model = MyModel(verts, length);
+	this->model = MyModel(verts, length, VAO);
 	this->position = position;
 	this->angle = angle;
 }
-MyWorldThing::MyWorldThing(std::string modelPath, glm::vec3 position, glm::vec4 angle)
+MyWorldThing::MyWorldThing(std::string modelPath, glm::vec3 position, glm::vec3 angle, GLint VAO)
 {
-	this->model = MyModel(modelPath);
+	this->model = MyModel(modelPath, VAO);
 	this->position = position;
 	this->angle = angle;
 }
 
 void MyWorldThing::Draw(GLint projectionLocation, GLint viewLocation, GLint modelLocation)
 {
-	glm::mat4 //new identity matrices
-		projectionMatrix	= glm::mat4(1.0f),
-		viewMatrix			= glm::mat4(1.0f),
-		modelMatrix			= glm::mat4(1.0f);
-	
-	//calculate model matrix
-	modelMatrix = glm::translate(modelMatrix, position);	//translate to the polygon's position
-	modelMatrix = glm::rotate( //generate the matrix
-		modelMatrix,
-		glm::radians(angle[0]),
-		glm::vec3(
-			angle[1],
-			angle[2],
-			angle[3]
-		)
-	);
-
+	//calculate matrices
+		glm::mat4 projectionMatrix(1.0f);
+		glm::mat4 viewMatrix(1.0f);
+		glm::mat4 modelMatrix(1.0f);
+		//this is the broken part!
+		//projection
+		//	glm::mat4 projectionMatrix = glm::perspective(
+		//		090.0f,
+		//		001.0f,
+		//		100.0f,
+		//		000.01f
+		//	);
+		////view
+		//	//init with identity
+		//		glm::mat4 viewMatrix(1.0f);
+		////model
+		//	//init with identity
+		//		glm::mat4 modelMatrix(1.0f);
+		//	//rotate around each axis
+		//		modelMatrix = glm::rotate(
+		//			modelMatrix,
+		//			glm::radians(angle.x),
+		//			glm::vec3(1,0,0)
+		//		);
+		//		modelMatrix = glm::rotate(
+		//			modelMatrix,
+		//			glm::radians(angle.y),
+		//			glm::vec3(0,1,0)
+		//		);
+		//		modelMatrix = glm::rotate(
+		//			modelMatrix,
+		//			glm::radians(angle.z),
+		//			glm::vec3(0,0,1)
+		//		);
+		//	//translate to the polygon's position
+		//	modelMatrix = glm::translate(modelMatrix, position);
 	//pass matrices to shader
-	glad_glUniformMatrix4fv(
-		projectionLocation,
-		1,
-		GL_FALSE,
-		glm::value_ptr(projectionMatrix)
-	);
-	glad_glUniformMatrix4fv(
-		viewLocation,
-		1,
-		GL_FALSE,
-		glm::value_ptr(viewMatrix)
-	);
-	glad_glUniformMatrix4fv(
-		modelLocation,
-		1,
-		GL_FALSE,
-		glm::value_ptr(modelMatrix)
-	);
-
-	glad_glDrawArrays(GL_TRIANGLE_STRIP, 0, this->model.nVertices); 
-	/*
-	doesn't work, because it's not immediate rendering
-	this queues up many drawArrays, which all pull from the buffer of the last polygon that we said to draw
-	so it draws the last poly many times
-	stackEx says I need vertexAttribPointers or something? 
-	https://stackoverflow.com/questions/23603228/draw-multiple-objects-from-different-buffers-arrays-switching
-	that's enough OpenGL for one day, I think
-	*/
-
-	//why is it still not working ;o;
+		glad_glUniformMatrix4fv(
+			projectionLocation,
+			1,
+			GL_FALSE,
+			glm::value_ptr(projectionMatrix)
+		);
+		glad_glUniformMatrix4fv(
+			viewLocation,
+			1,
+			GL_FALSE,
+			glm::value_ptr(viewMatrix)
+		);
+		glad_glUniformMatrix4fv(
+			modelLocation,
+			1,
+			GL_FALSE,
+			glm::value_ptr(modelMatrix)
+		);
+	//draw
+	model.Draw();
 }

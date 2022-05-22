@@ -8,20 +8,16 @@
 
 #include "myModel.h"
 
-
 class MyModel
 {
 	public:
-		static unsigned long int totalVertices; //counter for total required for buffer
-
-		unsigned long int startVertices; //start of my verts in the VBO
-		unsigned long int nVertices; //number of my verts in the vbo
+		unsigned long int nVerts; //number of my verts in the vbo
 
 		MyModel();
-		MyModel(float verts[], unsigned int nVerts);
-		MyModel(std::string);
+		MyModel(float vertsIn[], unsigned int lenVertsIn, GLint VAO);
+		MyModel(std::string, GLint VAO);
 		
-		void Buffer();
+		void Draw();
 	private:
-		float(*verts)[4];
+		GLuint *VBOs;
 };

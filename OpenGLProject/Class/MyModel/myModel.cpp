@@ -4,41 +4,46 @@
 
 #include "myModel.h"
 
-unsigned long int MyModel::totalVertices = 0; //counter for total required for buffer
 
 MyModel::MyModel()
 {
-	this->nVertices = -1;
-	this->startVertices = -1;
-	verts = NULL;
+	this->nVerts = -1;
+	VBOs = new GLuint[1];
 }
-MyModel::MyModel(float vertsIn[], unsigned int nVerts)
+MyModel::MyModel(float verts[], unsigned int lenVertsIn, GLint VAO)
 {
-	this->startVertices = totalVertices; //set start
-	this->nVertices = nVerts; //duration
-	this->totalVertices += nVerts; //update total
+	//init properties
+		VBOs = new GLuint[1];
+		this->nVerts = lenVertsIn; //duration
 
-	verts = new float[nVerts][4]; //copy verts over to this model
-	for (unsigned int i = 0, ii = 0;i < nVerts;i++, ii += 4)
-		verts[i][0] = vertsIn[ii],
-		verts[i][1] = vertsIn[ii + 1],
-		verts[i][2] = vertsIn[ii + 2],
-		verts[i][3] = vertsIn[ii + 3];
+		//generate, bind, copy verts to my buffer
+			glad_glBindVertexArray(VAO);
+			glad_glGenBuffers(1, VBOs); //19.5.21, first argument is the number of buffers, not the size of the buffer. corrupted the heap?
+			glad_glBindBuffer(GL_ARRAY_BUFFER, VBOs[0]);
+			glad_glBufferData( //add verts to buffer
+				GL_ARRAY_BUFFER,
+				nVerts * sizeof(float),
+				verts,
+				GL_STATIC_DRAW
+			);
 }
-MyModel::MyModel(std::string path)
+MyModel::MyModel(std::string path, GLint VAO)
 {
 	OutputDebugStringW(L"FATAL: called not-implemented constructor MyModel(std::string path)\n");
 	exit(1);
 	//TODO load the model
 }
 
-/// <summary>
-/// move this model's verts to the VBO
-/// </summary>
-void MyModel::MoveToBuffer()
+void MyModel::Draw()
 {
-	glad_glBufferSubData(GL_ARRAY_BUFFER, this->startVertices, this->nVertices * sizeof(float[4]), this->verts); //add verts to buffer
+	//draw
+	glad_glBindBuffer(GL_ARRAY_BUFFER, VBOs[0]);
+	glad_glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, NULL);
+	glad_glEnableVertexAttribArray(0);
 
-	free(verts);
-	verts = NULL;
+	float* bufferData = new float[nVerts];
+	glad_glBindBuffer(GL_ARRAY_BUFFER, VBOs[0]);
+	glad_glGetBufferSubData(GL_ARRAY_BUFFER, 0, nVerts * sizeof(float), bufferData);
+
+	glad_glDrawArrays(GL_POINTS, 0, nVerts);
 }
