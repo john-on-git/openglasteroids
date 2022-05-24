@@ -1,6 +1,6 @@
 #pragma once
 
-#include "program.h"
+#include "program.hpp"
 
 Program::Program(std::string fragShaderPath, std::string vertShaderPath)
 {

@@ -152,16 +152,18 @@
     <ClCompile Include="Class\Program\program.cpp" />
     <ClCompile Include="Class\MyWorldThing\myWorldThing.cpp" />
     <ClCompile Include="Class\MyModel\myModel.cpp" />
+    <ClCompile Include="Class\MyColoredPolyModel\MyColoredPolyModel.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Class\MyWorldThing\myWorldThing.h" />
+    <ClInclude Include="Class\MyWorldThing\myWorldThing.hpp" />
     <ClInclude Include="Libraries\include\glad\glad.h" />
     <ClInclude Include="Libraries\include\GLFW\glfw3.h" />
     <ClInclude Include="Libraries\include\GLFW\glfw3native.h" />
     <ClInclude Include="Libraries\include\KHR\khrplatform.h" />
-    <ClInclude Include="main.h" />
-    <ClInclude Include="Class\Program\program.h" />
-    <ClInclude Include="Class\MyModel\myModel.h" />
+    <ClInclude Include="main.hpp" />
+    <ClInclude Include="Class\Program\program.hpp" />
+    <ClInclude Include="Class\MyModel\myModel.hpp" />
+    <ClInclude Include="Class\MyColoredPolyModel\MyColoredPolyModel.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\MyFirstShader\myFirst.frag" />

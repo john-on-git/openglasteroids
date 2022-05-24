@@ -13,65 +13,69 @@
 #include <string>
 #include <windows.h>
 
-#include "../MyModel/myModel.h"
-#include "myWorldThing.h"
+#include "../myColoredPolyModel/myColoredPolyModel.hpp"
+#include "myWorldThing.hpp"
 
 MyWorldThing::MyWorldThing()
 {
 	OutputDebugStringW(L"FATAL: called invalid constructor MyWorldThing()\n");
 	exit(1);
 }
-MyWorldThing::MyWorldThing(float verts[], unsigned int length, glm::vec3 position, glm::vec3 angle, GLint VAO)
+MyWorldThing::MyWorldThing(MyModel *model, glm::vec3 position, glm::vec3 angle, GLuint projectionLocation, GLuint viewLocation, GLuint modelLocation)
 {
-	this->model = MyModel(verts, length, VAO);
+	this->model = model;
 	this->position = position;
 	this->angle = angle;
-}
-MyWorldThing::MyWorldThing(std::string modelPath, glm::vec3 position, glm::vec3 angle, GLint VAO)
-{
-	this->model = MyModel(modelPath, VAO);
-	this->position = position;
-	this->angle = angle;
+	this->projectionLocation = projectionLocation;
+	this->viewLocation = viewLocation;
+	this->modelLocation = modelLocation;
 }
 
-void MyWorldThing::Draw(GLint projectionLocation, GLint viewLocation, GLint modelLocation)
+void MyWorldThing::Draw()
 {
+	/*
+		22.5.22
+		rotation works correctly
+		translation does nothing but doesn't cause drawing errors
+		projection breaks everything
+
+		24.5.22
+		it's working!
+	*/
 	//calculate matrices
-		glm::mat4 projectionMatrix(1.0f);
-		glm::mat4 viewMatrix(1.0f);
-		glm::mat4 modelMatrix(1.0f);
-		//this is the broken part!
 		//projection
-		//	glm::mat4 projectionMatrix = glm::perspective(
-		//		090.0f,
-		//		001.0f,
-		//		100.0f,
-		//		000.01f
-		//	);
-		////view
-		//	//init with identity
-		//		glm::mat4 viewMatrix(1.0f);
-		////model
-		//	//init with identity
-		//		glm::mat4 modelMatrix(1.0f);
-		//	//rotate around each axis
-		//		modelMatrix = glm::rotate(
-		//			modelMatrix,
-		//			glm::radians(angle.x),
-		//			glm::vec3(1,0,0)
-		//		);
-		//		modelMatrix = glm::rotate(
-		//			modelMatrix,
-		//			glm::radians(angle.y),
-		//			glm::vec3(0,1,0)
-		//		);
-		//		modelMatrix = glm::rotate(
-		//			modelMatrix,
-		//			glm::radians(angle.z),
-		//			glm::vec3(0,0,1)
-		//		);
-		//	//translate to the polygon's position
-		//	modelMatrix = glm::translate(modelMatrix, position);
+			//this is the broken part!
+			glm::mat4 projectionMatrix = glm::perspective(
+				75.0f,
+				1.0f,
+				0.1f,
+				100.0f
+			);
+		//view
+			//init with identity
+				glm::mat4 viewMatrix(1.0f);
+		//model
+			//init with identity
+				glm::mat4 modelMatrix(1.0f);
+			//translate to the polygon's position
+				//22.5.22 this is broken for points on the origin
+				modelMatrix = glm::translate(modelMatrix, position);
+			//rotate around each axis
+				modelMatrix = glm::rotate(
+					modelMatrix,
+					glm::radians(angle.x),
+					glm::vec3(1,0,0)
+				);
+				modelMatrix = glm::rotate(
+					modelMatrix,
+					glm::radians(angle.y),
+					glm::vec3(0,1,0)
+				);
+				modelMatrix = glm::rotate(
+					modelMatrix,
+					glm::radians(angle.z),
+					glm::vec3(0,0,1)
+				);
 	//pass matrices to shader
 		glad_glUniformMatrix4fv(
 			projectionLocation,
@@ -92,5 +96,5 @@ void MyWorldThing::Draw(GLint projectionLocation, GLint viewLocation, GLint mode
 			glm::value_ptr(modelMatrix)
 		);
 	//draw
-	model.Draw();
+	model->Draw();
 }

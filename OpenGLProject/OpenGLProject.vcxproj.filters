@@ -30,6 +30,9 @@
     <ClCompile Include="Class\MyModel\myModel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Class\MyColoredPolyModel\MyColoredPolyModel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Libraries\include\glad\glad.h">
@@ -44,16 +47,19 @@
     <ClInclude Include="Libraries\include\KHR\khrplatform.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="main.h">
+    <ClInclude Include="main.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Class\Program\program.h">
+    <ClInclude Include="Class\Program\program.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Class\MyWorldThing\myWorldThing.h">
+    <ClInclude Include="Class\MyWorldThing\myWorldThing.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Class\MyModel\myModel.h">
+    <ClInclude Include="Class\MyModel\myModel.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Class\MyColoredPolyModel\MyColoredPolyModel.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

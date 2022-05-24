@@ -1,9 +1,9 @@
 #version 330 core
 
-in vec2 texCoord;
+uniform vec3 color;
 
 out vec4 colorOut;
 
 void main() {
-	colorOut = vec4(0f, 0f, 1f, 0f);
+	colorOut = vec4(color.x, color.y, color.z, 1f);
 }

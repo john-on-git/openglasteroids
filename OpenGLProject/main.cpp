@@ -16,14 +16,18 @@
 	#include <glm/ext/scalar_constants.hpp>
 	#include <glm/glm.hpp>
 	#include <glm/gtc/type_ptr.hpp>
+//ms
+	#include <conio.h>
 //project
-	#include "Class/Program/program.h"
-	#include "Class/myWorldThing/myWorldThing.h"
-	#include "main.h"
+	#include "Class/Program/program.hpp"
+	#include "Class/MyColoredPolyModel/MyColoredPolyModel.hpp"
+	#include "Class/myWorldThing/myWorldThing.hpp"
+	#include "main.hpp"
 
 using namespace std;
 
-char moveX = 0, moveY = 0, moveZ = 0;
+char moveX = 0, moveY = 0, moveZ = 0, rot = 0;
+unsigned char axis = 0;
 
 int main()
 {
@@ -49,44 +53,14 @@ int main()
 			OutputDebugStringW(L"FATAL: failed to initialize glad\n");
 			exit(1);
 		}
+	//init depth buffer
+		glad_glEnable(GL_DEPTH_TEST);
 	//set clear colour
 		glClearColor(1, 1, 1, 1);
 	//set up VAO(s)
 		GLuint VAOs[1];
 		glad_glGenVertexArrays(1, VAOs);
 		glad_glBindVertexArray(VAOs[0]);
-	//set up world stuff
-		glad_glPointSize(10);
-		std::vector<MyWorldThing> worldThings;
-		MyWorldThing cube(
-			new float[] { //cube
-				0.0f, 0.0f, 0.0f, 0.0f,
-				0.5f, 0.0f, 0.0f, 0.0f,
-				0.5f, 0.5f, 0.0f, 0.0f,
-				0.0f, 0.5f, 0.0f, 0.0f,
-				0.0f, 0.0f, 0.0f, 1.0f,
-				0.5f, 0.0f, 0.0f, 1.0f,
-				0.5f, 0.5f, 0.0f, 1.0f,
-				0.0f, 0.5f, 0.0f, 1.0f
-			},
-			32,
-			glm::vec3(0.0f, 0.0f, 0.0f),
-			glm::vec3(0.0f, 0.0f, 0.0f),
-			VAOs[0]
-		);
-		//worldThings.push_back(cube);
-		MyWorldThing triangle(
-			new float[] {
-				0.0f, 0.0f, 0.0f, 1.0f,
-				0.2f, 0.0f, 0.0f, 1.0f,
-				0.1f, 0.1f, 0.0f, 1.0f
-			},
-			12,
-			glm::vec3(0.0f, 0.0f, 0.0f),
-			glm::vec3(0.0f, 0.0f, 0.0f),
-			VAOs[0]
-		);
-		worldThings.push_back(triangle);
 	//shader setup
 		//compile
 			Program myFirstTransform(
@@ -95,7 +69,8 @@ int main()
 			);
 		//get uniform locations
 			myFirstTransform.Use();
-			GLint
+			GLuint
+				colorLocation		= glad_glGetUniformLocation(myFirstTransform.handle, "color"),
 				projectionLocation	= glad_glGetUniformLocation(myFirstTransform.handle, "projection"),
 				viewLocation		= glad_glGetUniformLocation(myFirstTransform.handle, "view"),
 				modelLocation		= glad_glGetUniformLocation(myFirstTransform.handle, "model");
@@ -105,25 +80,138 @@ int main()
 				OutputDebugStringW(L"FATAL: couldn't get uniform location\n");
 				exit(1);
 			}
+	//set up world stuff
+		glad_glPointSize(10);
+		vector<MyWorldThing*> worldThings{
+			new MyWorldThing(
+				new MyColoredPolyModel(
+					6,
+					new float[] {
+						//front
+						-0.1f, -0.1f,  0.1f, 1.0f,
+						 0.1f, -0.1f,  0.1f, 1.0f,
+						 0.1f,  0.1f,  0.1f, 1.0f,
+						-0.1f,  0.1f,  0.1f, 1.0f,
+						-0.1f, -0.1f,  0.1f, 1.0f,
+						//right
+						 0.1f, -0.1f,  0.1f, 1.0f,
+						 0.1f, -0.1f, -0.1f, 1.0f,
+						 0.1f,  0.1f, -0.1f, 1.0f,
+						 0.1f,  0.1f,  0.1f, 1.0f,
+						 0.1f, -0.1f,  0.1f, 1.0f,
+						//back
+						-0.1f, -0.1f,  -0.1f, 1.0f,
+						 0.1f, -0.1f,  -0.1f, 1.0f,
+						 0.1f,  0.1f,  -0.1f, 1.0f,
+						-0.1f,  0.1f,  -0.1f, 1.0f,
+						-0.1f, -0.1f,  -0.1f, 1.0f,
+						//left
+						-0.1f, -0.1f,  0.1f, 1.0f,
+						-0.1f, -0.1f, -0.1f, 1.0f,
+						-0.1f,  0.1f, -0.1f, 1.0f,
+						-0.1f,  0.1f,  0.1f, 1.0f,
+						-0.1f, -0.1f,  0.1f, 1.0f,
+						//top
+						-0.1f, -0.1f,  0.1f, 1.0f,
+						 0.1f, -0.1f,  0.1f, 1.0f,
+						 0.1f, -0.1f, -0.1f, 1.0f,
+						-0.1f, -0.1f, -0.1f, 1.0f,
+						-0.1f, -0.1f,  0.1f, 1.0f,
+						//bottom
+						-0.1f, 0.1f,  0.1f, 1.0f,
+						 0.1f, 0.1f,  0.1f, 1.0f,
+						 0.1f, 0.1f, -0.1f, 1.0f,
+						-0.1f, 0.1f, -0.1f, 1.0f,
+						-0.1f, 0.1f,  0.1f, 1.0f,
+						},
+					new glm::vec3[] {
+						glm::vec3(1.0f, 0.0f, 0.0f),
+						glm::vec3(0.0f, 1.0f, 0.0f),
+						glm::vec3(0.0f, 0.0f, 1.0f),
+						glm::vec3(1.0f, 0.5f, 0.0f),
+						glm::vec3(1.0f, 0.0f, 1.0f),
+						glm::vec3(0.0f, 1.0f, 1.0f)
+					},
+					new unsigned char[] {5, 5, 5, 5, 5, 5},
+					colorLocation,
+					VAOs[0]
+				),
+				glm::vec3(-0.2f, 0.2f,-2.0f),
+				glm::vec3(0.0f, 0.0f, 0.0f),
+				projectionLocation,
+				viewLocation,
+				modelLocation
+			),
+			new MyWorldThing(
+				/*size_t nPolygons, 
+				float* verts, 
+				glm::vec3* polygonColors, 
+				unsigned char* polygonBoundaries,
+				GLuint colorLocation, 
+				GLuint VAO*/
+				new MyColoredPolyModel(
+					1,
+					new float[] {
+						0.0f, 0.0f, 0.0f, 1.0f,
+						0.2f, 0.0f, 0.0f, 1.0f,
+						0.1f, 0.1f, 0.0f, 1.0f,
+						0.0f, 0.0f, 0.0f, 1.0f
+					},
+					new glm::vec3[] {
+						glm::vec3(1.0f, 0.0f, 0.0f)
+					},
+					new unsigned char[] {4},
+					colorLocation,
+					VAOs[0]
+				),
+				glm::vec3(0.0f, 0.0f, -1.0f),
+				glm::vec3(0.0f, 0.0f, 0.0f),
+				projectionLocation,
+				viewLocation,
+				modelLocation
+			)
+		};
+		MyWorldThing* first = worldThings[0];
 	//render loop
 	while (!glfwWindowShouldClose(window))
 	{
+		//print debug to console
+			system("cls");
+			cout << "triangle:"
+				<< "\n\tposition"
+					<< "\n\t\tx: "		<< first->position.x
+					<< "\n\t\ty: "		<< first->position.y
+					<< "\n\t\tz: "		<< first->position.z
+				<< "\n\trotation: "
+					<< "\n\t\tcur: "	<< (int)axis
+					<< "\n\t\tx: "		<< first->angle.x
+					<< "\n\t\ty: "		<< first->angle.y
+					<< "\n\t\tz: "		<< first->angle.z
+			;
 		//update world state
-			cube.position.x += moveX;
-			cube.position.y += moveY;
-			cube.position.z += moveZ;
-			triangle.position.x += moveX;
-			triangle.position.y += moveY;
-			triangle.position.z += moveZ;
+			first->position.x += moveX * MOVE_RATE;
+			first->position.y += moveY * MOVE_RATE;
+			first->position.z += moveZ * MOVE_RATE;
+			switch (axis) {
+				case 0:
+					first->angle.x += rot * ROTATE_RATE;
+				break;
+				case 1:
+					first->angle.y += rot * ROTATE_RATE;
+				break;
+				case 2:
+					first->angle.z += rot * ROTATE_RATE;
+				break;
+			}
 			moveX = 0;
 			moveY = 0;
 			moveZ = 0;
+			rot = 0;
 		//clear framebuffers
-			glad_glClear(GL_COLOR_BUFFER_BIT);
-			glad_glClear(GL_DEPTH_BUFFER_BIT);
+			glad_glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		//draw all objects
 			for (auto& thing : worldThings)
-				thing.Draw(projectionLocation, viewLocation, modelLocation);
+				thing->Draw();
 		//glfw stuff
 			glfwSwapBuffers(window);
 			glfwPollEvents();
@@ -146,22 +234,34 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	switch (key)
 	{
 		case GLFW_KEY_W:
-			moveX = 1;
+			moveY = -1;
 		break;
 		case GLFW_KEY_A:
-			moveX = -1;
+			moveX = 1;
 		break;
 		case GLFW_KEY_S:
 			moveY = 1;
 		break;
 		case GLFW_KEY_D:
-			moveY = -1;
+			moveX = -1;
+		break;
+		case GLFW_KEY_R:
+			moveZ = -1;
+		break;
+		case GLFW_KEY_F:
+			moveZ = 1;
 		break;
 		case GLFW_KEY_Q:
-			moveZ = 1;
-			break;
+			rot = 1;
+		break;
 		case GLFW_KEY_E:
-			moveZ = -1;
+			rot = -1;
+		break;
+		case GLFW_KEY_SPACE:
+			if(axis<2)
+				axis++;
+			else
+				axis = 0;
 		break;
 		default:
 		break;
