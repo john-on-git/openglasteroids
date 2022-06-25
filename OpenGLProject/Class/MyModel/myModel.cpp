@@ -29,17 +29,6 @@ MyModel::MyModel(size_t nPolygons, float *verts, unsigned char *polygonBoundarie
 		size_t nVerts = 0;
 		for (size_t i = 0;i < nPolygons;i++)
 			nVerts += polygonBoundaries[i];
-
-		//std::cout << "verts:\n";
-		//for (size_t i = 0;i < nVerts * 4;i+=4)
-		//{
-		//	std::cout << "\t["
-		//				<< verts[i]
-		//		<< ", " << verts[i+1]
-		//		<< ", " << verts[i+2]
-		//		<< ", " << verts[i+3]
-		//		<< "]\n";
-		//}
 	//generate, bind, copy verts to my buffer
 		glad_glBindVertexArray(VAO);
 		glad_glGenBuffers(1, VBOs); //19.5.21, first argument is the number of buffers, not the size of the buffer. corrupted the heap?

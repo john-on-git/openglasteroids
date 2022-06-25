@@ -18,19 +18,30 @@
 	#include <glm/gtc/type_ptr.hpp>
 //ms
 	#include <conio.h>
+//assimp
+	#include <assimp/Importer.hpp>
 //project
 	#include "Class/Program/program.hpp"
-	#include "Class/MyColoredPolyModel/MyColoredPolyModel.hpp"
+	#include "Class/MyTexturedModel/MyTexturedModel.hpp"
 	#include "Class/myWorldThing/myWorldThing.hpp"
 	#include "main.hpp"
+	#include "bmp_loader.hpp"
 
 using namespace std;
 
 char moveX = 0, moveY = 0, moveZ = 0, rot = 0;
-unsigned char axis = 0;
+unsigned char axis = 2;
 
+/*
+	TODO
+	texture support
+	loading models from file
+	licensing stuff for libs
+*/
 int main()
 {
+	Assimp::Importer importer;
+	importer.ReadFile("", );
 	//initialize glfw
 		if (!glfwInit())
 		{
@@ -53,103 +64,109 @@ int main()
 			OutputDebugStringW(L"FATAL: failed to initialize glad\n");
 			exit(1);
 		}
-	//init depth buffer
+	//glEnables
 		glad_glEnable(GL_DEPTH_TEST);
+		glad_glEnable(GL_TEXTURE_2D);
 	//set clear colour
-		glClearColor(1, 1, 1, 1);
+		glad_glClearColor(0.75f, 0.75f, 0.75f, 1);
 	//set up VAO(s)
 		GLuint VAOs[1];
 		glad_glGenVertexArrays(1, VAOs);
 		glad_glBindVertexArray(VAOs[0]);
 	//shader setup
 		//compile
-			Program myFirstTransform(
-				"Shaders/MyFirstTransform/myFirstTransform.frag",
-				"Shaders/MyFirstTransform/myFirstTransform.vert"
+			Program texturedTransform(
+				"Shaders/TexturedTransform/texturedTransform.frag",
+				"Shaders/TexturedTransform/texturedTransform.vert"
 			);
 		//get uniform locations
-			myFirstTransform.Use();
+			texturedTransform.Use();
 			GLuint
-				colorLocation		= glad_glGetUniformLocation(myFirstTransform.handle, "color"),
-				projectionLocation	= glad_glGetUniformLocation(myFirstTransform.handle, "projection"),
-				viewLocation		= glad_glGetUniformLocation(myFirstTransform.handle, "view"),
-				modelLocation		= glad_glGetUniformLocation(myFirstTransform.handle, "model");
+				textureLocation		= glad_glGetUniformLocation(texturedTransform.handle, "tex"),
+				projectionLocation	= glad_glGetUniformLocation(texturedTransform.handle, "projection"),
+				viewLocation		= glad_glGetUniformLocation(texturedTransform.handle, "view"),
+				modelLocation		= glad_glGetUniformLocation(texturedTransform.handle, "model");
 			//check for failure
 			if (projectionLocation == -1 || viewLocation == -1 || modelLocation == -1)
 			{
 				OutputDebugStringW(L"FATAL: couldn't get uniform location\n");
 				exit(1);
 			}
+	//load assets from disk
+			bmp* smile = load_bmp("textures/johncat.bmp");
+			//TODO assimp
+	//set up textures
+		GLuint textures[1];
+		glad_glGenTextures(1, textures);
+		glad_glBindTexture(GL_TEXTURE_2D, textures[0]);
+		glad_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glad_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		//glad_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+		//glad_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
+		glad_glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, smile->width, smile->height, 0, GL_RGB, GL_UNSIGNED_BYTE, smile->content);
 	//set up world stuff
-		glad_glPointSize(10);
 		vector<MyWorldThing*> worldThings{
 			new MyWorldThing(
-				new MyColoredPolyModel(
+				new MyTexturedModel(
 					6,
 					new float[] {
 						//front
-						-0.1f, -0.1f,  0.1f, 1.0f,
-						 0.1f, -0.1f,  0.1f, 1.0f,
-						 0.1f,  0.1f,  0.1f, 1.0f,
-						-0.1f,  0.1f,  0.1f, 1.0f,
-						-0.1f, -0.1f,  0.1f, 1.0f,
+						-0.1f, -0.1f,  0.1f, 1.0f,	0.0f, 0.0f,
+						 0.1f, -0.1f,  0.1f, 1.0f,	0.0f, 1.0f,
+						 0.1f,  0.1f,  0.1f, 1.0f,	1.0f, 1.0f,
+						-0.1f,  0.1f,  0.1f, 1.0f,	1.0f, 0.0f,
+						-0.1f, -0.1f,  0.1f, 1.0f,	0.0f, 0.0f,
 						//right
-						 0.1f, -0.1f,  0.1f, 1.0f,
-						 0.1f, -0.1f, -0.1f, 1.0f,
-						 0.1f,  0.1f, -0.1f, 1.0f,
-						 0.1f,  0.1f,  0.1f, 1.0f,
-						 0.1f, -0.1f,  0.1f, 1.0f,
+						 0.1f, -0.1f,  0.1f, 1.0f,	0.0f, 0.0f,
+						 0.1f, -0.1f, -0.1f, 1.0f,	0.0f, 1.0f,
+						 0.1f,  0.1f, -0.1f, 1.0f,	1.0f, 1.0f,
+						 0.1f,  0.1f,  0.1f, 1.0f,	1.0f, 0.0f,
+						 0.1f, -0.1f,  0.1f, 1.0f,	0.0f, 0.0f,
 						//back
-						-0.1f, -0.1f,  -0.1f, 1.0f,
-						 0.1f, -0.1f,  -0.1f, 1.0f,
-						 0.1f,  0.1f,  -0.1f, 1.0f,
-						-0.1f,  0.1f,  -0.1f, 1.0f,
-						-0.1f, -0.1f,  -0.1f, 1.0f,
+						-0.1f, -0.1f, -0.1f, 1.0f,	0.0f, 0.0f,
+						 0.1f, -0.1f, -0.1f, 1.0f,	0.0f, 1.0f,
+						 0.1f,  0.1f, -0.1f, 1.0f,	1.0f, 1.0f,
+						-0.1f,  0.1f, -0.1f, 1.0f,	1.0f, 0.0f,
+						-0.1f, -0.1f, -0.1f, 1.0f,	0.0f, 0.0f,
 						//left
-						-0.1f, -0.1f,  0.1f, 1.0f,
-						-0.1f, -0.1f, -0.1f, 1.0f,
-						-0.1f,  0.1f, -0.1f, 1.0f,
-						-0.1f,  0.1f,  0.1f, 1.0f,
-						-0.1f, -0.1f,  0.1f, 1.0f,
+						-0.1f, -0.1f,  0.1f, 1.0f,	0.0f, 1.0f,
+						-0.1f, -0.1f, -0.1f, 1.0f,	1.0f, 1.0f,
+						-0.1f,  0.1f, -0.1f, 1.0f,	1.0f, 0.0f,
+						-0.1f,  0.1f,  0.1f, 1.0f,	0.0f, 0.0f,
+						-0.1f, -0.1f,  0.1f, 1.0f,	0.0f, 1.0f,
 						//top
-						-0.1f, -0.1f,  0.1f, 1.0f,
-						 0.1f, -0.1f,  0.1f, 1.0f,
-						 0.1f, -0.1f, -0.1f, 1.0f,
-						-0.1f, -0.1f, -0.1f, 1.0f,
-						-0.1f, -0.1f,  0.1f, 1.0f,
+						-0.1f, -0.1f,  0.1f, 1.0f,	0.0f, 1.0f,
+						 0.1f, -0.1f,  0.1f, 1.0f,	1.0f, 1.0f,
+						 0.1f, -0.1f, -0.1f, 1.0f,	1.0f, 0.0f,
+						-0.1f, -0.1f, -0.1f, 1.0f,	0.0f, 0.0f,
+						-0.1f, -0.1f,  0.1f, 1.0f,	0.0f, 1.0f,
 						//bottom
-						-0.1f, 0.1f,  0.1f, 1.0f,
-						 0.1f, 0.1f,  0.1f, 1.0f,
-						 0.1f, 0.1f, -0.1f, 1.0f,
-						-0.1f, 0.1f, -0.1f, 1.0f,
-						-0.1f, 0.1f,  0.1f, 1.0f,
+						-0.1f,  0.1f,  0.1f, 1.0f,	0.0f, 1.0f,
+						 0.1f,  0.1f,  0.1f, 1.0f,	1.0f, 1.0f,
+						 0.1f,  0.1f, -0.1f, 1.0f,	1.0f, 0.0f,
+						-0.1f,  0.1f, -0.1f, 1.0f,	0.0f, 0.0f,
+						-0.1f,  0.1f,  0.1f, 1.0f,	0.0f, 1.0f,
 						},
-					new glm::vec3[] {
-						glm::vec3(1.0f, 0.0f, 0.0f),
-						glm::vec3(0.0f, 1.0f, 0.0f),
-						glm::vec3(0.0f, 0.0f, 1.0f),
-						glm::vec3(1.0f, 0.5f, 0.0f),
-						glm::vec3(1.0f, 0.0f, 1.0f),
-						glm::vec3(0.0f, 1.0f, 1.0f)
+					new GLuint[] {
+						textures[0],
+						textures[0],
+						textures[0],
+						textures[0],
+						textures[0],
+						textures[0]
 					},
 					new unsigned char[] {5, 5, 5, 5, 5, 5},
-					colorLocation,
+					textureLocation,
 					VAOs[0]
 				),
-				glm::vec3(-0.2f, 0.2f,-2.0f),
-				glm::vec3(0.0f, 0.0f, 0.0f),
+				glm::vec3(0.0f, 0.0f, -1.0f),
+				glm::vec3(65.0f, 180.0f, 65.0f),
 				projectionLocation,
 				viewLocation,
 				modelLocation
 			),
-			new MyWorldThing(
-				/*size_t nPolygons, 
-				float* verts, 
-				glm::vec3* polygonColors, 
-				unsigned char* polygonBoundaries,
-				GLuint colorLocation, 
-				GLuint VAO*/
-				new MyColoredPolyModel(
+			/*new MyWorldThing(
+				new MyTexturedModel(
 					1,
 					new float[] {
 						0.0f, 0.0f, 0.0f, 1.0f,
@@ -157,11 +174,11 @@ int main()
 						0.1f, 0.1f, 0.0f, 1.0f,
 						0.0f, 0.0f, 0.0f, 1.0f
 					},
-					new glm::vec3[] {
-						glm::vec3(1.0f, 0.0f, 0.0f)
+					new GLuint[] {
+						textures[0]
 					},
 					new unsigned char[] {4},
-					colorLocation,
+					textureLocation,
 					VAOs[0]
 				),
 				glm::vec3(0.0f, 0.0f, -1.0f),
@@ -169,7 +186,7 @@ int main()
 				projectionLocation,
 				viewLocation,
 				modelLocation
-			)
+			)*/
 		};
 		MyWorldThing* first = worldThings[0];
 	//render loop
@@ -212,6 +229,13 @@ int main()
 		//draw all objects
 			for (auto& thing : worldThings)
 				thing->Draw();
+		//check for GL errors
+			GLenum err = glad_glGetError();
+			while(err!=GL_NO_ERROR)
+			{
+				cout << "\nGL Error: " << to_string(err);
+				err = glad_glGetError();
+			}
 		//glfw stuff
 			glfwSwapBuffers(window);
 			glfwPollEvents();
@@ -252,16 +276,13 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 			moveZ = 1;
 		break;
 		case GLFW_KEY_Q:
-			rot = 1;
-		break;
-		case GLFW_KEY_E:
 			rot = -1;
 		break;
+		case GLFW_KEY_E:
+			rot = 1;
+		break;
 		case GLFW_KEY_SPACE:
-			if(axis<2)
-				axis++;
-			else
-				axis = 0;
+			++axis %= 3;
 		break;
 		default:
 		break;
