@@ -1,0 +1,1443 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{e2ea206e-c4e2-4ed1-9ca9-92e033997e84}</ProjectGuid>
+    <RootNamespace>OpenGLProject</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <PublicIncludeDirectories>$(PublicIncludeDirectories)</PublicIncludeDirectories>
+    <LibraryPath>C:\Users\John\source\repos\OpenGLProject\OpenGLProject\Libraries\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\John\source\repos\OpenGLProject\OpenGLProject\Libraries\include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <PublicIncludeDirectories>$(PublicIncludeDirectories)</PublicIncludeDirectories>
+    <LibraryPath>C:\Users\John\source\repos\OpenGLProject\OpenGLProject\Libraries\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\John\source\repos\OpenGLProject\OpenGLProject\Libraries\include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>glfw3.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>glfw3.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="bmp_loader.cpp" />
+    <ClCompile Include="Class\MyColoredPolyModel\MyColoredPolyModel.cpp" />
+    <ClCompile Include="Class\MyModel\myModel.cpp" />
+    <ClCompile Include="Class\MyTexturedModel\MyTexturedModel.cpp" />
+    <ClCompile Include="Class\MyWorldThing\myWorldThing.cpp" />
+    <ClCompile Include="Class\Program\program.cpp" />
+    <ClCompile Include="glad.c" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\3DS\3DSConverter.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\3DS\3DSExporter.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\3DS\3DSLoader.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\3MF\D3MFExporter.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\3MF\D3MFImporter.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\3MF\D3MFOpcPackage.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\3MF\XmlSerializer.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\AC\ACLoader.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\AMF\AMFImporter.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\AMF\AMFImporter_Geometry.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\AMF\AMFImporter_Material.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\AMF\AMFImporter_Postprocess.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\ASE\ASELoader.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\ASE\ASEParser.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\Assbin\AssbinExporter.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\Assbin\AssbinFileWriter.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\Assbin\AssbinLoader.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\Assjson\cencode.c" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\Assjson\json_exporter.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\Assjson\mesh_splitter.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\Assxml\AssxmlExporter.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\Assxml\AssxmlFileWriter.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\B3D\B3DImporter.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\Blender\BlenderBMesh.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\Blender\BlenderCustomData.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\Blender\BlenderDNA.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\Blender\BlenderLoader.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\Blender\BlenderModifier.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\Blender\BlenderScene.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\Blender\BlenderTessellator.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\BVH\BVHLoader.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\C4D\C4DImporter.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\COB\COBLoader.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\Collada\ColladaExporter.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\Collada\ColladaHelper.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\Collada\ColladaLoader.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\Collada\ColladaParser.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\CSM\CSMLoader.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\DXF\DXFLoader.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\FBX\FBXAnimation.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\FBX\FBXBinaryTokenizer.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\FBX\FBXConverter.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\FBX\FBXDeformer.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\FBX\FBXDocument.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\FBX\FBXDocumentUtil.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\FBX\FBXExporter.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\FBX\FBXExportNode.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\FBX\FBXExportProperty.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\FBX\FBXImporter.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\FBX\FBXMaterial.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\FBX\FBXMeshGeometry.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\FBX\FBXModel.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\FBX\FBXNodeAttribute.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\FBX\FBXParser.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\FBX\FBXProperties.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\FBX\FBXTokenizer.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\FBX\FBXUtil.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\glTF2\glTF2Exporter.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\glTF2\glTF2Importer.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\glTF\glTFCommon.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\glTF\glTFExporter.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\glTF\glTFImporter.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\HMP\HMPLoader.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\IFC\IFCBoolean.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\IFC\IFCCurve.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\IFC\IFCGeometry.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\IFC\IFCLoader.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\IFC\IFCMaterial.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\IFC\IFCOpenings.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\IFC\IFCProfile.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\IFC\IFCReaderGen1_2x3.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\IFC\IFCReaderGen2_2x3.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\IFC\IFCReaderGen_4.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\IFC\IFCUtil.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\IQM\IQMImporter.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\Irr\IRRLoader.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\Irr\IRRMeshLoader.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\Irr\IRRShared.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\LWO\LWOAnimation.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\LWO\LWOBLoader.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\LWO\LWOLoader.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\LWO\LWOMaterial.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\LWS\LWSLoader.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\M3D\M3DExporter.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\M3D\M3DImporter.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\M3D\M3DWrapper.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\MD2\MD2Loader.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\MD3\MD3Loader.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\MD5\MD5Loader.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\MD5\MD5Parser.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\MDC\MDCLoader.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\MDL\HalfLife\HL1MDLLoader.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\MDL\HalfLife\UniqueNameGenerator.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\MDL\MDLLoader.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\MDL\MDLMaterialLoader.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\MMD\MMDImporter.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\MMD\MMDPmxParser.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\MS3D\MS3DLoader.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\NDO\NDOLoader.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\NFF\NFFLoader.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\Obj\ObjExporter.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\Obj\ObjFileImporter.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\Obj\ObjFileMtlImporter.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\Obj\ObjFileParser.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\OFF\OFFLoader.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\Ogre\OgreBinarySerializer.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\Ogre\OgreImporter.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\Ogre\OgreMaterial.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\Ogre\OgreStructs.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\Ogre\OgreXmlSerializer.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\OpenGEX\OpenGEXExporter.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\OpenGEX\OpenGEXImporter.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\Ply\PlyExporter.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\Ply\PlyLoader.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\Ply\PlyParser.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\Q3BSP\Q3BSPFileImporter.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\Q3BSP\Q3BSPFileParser.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\Q3D\Q3DLoader.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\Raw\RawLoader.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\SIB\SIBImporter.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\SMD\SMDLoader.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\STEPParser\STEPFileEncoding.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\STEPParser\STEPFileReader.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\Step\StepExporter.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\STL\STLExporter.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\STL\STLLoader.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\Terragen\TerragenLoader.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\Unreal\UnrealLoader.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\X3D\X3DExporter.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\X3D\X3DGeoHelper.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\X3D\X3DImporter.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\X3D\X3DImporter_Geometry2D.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\X3D\X3DImporter_Geometry3D.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\X3D\X3DImporter_Group.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\X3D\X3DImporter_Light.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\X3D\X3DImporter_Metadata.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\X3D\X3DImporter_Networking.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\X3D\X3DImporter_Postprocess.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\X3D\X3DImporter_Rendering.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\X3D\X3DImporter_Shape.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\X3D\X3DImporter_Texturing.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\X3D\X3DXmlHelper.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\XGL\XGLLoader.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\X\XFileExporter.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\X\XFileImporter.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\AssetLib\X\XFileParser.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\CApi\AssimpCExport.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\CApi\CInterfaceIOWrapper.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\Common\AssertHandler.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\Common\Assimp.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\Common\Base64.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\Common\BaseImporter.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\Common\BaseProcess.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\Common\Bitmap.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\Common\Compression.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\Common\CreateAnimMesh.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\Common\DefaultIOStream.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\Common\DefaultIOSystem.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\Common\DefaultLogger.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\Common\Exceptional.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\Common\Exporter.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\Common\Importer.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\Common\ImporterRegistry.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\Common\IOSystem.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\Common\material.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\Common\PostStepRegistry.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\Common\RemoveComments.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\Common\scene.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\Common\SceneCombiner.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\Common\ScenePreprocessor.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\Common\SGSpatialSort.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\Common\simd.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\Common\SkeletonMeshBuilder.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\Common\SpatialSort.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\Common\StandardShapes.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\Common\Subdivision.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\Common\TargetAnimation.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\Common\Version.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\Common\VertexTriangleAdjacency.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\Common\ZipArchiveIOSystem.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\Material\MaterialSystem.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\Pbrt\PbrtExporter.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\PostProcessing\ArmaturePopulate.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\PostProcessing\CalcTangentsProcess.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\PostProcessing\ComputeUVMappingProcess.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\PostProcessing\ConvertToLHProcess.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\PostProcessing\DeboneProcess.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\PostProcessing\DropFaceNormalsProcess.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\PostProcessing\EmbedTexturesProcess.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\PostProcessing\FindDegenerates.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\PostProcessing\FindInstancesProcess.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\PostProcessing\FindInvalidDataProcess.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\PostProcessing\FixNormalsStep.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\PostProcessing\GenBoundingBoxesProcess.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\PostProcessing\GenFaceNormalsProcess.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\PostProcessing\GenVertexNormalsProcess.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\PostProcessing\ImproveCacheLocality.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\PostProcessing\JoinVerticesProcess.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\PostProcessing\LimitBoneWeightsProcess.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\PostProcessing\MakeVerboseFormat.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\PostProcessing\OptimizeGraph.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\PostProcessing\OptimizeMeshes.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\PostProcessing\PretransformVertices.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\PostProcessing\ProcessHelper.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\PostProcessing\RemoveRedundantMaterials.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\PostProcessing\RemoveVCProcess.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\PostProcessing\ScaleProcess.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\PostProcessing\SortByPTypeProcess.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\PostProcessing\SplitByBoneCountProcess.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\PostProcessing\SplitLargeMeshes.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\PostProcessing\TextureTransform.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\PostProcessing\TriangulateProcess.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\code\PostProcessing\ValidateDataStructure.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\fuzz\assimp_fuzzer.cc" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\port\AndroidJNI\AndroidJNIIOSystem.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\port\AndroidJNI\BundledAssetIOSystem.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\port\jassimp\jassimp-native\src\jassimp.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\samples\SharedCode\UTFConverter.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\samples\SimpleOpenGL\Sample_SimpleOpenGL.c" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\samples\SimpleTexturedDirectx11\SimpleTexturedDirectx11\main.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\samples\SimpleTexturedDirectx11\SimpleTexturedDirectx11\ModelLoader.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\samples\SimpleTexturedDirectx11\SimpleTexturedDirectx11\TextureLoader.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\samples\SimpleTexturedOpenGL\SimpleTexturedOpenGL\src\model_loading.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\AbstractImportExportBase.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\AssimpAPITest.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\AssimpAPITest_aiMatrix3x3.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\AssimpAPITest_aiMatrix4x4.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\AssimpAPITest_aiQuaternion.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\AssimpAPITest_aiVector2D.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\AssimpAPITest_aiVector3D.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\CCompilerTest.c" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\Common\uiScene.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\Common\utAssertHandler.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\Common\utBase64.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\Common\utLineSplitter.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\Common\utMesh.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\Common\utSpatialSort.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\Common\utStandardShapes.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\Common\utXmlParser.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\ImportExport\Assxml\utAssxmlImportExport.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\ImportExport\IRR\utIrrImportExport.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\ImportExport\MDL\utMDLImporter_HL1_ImportSettings.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\ImportExport\MDL\utMDLImporter_HL1_Materials.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\ImportExport\MDL\utMDLImporter_HL1_Nodes.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\ImportExport\RAW\utRAWImportExport.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\ImportExport\Terragen\utTerragenImportExport.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\ImportExport\utAssjsonImportExport.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\ImportExport\utCOBImportExport.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\ImportExport\utExporter.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\ImportExport\utMD2Importer.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\ImportExport\utMD3Importer.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\ImportExport\utMD5Importer.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\ImportExport\utMDLImporter.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\ImportExport\utNFFImportExport.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\ImportExport\utOFFImportExport.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\ImportExport\utOgreImportExport.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\ImportExport\utQ3BSPFileImportExport.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\ImportExport\utXGLImportExport.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\Main.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\MathTest.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\SceneDiffer.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\ut3DImportExport.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\ut3DSImportExport.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utACImportExport.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utAMFImportExport.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utAnim.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utArmaturePopulate.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utASEImportExport.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utAssbinImportExport.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utB3DImportExport.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utBatchLoader.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utBlenderImportExport.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utBlenderIntermediate.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utBlenderWork.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utBlendImportAreaLight.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utBlendImportMaterials.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utBVHImportExport.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utColladaExport.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utColladaImportExport.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utCSMImportExport.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utD3MFImportExport.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utDefaultIOStream.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utDXFImporterExporter.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utExport.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utFastAtof.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utFBXImporterExporter.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utFindDegenerates.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utFindInvalidData.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utFixInfacingNormals.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utGenBoundingBoxesProcess.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utGenNormals.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utglTF2ImportExport.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utglTFImportExport.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utHMPImportExport.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utIFCImportExport.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utImporter.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utImproveCacheLocality.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utIOStreamBuffer.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utIOSystem.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utIssues.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utJoinVertices.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utLimitBoneWeights.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utLWOImportExport.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utLWSImportExport.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utM3DImportExport.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utMaterialSystem.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utMatrix3x3.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utMatrix4x4.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utMDCImportExport.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utMetadata.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utNoBoostTest.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utObjImportExport.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utObjTools.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utOpenGEXImportExport.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utPLYImportExport.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utPMXImporter.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utPretransformVertices.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utProfiler.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utQ3DImportExport.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utRemoveComments.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utRemoveComponent.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utRemoveRedundantMaterials.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utRemoveVCProcess.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utScaleProcess.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utScene.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utSceneCombiner.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utScenePreprocessor.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utSharedPPData.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utSIBImporter.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utSimd.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utSMDImportExport.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utSortByPType.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utSplitLargeMeshes.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utSTLImportExport.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utStringUtils.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utTargetAnimation.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utTextureTransform.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utTriangulate.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utTypes.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utValidateDataStructure.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utVector3.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utVersion.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utVertexTriangleAdjacency.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utX3DImportExport.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\test\unit\utXImporterExporter.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\tools\assimp_cmd\CompareDump.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\tools\assimp_cmd\Export.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\tools\assimp_cmd\ImageExtractor.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\tools\assimp_cmd\Info.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\tools\assimp_cmd\Main.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\tools\assimp_cmd\WriteDump.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\tools\assimp_view\AnimEvaluator.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\tools\assimp_view\assimp_view.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\tools\assimp_view\Background.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\tools\assimp_view\Display.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\tools\assimp_view\HelpDialog.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\tools\assimp_view\Input.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\tools\assimp_view\LogDisplay.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\tools\assimp_view\LogWindow.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\tools\assimp_view\Material.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\tools\assimp_view\MeshRenderer.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\tools\assimp_view\MessageProc.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\tools\assimp_view\Normals.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\tools\assimp_view\SceneAnimator.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\tools\assimp_view\Shaders.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\tools\assimp_view\stdafx.cpp" />
+    <ClCompile Include="Libraries\include\assimp-5.2.4\tools\coverity\assimp_modeling.cpp" />
+    <ClCompile Include="Libraries\include\glm\detail\glm.cpp" />
+    <ClCompile Include="main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="bmp_loader.hpp" />
+    <ClInclude Include="Class\MyColoredPolyModel\MyColoredPolyModel.hpp" />
+    <ClInclude Include="Class\MyModel\myModel.hpp" />
+    <ClInclude Include="Class\MyTexturedModel\MyTexturedModel.hpp" />
+    <ClInclude Include="Class\MyWorldThing\myWorldThing.hpp" />
+    <ClInclude Include="Class\Program\program.hpp" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\3DS\3DSExporter.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\3DS\3DSHelper.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\3DS\3DSLoader.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\3MF\3MFTypes.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\3MF\3MFXmlTags.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\3MF\D3MFExporter.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\3MF\D3MFImporter.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\3MF\D3MFOpcPackage.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\3MF\XmlSerializer.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\AC\ACLoader.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\AMF\AMFImporter.hpp" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\AMF\AMFImporter_Node.hpp" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\ASE\ASELoader.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\ASE\ASEParser.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\Assbin\AssbinExporter.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\Assbin\AssbinFileWriter.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\Assbin\AssbinLoader.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\Assjson\cencode.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\Assjson\mesh_splitter.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\Assxml\AssxmlExporter.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\Assxml\AssxmlFileWriter.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\B3D\B3DImporter.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\Blender\BlenderBMesh.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\Blender\BlenderCustomData.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\Blender\BlenderDNA.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\Blender\BlenderIntermediate.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\Blender\BlenderLoader.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\Blender\BlenderModifier.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\Blender\BlenderScene.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\Blender\BlenderSceneGen.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\Blender\BlenderTessellator.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\BVH\BVHLoader.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\C4D\C4DImporter.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\COB\COBLoader.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\COB\COBScene.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\Collada\ColladaExporter.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\Collada\ColladaHelper.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\Collada\ColladaLoader.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\Collada\ColladaParser.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\CSM\CSMLoader.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\DXF\DXFHelper.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\DXF\DXFLoader.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\FBX\FBXCommon.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\FBX\FBXCompileConfig.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\FBX\FBXConverter.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\FBX\FBXDocument.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\FBX\FBXDocumentUtil.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\FBX\FBXExporter.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\FBX\FBXExportNode.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\FBX\FBXExportProperty.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\FBX\FBXImporter.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\FBX\FBXImportSettings.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\FBX\FBXMeshGeometry.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\FBX\FBXParser.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\FBX\FBXProperties.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\FBX\FBXTokenizer.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\FBX\FBXUtil.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\glTF2\glTF2Asset.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\glTF2\glTF2AssetWriter.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\glTF2\glTF2Exporter.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\glTF2\glTF2Importer.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\glTF\glTFAsset.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\glTF\glTFAssetWriter.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\glTF\glTFCommon.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\glTF\glTFExporter.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\glTF\glTFImporter.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\HMP\HalfLifeFileData.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\HMP\HMPFileData.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\HMP\HMPLoader.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\IFC\IFCLoader.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\IFC\IFCReaderGen_2x3.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\IFC\IFCReaderGen_4.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\IFC\IFCUtil.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\IQM\iqm.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\IQM\IQMImporter.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\Irr\IRRLoader.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\Irr\IRRMeshLoader.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\Irr\IRRShared.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\LWO\LWOAnimation.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\LWO\LWOFileData.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\LWO\LWOLoader.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\LWS\LWSLoader.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\M3D\m3d.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\M3D\M3DExporter.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\M3D\M3DImporter.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\M3D\M3DMaterials.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\M3D\M3DWrapper.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\MD2\MD2FileData.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\MD2\MD2Loader.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\MD2\MD2NormalTable.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\MD3\MD3FileData.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\MD3\MD3Loader.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\MD4\MD4FileData.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\MD5\MD5Loader.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\MD5\MD5Parser.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\MDC\MDCFileData.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\MDC\MDCLoader.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\MDC\MDCNormalTable.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\MDL\HalfLife\HalfLifeMDLBaseHeader.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\MDL\HalfLife\HL1FileData.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\MDL\HalfLife\HL1ImportDefinitions.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\MDL\HalfLife\HL1ImportSettings.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\MDL\HalfLife\HL1MDLLoader.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\MDL\HalfLife\HL1MeshTrivert.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\MDL\HalfLife\LogFunctions.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\MDL\HalfLife\UniqueNameGenerator.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\MDL\MDLDefaultColorMap.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\MDL\MDLFileData.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\MDL\MDLLoader.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\MMD\MMDCpp14.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\MMD\MMDImporter.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\MMD\MMDPmdParser.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\MMD\MMDPmxParser.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\MMD\MMDVmdParser.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\MS3D\MS3DLoader.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\NDO\NDOLoader.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\NFF\NFFLoader.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\Obj\ObjExporter.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\Obj\ObjFileData.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\Obj\ObjFileImporter.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\Obj\ObjFileMtlImporter.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\Obj\ObjFileParser.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\Obj\ObjTools.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\OFF\OFFLoader.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\Ogre\OgreBinarySerializer.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\Ogre\OgreImporter.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\Ogre\OgreParsingUtils.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\Ogre\OgreStructs.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\Ogre\OgreXmlSerializer.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\OpenGEX\OpenGEXExporter.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\OpenGEX\OpenGEXImporter.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\OpenGEX\OpenGEXStructs.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\Ply\PlyExporter.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\Ply\PlyLoader.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\Ply\PlyParser.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\Q3BSP\Q3BSPFileData.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\Q3BSP\Q3BSPFileImporter.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\Q3BSP\Q3BSPFileParser.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\Q3D\Q3DLoader.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\Raw\RawLoader.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\SIB\SIBImporter.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\SMD\SMDLoader.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\STEPParser\STEPFileEncoding.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\STEPParser\STEPFileReader.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\Step\StepExporter.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\Step\STEPFile.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\STL\STLExporter.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\STL\STLLoader.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\Terragen\TerragenLoader.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\Unreal\UnrealLoader.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\X3D\X3DExporter.hpp" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\X3D\X3DGeoHelper.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\X3D\X3DImporter.hpp" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\X3D\X3DImporter_Macro.hpp" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\X3D\X3DImporter_Node.hpp" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\X3D\X3DXmlHelper.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\XGL\XGLLoader.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\X\XFileExporter.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\X\XFileHelper.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\X\XFileImporter.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\AssetLib\X\XFileParser.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\CApi\CInterfaceIOWrapper.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\Common\assbin_chunks.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\Common\AssertHandler.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\Common\BaseProcess.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\Common\Compression.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\Common\DefaultProgressHandler.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\Common\FileLogStream.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\Common\FileSystemFilter.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\Common\IFF.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\Common\Importer.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\Common\Maybe.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\Common\PolyTools.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\Common\ScenePreprocessor.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\Common\ScenePrivate.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\Common\simd.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\Common\StdOStreamLogStream.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\Common\TargetAnimation.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\Common\VertexTriangleAdjacency.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\Common\Win32DebugLogStream.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\Material\MaterialSystem.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\Pbrt\PbrtExporter.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\PostProcessing\ArmaturePopulate.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\PostProcessing\CalcTangentsProcess.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\PostProcessing\ComputeUVMappingProcess.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\PostProcessing\ConvertToLHProcess.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\PostProcessing\DeboneProcess.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\PostProcessing\DropFaceNormalsProcess.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\PostProcessing\EmbedTexturesProcess.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\PostProcessing\FindDegenerates.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\PostProcessing\FindInstancesProcess.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\PostProcessing\FindInvalidDataProcess.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\PostProcessing\FixNormalsStep.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\PostProcessing\GenBoundingBoxesProcess.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\PostProcessing\GenFaceNormalsProcess.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\PostProcessing\GenVertexNormalsProcess.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\PostProcessing\ImproveCacheLocality.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\PostProcessing\JoinVerticesProcess.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\PostProcessing\LimitBoneWeightsProcess.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\PostProcessing\MakeVerboseFormat.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\PostProcessing\OptimizeGraph.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\PostProcessing\OptimizeMeshes.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\PostProcessing\PretransformVertices.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\PostProcessing\ProcessHelper.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\PostProcessing\RemoveRedundantMaterials.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\PostProcessing\RemoveVCProcess.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\PostProcessing\ScaleProcess.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\PostProcessing\SortByPTypeProcess.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\PostProcessing\SplitByBoneCountProcess.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\PostProcessing\SplitLargeMeshes.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\PostProcessing\TextureTransform.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\PostProcessing\TriangulateProcess.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\code\PostProcessing\ValidateDataStructure.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\doc\dox.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\doc\dox_cmd.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\aabb.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\ai_assert.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\anim.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\Base64.hpp" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\BaseImporter.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\Bitmap.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\BlobIOSystem.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\ByteSwapper.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\camera.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\cexport.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\cfileio.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\cimport.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\ColladaMetaData.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\color4.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\commonMetaData.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\Compiler\poppack1.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\Compiler\pstdint.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\Compiler\pushpack1.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\CreateAnimMesh.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\DefaultIOStream.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\DefaultIOSystem.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\DefaultLogger.hpp" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\defs.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\Exceptional.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\Exporter.hpp" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\fast_atof.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\GenericProperty.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\GltfMaterial.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\Hash.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\Importer.hpp" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\importerdesc.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\IOStream.hpp" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\IOStreamBuffer.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\IOSystem.hpp" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\light.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\LineSplitter.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\LogAux.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\Logger.hpp" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\LogStream.hpp" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\material.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\MathFunctions.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\matrix3x3.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\matrix4x4.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\MemoryIOWrapper.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\mesh.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\metadata.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\NullLogger.hpp" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\ObjMaterial.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\ParsingUtils.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\pbrmaterial.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\port\AndroidJNI\AndroidJNIIOSystem.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\port\AndroidJNI\BundledAssetIOSystem.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\postprocess.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\Profiler.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\ProgressHandler.hpp" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\qnan.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\quaternion.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\RemoveComments.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\scene.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\SceneCombiner.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\SGSpatialSort.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\SkeletonMeshBuilder.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\SmallVector.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\SmoothingGroups.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\SpatialSort.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\StandardShapes.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\StreamReader.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\StreamWriter.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\StringComparison.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\StringUtils.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\Subdivision.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\texture.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\TinyFormatter.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\types.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\vector2.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\vector3.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\version.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\Vertex.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\XmlParser.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\XMLTools.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\include\assimp\ZipArchiveIOSystem.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\port\jassimp\jassimp-native\src\jassimp.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\samples\SharedCode\UTFConverter.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\samples\SimpleAssimpViewX\ModelLoaderHelperClasses.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\samples\SimpleAssimpViewX\MyDocument.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\samples\SimpleTexturedDirectx11\SimpleTexturedDirectx11\Mesh.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\samples\SimpleTexturedDirectx11\SimpleTexturedDirectx11\ModelLoader.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\samples\SimpleTexturedDirectx11\SimpleTexturedDirectx11\SafeRelease.hpp" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\samples\SimpleTexturedDirectx11\SimpleTexturedDirectx11\TextureLoader.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\test\unit\AbstractImportExportBase.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\test\unit\ImportExport\MDL\MDLHL1TestFiles.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\test\unit\MathTest.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\test\unit\RandomNumberGeneration.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\test\unit\SceneDiffer.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\test\unit\TestIOStream.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\test\unit\TestIOSystem.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\test\unit\TestModelFactory.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\test\unit\UnitTestFileGenerator.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\test\unit\UnitTestPCH.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\test\unit\UTLogStream.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\tools\assimp_cmd\generic_inserter.hpp" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\tools\assimp_cmd\Main.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\tools\assimp_view\AnimEvaluator.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\tools\assimp_view\AssetHelper.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\tools\assimp_view\assimp_view.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\tools\assimp_view\Background.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\tools\assimp_view\Camera.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\tools\assimp_view\Display.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\tools\assimp_view\LogDisplay.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\tools\assimp_view\LogWindow.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\tools\assimp_view\MaterialManager.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\tools\assimp_view\MeshRenderer.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\tools\assimp_view\RenderOptions.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\tools\assimp_view\resource.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\tools\assimp_view\SceneAnimator.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\tools\assimp_view\Shaders.h" />
+    <ClInclude Include="Libraries\include\assimp-5.2.4\tools\assimp_view\stdafx.h" />
+    <ClInclude Include="Libraries\include\assimp\aabb.h" />
+    <ClInclude Include="Libraries\include\assimp\ai_assert.h" />
+    <ClInclude Include="Libraries\include\assimp\anim.h" />
+    <ClInclude Include="Libraries\include\assimp\Base64.hpp" />
+    <ClInclude Include="Libraries\include\assimp\BaseImporter.h" />
+    <ClInclude Include="Libraries\include\assimp\Bitmap.h" />
+    <ClInclude Include="Libraries\include\assimp\BlobIOSystem.h" />
+    <ClInclude Include="Libraries\include\assimp\ByteSwapper.h" />
+    <ClInclude Include="Libraries\include\assimp\camera.h" />
+    <ClInclude Include="Libraries\include\assimp\cexport.h" />
+    <ClInclude Include="Libraries\include\assimp\cfileio.h" />
+    <ClInclude Include="Libraries\include\assimp\cimport.h" />
+    <ClInclude Include="Libraries\include\assimp\ColladaMetaData.h" />
+    <ClInclude Include="Libraries\include\assimp\color4.h" />
+    <ClInclude Include="Libraries\include\assimp\commonMetaData.h" />
+    <ClInclude Include="Libraries\include\assimp\Compiler\poppack1.h" />
+    <ClInclude Include="Libraries\include\assimp\Compiler\pstdint.h" />
+    <ClInclude Include="Libraries\include\assimp\Compiler\pushpack1.h" />
+    <ClInclude Include="Libraries\include\assimp\config.h" />
+    <ClInclude Include="Libraries\include\assimp\CreateAnimMesh.h" />
+    <ClInclude Include="Libraries\include\assimp\DefaultIOStream.h" />
+    <ClInclude Include="Libraries\include\assimp\DefaultIOSystem.h" />
+    <ClInclude Include="Libraries\include\assimp\DefaultLogger.hpp" />
+    <ClInclude Include="Libraries\include\assimp\defs.h" />
+    <ClInclude Include="Libraries\include\assimp\Exceptional.h" />
+    <ClInclude Include="Libraries\include\assimp\Exporter.hpp" />
+    <ClInclude Include="Libraries\include\assimp\fast_atof.h" />
+    <ClInclude Include="Libraries\include\assimp\GenericProperty.h" />
+    <ClInclude Include="Libraries\include\assimp\GltfMaterial.h" />
+    <ClInclude Include="Libraries\include\assimp\Hash.h" />
+    <ClInclude Include="Libraries\include\assimp\Importer.hpp" />
+    <ClInclude Include="Libraries\include\assimp\importerdesc.h" />
+    <ClInclude Include="Libraries\include\assimp\IOStream.hpp" />
+    <ClInclude Include="Libraries\include\assimp\IOStreamBuffer.h" />
+    <ClInclude Include="Libraries\include\assimp\IOSystem.hpp" />
+    <ClInclude Include="Libraries\include\assimp\light.h" />
+    <ClInclude Include="Libraries\include\assimp\LineSplitter.h" />
+    <ClInclude Include="Libraries\include\assimp\LogAux.h" />
+    <ClInclude Include="Libraries\include\assimp\Logger.hpp" />
+    <ClInclude Include="Libraries\include\assimp\LogStream.hpp" />
+    <ClInclude Include="Libraries\include\assimp\material.h" />
+    <ClInclude Include="Libraries\include\assimp\MathFunctions.h" />
+    <ClInclude Include="Libraries\include\assimp\matrix3x3.h" />
+    <ClInclude Include="Libraries\include\assimp\matrix4x4.h" />
+    <ClInclude Include="Libraries\include\assimp\MemoryIOWrapper.h" />
+    <ClInclude Include="Libraries\include\assimp\mesh.h" />
+    <ClInclude Include="Libraries\include\assimp\metadata.h" />
+    <ClInclude Include="Libraries\include\assimp\NullLogger.hpp" />
+    <ClInclude Include="Libraries\include\assimp\ObjMaterial.h" />
+    <ClInclude Include="Libraries\include\assimp\ParsingUtils.h" />
+    <ClInclude Include="Libraries\include\assimp\pbrmaterial.h" />
+    <ClInclude Include="Libraries\include\assimp\port\AndroidJNI\AndroidJNIIOSystem.h" />
+    <ClInclude Include="Libraries\include\assimp\port\AndroidJNI\BundledAssetIOSystem.h" />
+    <ClInclude Include="Libraries\include\assimp\postprocess.h" />
+    <ClInclude Include="Libraries\include\assimp\Profiler.h" />
+    <ClInclude Include="Libraries\include\assimp\ProgressHandler.hpp" />
+    <ClInclude Include="Libraries\include\assimp\qnan.h" />
+    <ClInclude Include="Libraries\include\assimp\quaternion.h" />
+    <ClInclude Include="Libraries\include\assimp\RemoveComments.h" />
+    <ClInclude Include="Libraries\include\assimp\scene.h" />
+    <ClInclude Include="Libraries\include\assimp\SceneCombiner.h" />
+    <ClInclude Include="Libraries\include\assimp\SGSpatialSort.h" />
+    <ClInclude Include="Libraries\include\assimp\SkeletonMeshBuilder.h" />
+    <ClInclude Include="Libraries\include\assimp\SmallVector.h" />
+    <ClInclude Include="Libraries\include\assimp\SmoothingGroups.h" />
+    <ClInclude Include="Libraries\include\assimp\SpatialSort.h" />
+    <ClInclude Include="Libraries\include\assimp\StandardShapes.h" />
+    <ClInclude Include="Libraries\include\assimp\StreamReader.h" />
+    <ClInclude Include="Libraries\include\assimp\StreamWriter.h" />
+    <ClInclude Include="Libraries\include\assimp\StringComparison.h" />
+    <ClInclude Include="Libraries\include\assimp\StringUtils.h" />
+    <ClInclude Include="Libraries\include\assimp\Subdivision.h" />
+    <ClInclude Include="Libraries\include\assimp\texture.h" />
+    <ClInclude Include="Libraries\include\assimp\TinyFormatter.h" />
+    <ClInclude Include="Libraries\include\assimp\types.h" />
+    <ClInclude Include="Libraries\include\assimp\vector2.h" />
+    <ClInclude Include="Libraries\include\assimp\vector3.h" />
+    <ClInclude Include="Libraries\include\assimp\version.h" />
+    <ClInclude Include="Libraries\include\assimp\Vertex.h" />
+    <ClInclude Include="Libraries\include\assimp\XmlParser.h" />
+    <ClInclude Include="Libraries\include\assimp\XMLTools.h" />
+    <ClInclude Include="Libraries\include\assimp\ZipArchiveIOSystem.h" />
+    <ClInclude Include="Libraries\include\glad\glad.h" />
+    <ClInclude Include="Libraries\include\GLFW\glfw3.h" />
+    <ClInclude Include="Libraries\include\GLFW\glfw3native.h" />
+    <ClInclude Include="Libraries\include\glm\common.hpp" />
+    <ClInclude Include="Libraries\include\glm\detail\compute_common.hpp" />
+    <ClInclude Include="Libraries\include\glm\detail\compute_vector_relational.hpp" />
+    <ClInclude Include="Libraries\include\glm\detail\qualifier.hpp" />
+    <ClInclude Include="Libraries\include\glm\detail\setup.hpp" />
+    <ClInclude Include="Libraries\include\glm\detail\type_float.hpp" />
+    <ClInclude Include="Libraries\include\glm\detail\type_half.hpp" />
+    <ClInclude Include="Libraries\include\glm\detail\type_mat2x2.hpp" />
+    <ClInclude Include="Libraries\include\glm\detail\type_mat2x3.hpp" />
+    <ClInclude Include="Libraries\include\glm\detail\type_mat2x4.hpp" />
+    <ClInclude Include="Libraries\include\glm\detail\type_mat3x2.hpp" />
+    <ClInclude Include="Libraries\include\glm\detail\type_mat3x3.hpp" />
+    <ClInclude Include="Libraries\include\glm\detail\type_mat3x4.hpp" />
+    <ClInclude Include="Libraries\include\glm\detail\type_mat4x2.hpp" />
+    <ClInclude Include="Libraries\include\glm\detail\type_mat4x3.hpp" />
+    <ClInclude Include="Libraries\include\glm\detail\type_mat4x4.hpp" />
+    <ClInclude Include="Libraries\include\glm\detail\type_quat.hpp" />
+    <ClInclude Include="Libraries\include\glm\detail\type_vec1.hpp" />
+    <ClInclude Include="Libraries\include\glm\detail\type_vec2.hpp" />
+    <ClInclude Include="Libraries\include\glm\detail\type_vec3.hpp" />
+    <ClInclude Include="Libraries\include\glm\detail\type_vec4.hpp" />
+    <ClInclude Include="Libraries\include\glm\detail\_features.hpp" />
+    <ClInclude Include="Libraries\include\glm\detail\_fixes.hpp" />
+    <ClInclude Include="Libraries\include\glm\detail\_noise.hpp" />
+    <ClInclude Include="Libraries\include\glm\detail\_swizzle.hpp" />
+    <ClInclude Include="Libraries\include\glm\detail\_swizzle_func.hpp" />
+    <ClInclude Include="Libraries\include\glm\detail\_vectorize.hpp" />
+    <ClInclude Include="Libraries\include\glm\exponential.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_clip_space.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_common.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_double2x2.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_double2x2_precision.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_double2x3.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_double2x3_precision.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_double2x4.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_double2x4_precision.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_double3x2.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_double3x2_precision.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_double3x3.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_double3x3_precision.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_double3x4.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_double3x4_precision.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_double4x2.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_double4x2_precision.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_double4x3.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_double4x3_precision.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_double4x4.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_double4x4_precision.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_float2x2.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_float2x2_precision.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_float2x3.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_float2x3_precision.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_float2x4.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_float2x4_precision.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_float3x2.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_float3x2_precision.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_float3x3.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_float3x3_precision.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_float3x4.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_float3x4_precision.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_float4x2.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_float4x2_precision.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_float4x3.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_float4x3_precision.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_float4x4.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_float4x4_precision.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_int2x2.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_int2x2_sized.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_int2x3.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_int2x3_sized.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_int2x4.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_int2x4_sized.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_int3x2.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_int3x2_sized.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_int3x3.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_int3x3_sized.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_int3x4.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_int3x4_sized.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_int4x2.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_int4x2_sized.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_int4x3.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_int4x3_sized.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_int4x4.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_int4x4_sized.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_projection.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_relational.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_transform.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_uint2x2.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_uint2x2_sized.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_uint2x3.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_uint2x3_sized.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_uint2x4.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_uint2x4_sized.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_uint3x2.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_uint3x2_sized.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_uint3x3.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_uint3x3_sized.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_uint3x4.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_uint3x4_sized.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_uint4x2.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_uint4x2_sized.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_uint4x3.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_uint4x3_sized.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_uint4x4.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\matrix_uint4x4_sized.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\quaternion_common.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\quaternion_double.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\quaternion_double_precision.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\quaternion_exponential.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\quaternion_float.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\quaternion_float_precision.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\quaternion_geometric.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\quaternion_relational.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\quaternion_transform.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\quaternion_trigonometric.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\scalar_common.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\scalar_constants.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\scalar_integer.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\scalar_int_sized.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\scalar_packing.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\scalar_relational.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\scalar_uint_sized.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\scalar_ulp.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\vector_bool1.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\vector_bool1_precision.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\vector_bool2.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\vector_bool2_precision.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\vector_bool3.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\vector_bool3_precision.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\vector_bool4.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\vector_bool4_precision.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\vector_common.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\vector_double1.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\vector_double1_precision.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\vector_double2.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\vector_double2_precision.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\vector_double3.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\vector_double3_precision.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\vector_double4.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\vector_double4_precision.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\vector_float1.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\vector_float1_precision.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\vector_float2.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\vector_float2_precision.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\vector_float3.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\vector_float3_precision.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\vector_float4.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\vector_float4_precision.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\vector_int1.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\vector_int1_sized.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\vector_int2.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\vector_int2_sized.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\vector_int3.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\vector_int3_sized.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\vector_int4.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\vector_int4_sized.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\vector_integer.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\vector_packing.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\vector_relational.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\vector_uint1.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\vector_uint1_sized.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\vector_uint2.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\vector_uint2_sized.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\vector_uint3.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\vector_uint3_sized.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\vector_uint4.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\vector_uint4_sized.hpp" />
+    <ClInclude Include="Libraries\include\glm\ext\vector_ulp.hpp" />
+    <ClInclude Include="Libraries\include\glm\fwd.hpp" />
+    <ClInclude Include="Libraries\include\glm\geometric.hpp" />
+    <ClInclude Include="Libraries\include\glm\glm.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtc\bitfield.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtc\color_space.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtc\constants.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtc\epsilon.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtc\integer.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtc\matrix_access.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtc\matrix_integer.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtc\matrix_inverse.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtc\matrix_transform.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtc\noise.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtc\packing.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtc\quaternion.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtc\random.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtc\reciprocal.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtc\round.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtc\type_aligned.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtc\type_precision.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtc\type_ptr.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtc\ulp.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtc\vec1.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtx\associated_min_max.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtx\bit.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtx\closest_point.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtx\color_encoding.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtx\color_space.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtx\color_space_YCoCg.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtx\common.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtx\compatibility.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtx\component_wise.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtx\dual_quaternion.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtx\easing.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtx\euler_angles.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtx\extend.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtx\extended_min_max.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtx\exterior_product.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtx\fast_exponential.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtx\fast_square_root.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtx\fast_trigonometry.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtx\functions.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtx\gradient_paint.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtx\handed_coordinate_space.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtx\hash.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtx\integer.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtx\intersect.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtx\io.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtx\log_base.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtx\matrix_cross_product.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtx\matrix_decompose.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtx\matrix_factorisation.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtx\matrix_interpolation.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtx\matrix_major_storage.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtx\matrix_operation.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtx\matrix_query.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtx\matrix_transform_2d.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtx\mixed_product.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtx\norm.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtx\normal.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtx\normalize_dot.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtx\number_precision.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtx\optimum_pow.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtx\orthonormalize.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtx\perpendicular.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtx\polar_coordinates.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtx\projection.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtx\quaternion.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtx\range.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtx\raw_data.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtx\rotate_normalized_axis.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtx\rotate_vector.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtx\scalar_multiplication.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtx\scalar_relational.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtx\spline.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtx\std_based_type.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtx\string_cast.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtx\texture.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtx\transform.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtx\transform2.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtx\type_aligned.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtx\type_trait.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtx\vector_angle.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtx\vector_query.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtx\vec_swizzle.hpp" />
+    <ClInclude Include="Libraries\include\glm\gtx\wrap.hpp" />
+    <ClInclude Include="Libraries\include\glm\integer.hpp" />
+    <ClInclude Include="Libraries\include\glm\mat2x2.hpp" />
+    <ClInclude Include="Libraries\include\glm\mat2x3.hpp" />
+    <ClInclude Include="Libraries\include\glm\mat2x4.hpp" />
+    <ClInclude Include="Libraries\include\glm\mat3x2.hpp" />
+    <ClInclude Include="Libraries\include\glm\mat3x3.hpp" />
+    <ClInclude Include="Libraries\include\glm\mat3x4.hpp" />
+    <ClInclude Include="Libraries\include\glm\mat4x2.hpp" />
+    <ClInclude Include="Libraries\include\glm\mat4x3.hpp" />
+    <ClInclude Include="Libraries\include\glm\mat4x4.hpp" />
+    <ClInclude Include="Libraries\include\glm\matrix.hpp" />
+    <ClInclude Include="Libraries\include\glm\packing.hpp" />
+    <ClInclude Include="Libraries\include\glm\simd\common.h" />
+    <ClInclude Include="Libraries\include\glm\simd\exponential.h" />
+    <ClInclude Include="Libraries\include\glm\simd\geometric.h" />
+    <ClInclude Include="Libraries\include\glm\simd\integer.h" />
+    <ClInclude Include="Libraries\include\glm\simd\matrix.h" />
+    <ClInclude Include="Libraries\include\glm\simd\neon.h" />
+    <ClInclude Include="Libraries\include\glm\simd\packing.h" />
+    <ClInclude Include="Libraries\include\glm\simd\platform.h" />
+    <ClInclude Include="Libraries\include\glm\simd\trigonometric.h" />
+    <ClInclude Include="Libraries\include\glm\simd\vector_relational.h" />
+    <ClInclude Include="Libraries\include\glm\trigonometric.hpp" />
+    <ClInclude Include="Libraries\include\glm\vec2.hpp" />
+    <ClInclude Include="Libraries\include\glm\vec3.hpp" />
+    <ClInclude Include="Libraries\include\glm\vec4.hpp" />
+    <ClInclude Include="Libraries\include\glm\vector_relational.hpp" />
+    <ClInclude Include="Libraries\include\KHR\khrplatform.h" />
+    <ClInclude Include="main.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Libraries\include\assimp-5.2.4\code\AssetLib\Blender\BlenderDNA.inl" />
+    <None Include="Libraries\include\assimp-5.2.4\code\AssetLib\glTF2\glTF2Asset.inl" />
+    <None Include="Libraries\include\assimp-5.2.4\code\AssetLib\glTF2\glTF2AssetWriter.inl" />
+    <None Include="Libraries\include\assimp-5.2.4\code\AssetLib\glTF\glTFAsset.inl" />
+    <None Include="Libraries\include\assimp-5.2.4\code\AssetLib\glTF\glTFAssetWriter.inl" />
+    <None Include="Libraries\include\assimp-5.2.4\doc\architecture\assimp.object.violet.html" />
+    <None Include="Libraries\include\assimp-5.2.4\doc\architecture\Assimp_Arch_export.class.violet.html" />
+    <None Include="Libraries\include\assimp-5.2.4\doc\architecture\Assimp_Arch_Import.class.violet.html" />
+    <None Include="Libraries\include\assimp-5.2.4\doc\architecture\assimp_usecase.ucase.violet.html" />
+    <None Include="Libraries\include\assimp-5.2.4\doc\architecture\process.class.violet.html" />
+    <None Include="Libraries\include\assimp-5.2.4\include\assimp\color4.inl" />
+    <None Include="Libraries\include\assimp-5.2.4\include\assimp\material.inl" />
+    <None Include="Libraries\include\assimp-5.2.4\include\assimp\matrix3x3.inl" />
+    <None Include="Libraries\include\assimp-5.2.4\include\assimp\matrix4x4.inl" />
+    <None Include="Libraries\include\assimp-5.2.4\include\assimp\quaternion.inl" />
+    <None Include="Libraries\include\assimp-5.2.4\include\assimp\SmoothingGroups.inl" />
+    <None Include="Libraries\include\assimp-5.2.4\include\assimp\vector2.inl" />
+    <None Include="Libraries\include\assimp-5.2.4\include\assimp\vector3.inl" />
+    <None Include="Libraries\include\assimp-5.2.4\test\models\glTF2\BoxTexcoords-glTF\boxTexcoords.bin" />
+    <None Include="Libraries\include\assimp-5.2.4\test\models\glTF2\BoxTextured-glTF-pbrSpecularGlossiness\BoxTextured0.bin" />
+    <None Include="Libraries\include\assimp-5.2.4\test\models\glTF2\BoxTextured-glTF-techniqueWebGL\BoxTextured0.bin" />
+    <None Include="Libraries\include\assimp-5.2.4\test\models\glTF2\BoxTextured-glTF\BoxTextured0.bin" />
+    <None Include="Libraries\include\assimp-5.2.4\test\models\glTF2\cameras\simpleSquare.bin" />
+    <None Include="Libraries\include\assimp-5.2.4\test\models\glTF2\ClearCoat-glTF\ClearCoatTest.bin" />
+    <None Include="Libraries\include\assimp-5.2.4\test\models\glTF2\draco\2CylinderEngine.bin" />
+    <None Include="Libraries\include\assimp-5.2.4\test\models\glTF2\glTF-Asset-Generator\Mesh_PrimitiveMode\Mesh_PrimitiveMode_00.bin" />
+    <None Include="Libraries\include\assimp-5.2.4\test\models\glTF2\glTF-Asset-Generator\Mesh_PrimitiveMode\Mesh_PrimitiveMode_01.bin" />
+    <None Include="Libraries\include\assimp-5.2.4\test\models\glTF2\glTF-Asset-Generator\Mesh_PrimitiveMode\Mesh_PrimitiveMode_02.bin" />
+    <None Include="Libraries\include\assimp-5.2.4\test\models\glTF2\glTF-Asset-Generator\Mesh_PrimitiveMode\Mesh_PrimitiveMode_03.bin" />
+    <None Include="Libraries\include\assimp-5.2.4\test\models\glTF2\glTF-Asset-Generator\Mesh_PrimitiveMode\Mesh_PrimitiveMode_04.bin" />
+    <None Include="Libraries\include\assimp-5.2.4\test\models\glTF2\glTF-Asset-Generator\Mesh_PrimitiveMode\Mesh_PrimitiveMode_05.bin" />
+    <None Include="Libraries\include\assimp-5.2.4\test\models\glTF2\glTF-Asset-Generator\Mesh_PrimitiveMode\Mesh_PrimitiveMode_06.bin" />
+    <None Include="Libraries\include\assimp-5.2.4\test\models\glTF2\glTF-Asset-Generator\Mesh_PrimitiveMode\Mesh_PrimitiveMode_07.bin" />
+    <None Include="Libraries\include\assimp-5.2.4\test\models\glTF2\glTF-Asset-Generator\Mesh_PrimitiveMode\Mesh_PrimitiveMode_08.bin" />
+    <None Include="Libraries\include\assimp-5.2.4\test\models\glTF2\glTF-Asset-Generator\Mesh_PrimitiveMode\Mesh_PrimitiveMode_09.bin" />
+    <None Include="Libraries\include\assimp-5.2.4\test\models\glTF2\glTF-Asset-Generator\Mesh_PrimitiveMode\Mesh_PrimitiveMode_10.bin" />
+    <None Include="Libraries\include\assimp-5.2.4\test\models\glTF2\glTF-Asset-Generator\Mesh_PrimitiveMode\Mesh_PrimitiveMode_11.bin" />
+    <None Include="Libraries\include\assimp-5.2.4\test\models\glTF2\glTF-Asset-Generator\Mesh_PrimitiveMode\Mesh_PrimitiveMode_12.bin" />
+    <None Include="Libraries\include\assimp-5.2.4\test\models\glTF2\glTF-Asset-Generator\Mesh_PrimitiveMode\Mesh_PrimitiveMode_13.bin" />
+    <None Include="Libraries\include\assimp-5.2.4\test\models\glTF2\glTF-Asset-Generator\Mesh_PrimitiveMode\Mesh_PrimitiveMode_14.bin" />
+    <None Include="Libraries\include\assimp-5.2.4\test\models\glTF2\glTF-Asset-Generator\Mesh_PrimitiveMode\Mesh_PrimitiveMode_15.bin" />
+    <None Include="Libraries\include\assimp-5.2.4\test\models\glTF2\glTF-Sample-Models\AnimatedMorphCube-glTF\AnimatedMorphCube.bin" />
+    <None Include="Libraries\include\assimp-5.2.4\test\models\glTF2\IncorrectVertexArrays\Cube.bin" />
+    <None Include="Libraries\include\assimp-5.2.4\test\models\glTF2\IndexOutOfRange\AllIndicesOutOfRange.bin" />
+    <None Include="Libraries\include\assimp-5.2.4\test\models\glTF2\IndexOutOfRange\IndexOutOfRange.bin" />
+    <None Include="Libraries\include\assimp-5.2.4\test\models\glTF2\textureTransform\TextureTransformTest.bin" />
+    <None Include="Libraries\include\assimp-5.2.4\test\models\glTF2\wrongTypes\BoxTextured0.bin" />
+    <None Include="Libraries\include\assimp-5.2.4\test\models\glTF\BoxTextured-glTF-MaterialsCommon\BoxTextured.bin" />
+    <None Include="Libraries\include\assimp-5.2.4\test\models\glTF\BoxTextured-glTF\BoxTextured.bin" />
+    <None Include="Libraries\include\assimp-5.2.4\test\models\glTF\CesiumMilkTruck\CesiumMilkTruck.bin" />
+    <None Include="Libraries\include\assimp-5.2.4\test\models\glTF\IncorrectVertexArrays\Cube.bin" />
+    <None Include="Libraries\include\assimp-5.2.4\test\models\glTF\TwoBoxes\Box.bin" />
+    <None Include="Libraries\include\assimp-5.2.4\tools\assimp_view\text1.bin" />
+    <None Include="Libraries\include\assimp\color4.inl" />
+    <None Include="Libraries\include\assimp\material.inl" />
+    <None Include="Libraries\include\assimp\matrix3x3.inl" />
+    <None Include="Libraries\include\assimp\matrix4x4.inl" />
+    <None Include="Libraries\include\assimp\quaternion.inl" />
+    <None Include="Libraries\include\assimp\SmoothingGroups.inl" />
+    <None Include="Libraries\include\assimp\vector2.inl" />
+    <None Include="Libraries\include\assimp\vector3.inl" />
+    <None Include="Libraries\include\glm\detail\func_common.inl" />
+    <None Include="Libraries\include\glm\detail\func_common_simd.inl" />
+    <None Include="Libraries\include\glm\detail\func_exponential.inl" />
+    <None Include="Libraries\include\glm\detail\func_exponential_simd.inl" />
+    <None Include="Libraries\include\glm\detail\func_geometric.inl" />
+    <None Include="Libraries\include\glm\detail\func_geometric_simd.inl" />
+    <None Include="Libraries\include\glm\detail\func_integer.inl" />
+    <None Include="Libraries\include\glm\detail\func_integer_simd.inl" />
+    <None Include="Libraries\include\glm\detail\func_matrix.inl" />
+    <None Include="Libraries\include\glm\detail\func_matrix_simd.inl" />
+    <None Include="Libraries\include\glm\detail\func_packing.inl" />
+    <None Include="Libraries\include\glm\detail\func_packing_simd.inl" />
+    <None Include="Libraries\include\glm\detail\func_trigonometric.inl" />
+    <None Include="Libraries\include\glm\detail\func_trigonometric_simd.inl" />
+    <None Include="Libraries\include\glm\detail\func_vector_relational.inl" />
+    <None Include="Libraries\include\glm\detail\func_vector_relational_simd.inl" />
+    <None Include="Libraries\include\glm\detail\type_half.inl" />
+    <None Include="Libraries\include\glm\detail\type_mat2x2.inl" />
+    <None Include="Libraries\include\glm\detail\type_mat2x3.inl" />
+    <None Include="Libraries\include\glm\detail\type_mat2x4.inl" />
+    <None Include="Libraries\include\glm\detail\type_mat3x2.inl" />
+    <None Include="Libraries\include\glm\detail\type_mat3x3.inl" />
+    <None Include="Libraries\include\glm\detail\type_mat3x4.inl" />
+    <None Include="Libraries\include\glm\detail\type_mat4x2.inl" />
+    <None Include="Libraries\include\glm\detail\type_mat4x3.inl" />
+    <None Include="Libraries\include\glm\detail\type_mat4x4.inl" />
+    <None Include="Libraries\include\glm\detail\type_mat4x4_simd.inl" />
+    <None Include="Libraries\include\glm\detail\type_quat.inl" />
+    <None Include="Libraries\include\glm\detail\type_quat_simd.inl" />
+    <None Include="Libraries\include\glm\detail\type_vec1.inl" />
+    <None Include="Libraries\include\glm\detail\type_vec2.inl" />
+    <None Include="Libraries\include\glm\detail\type_vec3.inl" />
+    <None Include="Libraries\include\glm\detail\type_vec4.inl" />
+    <None Include="Libraries\include\glm\detail\type_vec4_simd.inl" />
+    <None Include="Libraries\include\glm\ext\matrix_clip_space.inl" />
+    <None Include="Libraries\include\glm\ext\matrix_common.inl" />
+    <None Include="Libraries\include\glm\ext\matrix_projection.inl" />
+    <None Include="Libraries\include\glm\ext\matrix_relational.inl" />
+    <None Include="Libraries\include\glm\ext\matrix_transform.inl" />
+    <None Include="Libraries\include\glm\ext\quaternion_common.inl" />
+    <None Include="Libraries\include\glm\ext\quaternion_common_simd.inl" />
+    <None Include="Libraries\include\glm\ext\quaternion_exponential.inl" />
+    <None Include="Libraries\include\glm\ext\quaternion_geometric.inl" />
+    <None Include="Libraries\include\glm\ext\quaternion_relational.inl" />
+    <None Include="Libraries\include\glm\ext\quaternion_transform.inl" />
+    <None Include="Libraries\include\glm\ext\quaternion_trigonometric.inl" />
+    <None Include="Libraries\include\glm\ext\scalar_common.inl" />
+    <None Include="Libraries\include\glm\ext\scalar_constants.inl" />
+    <None Include="Libraries\include\glm\ext\scalar_integer.inl" />
+    <None Include="Libraries\include\glm\ext\scalar_packing.inl" />
+    <None Include="Libraries\include\glm\ext\scalar_relational.inl" />
+    <None Include="Libraries\include\glm\ext\scalar_ulp.inl" />
+    <None Include="Libraries\include\glm\ext\vector_common.inl" />
+    <None Include="Libraries\include\glm\ext\vector_integer.inl" />
+    <None Include="Libraries\include\glm\ext\vector_packing.inl" />
+    <None Include="Libraries\include\glm\ext\vector_relational.inl" />
+    <None Include="Libraries\include\glm\ext\vector_ulp.inl" />
+    <None Include="Libraries\include\glm\gtc\bitfield.inl" />
+    <None Include="Libraries\include\glm\gtc\color_space.inl" />
+    <None Include="Libraries\include\glm\gtc\constants.inl" />
+    <None Include="Libraries\include\glm\gtc\epsilon.inl" />
+    <None Include="Libraries\include\glm\gtc\integer.inl" />
+    <None Include="Libraries\include\glm\gtc\matrix_access.inl" />
+    <None Include="Libraries\include\glm\gtc\matrix_inverse.inl" />
+    <None Include="Libraries\include\glm\gtc\matrix_transform.inl" />
+    <None Include="Libraries\include\glm\gtc\noise.inl" />
+    <None Include="Libraries\include\glm\gtc\packing.inl" />
+    <None Include="Libraries\include\glm\gtc\quaternion.inl" />
+    <None Include="Libraries\include\glm\gtc\quaternion_simd.inl" />
+    <None Include="Libraries\include\glm\gtc\random.inl" />
+    <None Include="Libraries\include\glm\gtc\reciprocal.inl" />
+    <None Include="Libraries\include\glm\gtc\round.inl" />
+    <None Include="Libraries\include\glm\gtc\type_precision.inl" />
+    <None Include="Libraries\include\glm\gtc\type_ptr.inl" />
+    <None Include="Libraries\include\glm\gtc\ulp.inl" />
+    <None Include="Libraries\include\glm\gtx\associated_min_max.inl" />
+    <None Include="Libraries\include\glm\gtx\bit.inl" />
+    <None Include="Libraries\include\glm\gtx\closest_point.inl" />
+    <None Include="Libraries\include\glm\gtx\color_encoding.inl" />
+    <None Include="Libraries\include\glm\gtx\color_space.inl" />
+    <None Include="Libraries\include\glm\gtx\color_space_YCoCg.inl" />
+    <None Include="Libraries\include\glm\gtx\common.inl" />
+    <None Include="Libraries\include\glm\gtx\compatibility.inl" />
+    <None Include="Libraries\include\glm\gtx\component_wise.inl" />
+    <None Include="Libraries\include\glm\gtx\dual_quaternion.inl" />
+    <None Include="Libraries\include\glm\gtx\easing.inl" />
+    <None Include="Libraries\include\glm\gtx\euler_angles.inl" />
+    <None Include="Libraries\include\glm\gtx\extend.inl" />
+    <None Include="Libraries\include\glm\gtx\extended_min_max.inl" />
+    <None Include="Libraries\include\glm\gtx\exterior_product.inl" />
+    <None Include="Libraries\include\glm\gtx\fast_exponential.inl" />
+    <None Include="Libraries\include\glm\gtx\fast_square_root.inl" />
+    <None Include="Libraries\include\glm\gtx\fast_trigonometry.inl" />
+    <None Include="Libraries\include\glm\gtx\float_notmalize.inl" />
+    <None Include="Libraries\include\glm\gtx\functions.inl" />
+    <None Include="Libraries\include\glm\gtx\gradient_paint.inl" />
+    <None Include="Libraries\include\glm\gtx\handed_coordinate_space.inl" />
+    <None Include="Libraries\include\glm\gtx\hash.inl" />
+    <None Include="Libraries\include\glm\gtx\integer.inl" />
+    <None Include="Libraries\include\glm\gtx\intersect.inl" />
+    <None Include="Libraries\include\glm\gtx\io.inl" />
+    <None Include="Libraries\include\glm\gtx\log_base.inl" />
+    <None Include="Libraries\include\glm\gtx\matrix_cross_product.inl" />
+    <None Include="Libraries\include\glm\gtx\matrix_decompose.inl" />
+    <None Include="Libraries\include\glm\gtx\matrix_factorisation.inl" />
+    <None Include="Libraries\include\glm\gtx\matrix_interpolation.inl" />
+    <None Include="Libraries\include\glm\gtx\matrix_major_storage.inl" />
+    <None Include="Libraries\include\glm\gtx\matrix_operation.inl" />
+    <None Include="Libraries\include\glm\gtx\matrix_query.inl" />
+    <None Include="Libraries\include\glm\gtx\matrix_transform_2d.inl" />
+    <None Include="Libraries\include\glm\gtx\mixed_product.inl" />
+    <None Include="Libraries\include\glm\gtx\norm.inl" />
+    <None Include="Libraries\include\glm\gtx\normal.inl" />
+    <None Include="Libraries\include\glm\gtx\normalize_dot.inl" />
+    <None Include="Libraries\include\glm\gtx\number_precision.inl" />
+    <None Include="Libraries\include\glm\gtx\optimum_pow.inl" />
+    <None Include="Libraries\include\glm\gtx\orthonormalize.inl" />
+    <None Include="Libraries\include\glm\gtx\perpendicular.inl" />
+    <None Include="Libraries\include\glm\gtx\polar_coordinates.inl" />
+    <None Include="Libraries\include\glm\gtx\projection.inl" />
+    <None Include="Libraries\include\glm\gtx\quaternion.inl" />
+    <None Include="Libraries\include\glm\gtx\raw_data.inl" />
+    <None Include="Libraries\include\glm\gtx\rotate_normalized_axis.inl" />
+    <None Include="Libraries\include\glm\gtx\rotate_vector.inl" />
+    <None Include="Libraries\include\glm\gtx\scalar_relational.inl" />
+    <None Include="Libraries\include\glm\gtx\spline.inl" />
+    <None Include="Libraries\include\glm\gtx\std_based_type.inl" />
+    <None Include="Libraries\include\glm\gtx\string_cast.inl" />
+    <None Include="Libraries\include\glm\gtx\texture.inl" />
+    <None Include="Libraries\include\glm\gtx\transform.inl" />
+    <None Include="Libraries\include\glm\gtx\transform2.inl" />
+    <None Include="Libraries\include\glm\gtx\type_aligned.inl" />
+    <None Include="Libraries\include\glm\gtx\type_trait.inl" />
+    <None Include="Libraries\include\glm\gtx\vector_angle.inl" />
+    <None Include="Libraries\include\glm\gtx\vector_query.inl" />
+    <None Include="Libraries\include\glm\gtx\wrap.inl" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Libraries\include\assimp-5.2.4\code\res\assimp.rc" />
+    <ResourceCompile Include="Libraries\include\assimp-5.2.4\tools\assimp_cmd\assimp_cmd.rc" />
+    <ResourceCompile Include="Libraries\include\assimp-5.2.4\tools\assimp_view\assimp_view.rc" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

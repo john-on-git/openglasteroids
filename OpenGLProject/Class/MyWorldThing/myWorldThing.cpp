@@ -13,7 +13,7 @@
 #include <string>
 #include <windows.h>
 
-#include "../myColoredPolyModel/myColoredPolyModel.hpp"
+#include "../BufferedAiMesh/BufferedAiMesh.hpp"
 #include "myWorldThing.hpp"
 
 MyWorldThing::MyWorldThing()
@@ -21,7 +21,7 @@ MyWorldThing::MyWorldThing()
 	OutputDebugStringW(L"FATAL: called invalid constructor MyWorldThing()\n");
 	exit(1);
 }
-MyWorldThing::MyWorldThing(MyModel *model, glm::vec3 position, glm::vec3 angle, GLuint projectionLocation, GLuint viewLocation, GLuint modelLocation)
+MyWorldThing::MyWorldThing(BufferedAiMesh *model, glm::vec3 position, glm::vec3 angle, GLuint projectionLocation, GLuint viewLocation, GLuint modelLocation)
 {
 	this->model = model;
 	this->position = position;

@@ -20,9 +20,10 @@
 	#include <conio.h>
 //assimp
 	#include <assimp/Importer.hpp>
+	#include <assimp\postprocess.h>
 //project
 	#include "Class/Program/program.hpp"
-	#include "Class/MyTexturedModel/MyTexturedModel.hpp"
+	#include "Class/BufferedAiMesh/BufferedAiMesh.hpp"
 	#include "Class/myWorldThing/myWorldThing.hpp"
 	#include "main.hpp"
 	#include "bmp_loader.hpp"
@@ -40,8 +41,6 @@ unsigned char axis = 2;
 */
 int main()
 {
-	Assimp::Importer importer;
-	importer.ReadFile("", );
 	//initialize glfw
 		if (!glfwInit())
 		{
@@ -67,8 +66,9 @@ int main()
 	//glEnables
 		glad_glEnable(GL_DEPTH_TEST);
 		glad_glEnable(GL_TEXTURE_2D);
-	//set clear colour
+	//gl drawing config
 		glad_glClearColor(0.75f, 0.75f, 0.75f, 1);
+		glad_glPointSize(5.0f);
 	//set up VAO(s)
 		GLuint VAOs[1];
 		glad_glGenVertexArrays(1, VAOs);
@@ -93,9 +93,9 @@ int main()
 				exit(1);
 			}
 	//load assets from disk
-			bmp* smile = load_bmp("textures/johncat.bmp");
-			//TODO assimp
+			bmp* cat = load_bmp("textures/johncat.bmp");
 	//set up textures
+		//todo make a class
 		GLuint textures[1];
 		glad_glGenTextures(1, textures);
 		glad_glBindTexture(GL_TEXTURE_2D, textures[0]);
@@ -103,90 +103,23 @@ int main()
 		glad_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		//glad_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 		//glad_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
-		glad_glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, smile->width, smile->height, 0, GL_RGB, GL_UNSIGNED_BYTE, smile->content);
+		glad_glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, cat->width, cat->height, 0, GL_RGB, GL_UNSIGNED_BYTE, cat->content);
+		delete cat;
 	//set up world stuff
 		vector<MyWorldThing*> worldThings{
 			new MyWorldThing(
-				new MyTexturedModel(
-					6,
-					new float[] {
-						//front
-						-0.1f, -0.1f,  0.1f, 1.0f,	0.0f, 0.0f,
-						 0.1f, -0.1f,  0.1f, 1.0f,	0.0f, 1.0f,
-						 0.1f,  0.1f,  0.1f, 1.0f,	1.0f, 1.0f,
-						-0.1f,  0.1f,  0.1f, 1.0f,	1.0f, 0.0f,
-						-0.1f, -0.1f,  0.1f, 1.0f,	0.0f, 0.0f,
-						//right
-						 0.1f, -0.1f,  0.1f, 1.0f,	0.0f, 0.0f,
-						 0.1f, -0.1f, -0.1f, 1.0f,	0.0f, 1.0f,
-						 0.1f,  0.1f, -0.1f, 1.0f,	1.0f, 1.0f,
-						 0.1f,  0.1f,  0.1f, 1.0f,	1.0f, 0.0f,
-						 0.1f, -0.1f,  0.1f, 1.0f,	0.0f, 0.0f,
-						//back
-						-0.1f, -0.1f, -0.1f, 1.0f,	0.0f, 0.0f,
-						 0.1f, -0.1f, -0.1f, 1.0f,	0.0f, 1.0f,
-						 0.1f,  0.1f, -0.1f, 1.0f,	1.0f, 1.0f,
-						-0.1f,  0.1f, -0.1f, 1.0f,	1.0f, 0.0f,
-						-0.1f, -0.1f, -0.1f, 1.0f,	0.0f, 0.0f,
-						//left
-						-0.1f, -0.1f,  0.1f, 1.0f,	0.0f, 1.0f,
-						-0.1f, -0.1f, -0.1f, 1.0f,	1.0f, 1.0f,
-						-0.1f,  0.1f, -0.1f, 1.0f,	1.0f, 0.0f,
-						-0.1f,  0.1f,  0.1f, 1.0f,	0.0f, 0.0f,
-						-0.1f, -0.1f,  0.1f, 1.0f,	0.0f, 1.0f,
-						//top
-						-0.1f, -0.1f,  0.1f, 1.0f,	0.0f, 1.0f,
-						 0.1f, -0.1f,  0.1f, 1.0f,	1.0f, 1.0f,
-						 0.1f, -0.1f, -0.1f, 1.0f,	1.0f, 0.0f,
-						-0.1f, -0.1f, -0.1f, 1.0f,	0.0f, 0.0f,
-						-0.1f, -0.1f,  0.1f, 1.0f,	0.0f, 1.0f,
-						//bottom
-						-0.1f,  0.1f,  0.1f, 1.0f,	0.0f, 1.0f,
-						 0.1f,  0.1f,  0.1f, 1.0f,	1.0f, 1.0f,
-						 0.1f,  0.1f, -0.1f, 1.0f,	1.0f, 0.0f,
-						-0.1f,  0.1f, -0.1f, 1.0f,	0.0f, 0.0f,
-						-0.1f,  0.1f,  0.1f, 1.0f,	0.0f, 1.0f,
-						},
-					new GLuint[] {
-						textures[0],
-						textures[0],
-						textures[0],
-						textures[0],
-						textures[0],
-						textures[0]
-					},
-					new unsigned char[] {5, 5, 5, 5, 5, 5},
+				new BufferedAiMesh(
+					"Models/utah_teapot.obj",
+					textures[0],
 					textureLocation,
 					VAOs[0]
 				),
-				glm::vec3(0.0f, 0.0f, -1.0f),
-				glm::vec3(65.0f, 180.0f, 65.0f),
-				projectionLocation,
-				viewLocation,
-				modelLocation
-			),
-			/*new MyWorldThing(
-				new MyTexturedModel(
-					1,
-					new float[] {
-						0.0f, 0.0f, 0.0f, 1.0f,
-						0.2f, 0.0f, 0.0f, 1.0f,
-						0.1f, 0.1f, 0.0f, 1.0f,
-						0.0f, 0.0f, 0.0f, 1.0f
-					},
-					new GLuint[] {
-						textures[0]
-					},
-					new unsigned char[] {4},
-					textureLocation,
-					VAOs[0]
-				),
-				glm::vec3(0.0f, 0.0f, -1.0f),
+				glm::vec3(0.0f, 0.0f, -20.0f),
 				glm::vec3(0.0f, 0.0f, 0.0f),
 				projectionLocation,
 				viewLocation,
 				modelLocation
-			)*/
+			)
 		};
 		MyWorldThing* first = worldThings[0];
 	//render loop
@@ -209,24 +142,12 @@ int main()
 			first->position.x += moveX * MOVE_RATE;
 			first->position.y += moveY * MOVE_RATE;
 			first->position.z += moveZ * MOVE_RATE;
-			switch (axis) {
-				case 0:
-					first->angle.x += rot * ROTATE_RATE;
-				break;
-				case 1:
-					first->angle.y += rot * ROTATE_RATE;
-				break;
-				case 2:
-					first->angle.z += rot * ROTATE_RATE;
-				break;
-			}
-			moveX = 0;
-			moveY = 0;
-			moveZ = 0;
+			moveX = 0, moveY = 0, moveZ = 0;
+			first->angle[axis] = (int)(first->angle[axis] + rot * ROTATE_RATE + 360) % 360;
 			rot = 0;
 		//clear framebuffers
 			glad_glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		//draw all objects
+		//draw all things
 			for (auto& thing : worldThings)
 				thing->Draw();
 		//check for GL errors
