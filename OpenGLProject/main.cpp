@@ -93,7 +93,7 @@ int main()
 				exit(1);
 			}
 	//load assets from disk
-			bmp* cat = load_bmp("textures/johncat.bmp");
+			bmp* cat = load_bmp("textures/aidens_cat.bmp");
 	//set up textures
 		//todo make a class
 		GLuint textures[1];
@@ -109,13 +109,13 @@ int main()
 		vector<MyWorldThing*> worldThings{
 			new MyWorldThing(
 				new BufferedAiMesh(
-					"Models/utah_teapot.obj",
+					"Models/utah_teapot_textured.obj",
 					textures[0],
 					textureLocation,
 					VAOs[0]
 				),
 				glm::vec3(0.0f, 0.0f, -20.0f),
-				glm::vec3(0.0f, 0.0f, 0.0f),
+				glm::vec3(0.0f, 0.0f, 180.0f),
 				projectionLocation,
 				viewLocation,
 				modelLocation

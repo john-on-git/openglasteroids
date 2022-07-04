@@ -14,12 +14,12 @@ using namespace std;
 bmp* load_bmp(std::string path)
 {
     struct dibheader {
-        unsigned int size;
+        size_t size;
         unsigned short int bpp; //bits per pixel
         unsigned int compresionMethod;
-        unsigned int imageSize;
-        unsigned int horizontalResolution;
-        unsigned int verticalResolution;
+        size_t imageSize;
+        size_t horizontalResolution;
+        size_t verticalResolution;
         unsigned int colorPaletteSize;
         unsigned int numImportantColors;
     };
@@ -168,9 +168,9 @@ bmp* load_bmp(std::string path)
                     {
                         for (size_t j = 0;j <= o->width;j++)
                         {
-                            file.read((char*)o->content + (i * (o->width + paddingAfterLine) * PX_SIZE) + (j * PX_SIZE) + 2, sizeof(unsigned char)); //blue
-                            file.read((char*)o->content + (i * (o->width + paddingAfterLine) * PX_SIZE) + (j * PX_SIZE) + 1, sizeof(unsigned char)); //green
-                            file.read((char*)o->content + (i * (o->width + paddingAfterLine) * PX_SIZE) + (j * PX_SIZE) + 0, sizeof(unsigned char)); //red
+                            file.read((char*)o->content + (i * (static_cast<size_t>(o->width) + paddingAfterLine) * PX_SIZE) + (j * PX_SIZE) + 2, sizeof(unsigned char)); //blue
+                            file.read((char*)o->content + (i * (static_cast<size_t>(o->width) + paddingAfterLine) * PX_SIZE) + (j * PX_SIZE) + 1, sizeof(unsigned char)); //green
+                            file.read((char*)o->content + (i * (static_cast<size_t>(o->width) + paddingAfterLine) * PX_SIZE) + (j * PX_SIZE) + 0, sizeof(unsigned char)); //red
                             //o->content[(i * (o->width + paddingAfterLine) * PX_SIZE) + (j * PX_SIZE) + 3] = 0xFF;
                         }
                     }
