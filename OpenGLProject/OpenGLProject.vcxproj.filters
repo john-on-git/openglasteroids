@@ -39,6 +39,9 @@
     <ClCompile Include="Class\Texture\Texture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Class\Model\Model.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Class\BufferedAiMesh\BufferedAiMesh.hpp">
@@ -1164,6 +1167,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Class\Texture\Texture.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Class\Model\Model.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

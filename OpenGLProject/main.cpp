@@ -1,32 +1,27 @@
-//std
-	#include <iostream>
-	#include <fstream>
-	#include <windows.h>
-	#include <cmath>
-	#include <vector>
-//opengl and libs
-	#include <glad/glad.h>
-	#include <GLFW/glfw3.h>
-//glm
-	#include <glm/vec3.hpp>
-	#include <glm/vec4.hpp>
-	#include <glm/mat4x4.hpp>
-	#include <glm/ext/matrix_transform.hpp>
-	#include <glm/ext/matrix_clip_space.hpp>
-	#include <glm/ext/scalar_constants.hpp>
-	#include <glm/glm.hpp>
-	#include <glm/gtc/type_ptr.hpp>
-//ms
-	#include <conio.h>
-//assimp
-	#include <assimp/Importer.hpp>
-	#include <assimp\postprocess.h>
-//project
-	#include "Class/Program/program.hpp"
-	#include "Class/BufferedAiMesh/BufferedAiMesh.hpp"
-	#include "Class/myWorldThing/myWorldThing.hpp"
-	#include "Class/Texture/Texture.hpp"
-	#include "main.hpp"
+#include <iostream>
+#include <fstream>
+#include <windows.h>
+#include <cmath>
+#include <vector>
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+#include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
+#include <glm/mat4x4.hpp>
+#include <glm/ext/matrix_transform.hpp>
+#include <glm/ext/matrix_clip_space.hpp>
+#include <glm/ext/scalar_constants.hpp>
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <conio.h>
+#include <assimp/Importer.hpp>
+#include <assimp\postprocess.h>
+
+#include "Class/Program/program.hpp"
+#include "Class/BufferedAiMesh/BufferedAiMesh.hpp"
+#include "Class/myWorldThing/myWorldThing.hpp"
+#include "Class/Texture/Texture.hpp"
+#include "main.hpp"
 
 
 using namespace std;
@@ -70,10 +65,6 @@ int main()
 	//gl drawing config
 		glad_glClearColor(0.75f, 0.75f, 0.75f, 1);
 		glad_glPointSize(5.0f);
-	//set up VAO(s)
-		GLuint VAOs[1];
-		glad_glGenVertexArrays(1, VAOs);
-		glad_glBindVertexArray(VAOs[0]);
 	//shader setup
 		//compile
 			Program texturedTransform(
@@ -94,42 +85,62 @@ int main()
 				exit(1);
 			}
 	//textures
-		auto shadow = new Texture("textures/shadow.jpg");
-		auto john	= new Texture("textures/johncat.bmp");
+		auto shadow	= new Texture("textures/shadow.jpg");
+		auto john	= new Texture("textures/colored_johncat.bmp");
+		auto dish1	= new Texture("textures/dish_1.jpg");
+		auto dish2	= new Texture("textures/dish_2.jpg");
 	//set up world stuff
 		vector<MyWorldThing*> worldThings{
 			new MyWorldThing(
-				new BufferedAiMesh(
-					"Models/utah_teapot_textured.obj",
-					shadow->handle,
+				new Model(
+					"Models/dish.obj",
 					textureLocation,
-					VAOs[0]
+					new GLuint[]{ dish1->handle, dish2->handle },
+					2
 				),
-				glm::vec3(0.0f, 0.0f, -20.0f),
-				glm::vec3(0.0f, 0.0f, 180.0f),
+				glm::vec3(  0.0f,   1.0f,  -5.0f),
+				glm::vec3(180.0f,   0.0f,   0.0f),
+				glm::vec3(  0.1f,   0.1f,   0.1f),
 				projectionLocation,
 				viewLocation,
 				modelLocation
 			),
 			new MyWorldThing(
-				new BufferedAiMesh(
-					"Models/uvmapped_cube.obj",
-					john->handle,
+				new Model(
+					"Models/utah_teapot_textured.obj",
 					textureLocation,
-					VAOs[0]
+					new GLuint[]{ john->handle },
+					1
 				),
-				glm::vec3(-4.0f, -4.0f, -10.0f),
-				glm::vec3(0.0f, 0.0f, 0.0f),
+				glm::vec3(  0.0f,   1.0f,  -5.0f),
+				glm::vec3(  0.0f,   0.0f, 180.0f),
+				glm::vec3(  0.2f,   0.2f,   0.2f),
 				projectionLocation,
 				viewLocation,
 				modelLocation
 			)
+			/*,
+			new MyWorldThing(
+				new Model(
+					"Models/uvmapped_cube.obj",
+					textureLocation,
+					new GLuint[]{ john->handle },
+					1
+				),
+				glm::vec3( -1.0f,  -1.0f, -15.0f),
+				glm::vec3(340.0f,  60.0f,   0.0f),
+				glm::vec3(1.0f, 1.0f, 1.0f),
+				projectionLocation,
+				viewLocation,
+				modelLocation
+			)*/
 		};
-		MyWorldThing* first = worldThings[0];
+		MyWorldThing* first = worldThings[1];
 	//render loop
 	while (!glfwWindowShouldClose(window))
 	{
 		//print debug to console
+			/*
 			system("cls");
 			cout << "triangle:"
 				<< "\n\tposition"
@@ -142,6 +153,7 @@ int main()
 					<< "\n\t\ty: "		<< first->angle.y
 					<< "\n\t\tz: "		<< first->angle.z
 			;
+			*/
 		//update world state
 			first->position.x += moveX * MOVE_RATE;
 			first->position.y += moveY * MOVE_RATE;

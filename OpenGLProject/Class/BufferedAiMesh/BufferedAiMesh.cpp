@@ -1,31 +1,25 @@
-#include <windows.h>
-
 #include "BufferedAiMesh.hpp"
-#include <glm/gtc/type_ptr.hpp>
+#include "windows.h"
 #include <iostream>
-#include <assimp/Importer.hpp>
-#include <assimp/postprocess.h>
-#include <assimp/scene.h>
 
 BufferedAiMesh::BufferedAiMesh()
 {
-	OutputDebugStringW(L"FATAL: called not-implemented constructor MyTexturedModel()\n");
-	exit(1);
+	VAO = 0;
+	buffers = NULL;
+	textureLocation = 0;
+	texture = 0;
+	numIndices = 0;
 }
 
 constexpr auto STRIDE = 6; //width of each vert
-constexpr auto NUM_POINTS_IN_A_TRIANGLE = 3;
+constexpr auto INDICES_PER_TRI = 3;
 
-BufferedAiMesh::BufferedAiMesh(std::string fileName, GLuint texture, GLuint textureLocation, GLuint VAO)
+BufferedAiMesh::BufferedAiMesh(aiMesh* mesh, GLuint texture, GLuint textureLocation)
 {
-	Assimp::Importer importer;
-	aiMesh* mesh = importer.ReadFile(fileName, aiProcess_Triangulate | aiProcess_JoinIdenticalVertices)->mMeshes[0];
-
 	//init properties
-		buffers = new GLuint[2]; //vertex buffer, and vertex index buffer
-		this->texture = texture;
 		this->textureLocation = textureLocation;
-		this->numIndices = static_cast<size_t>(mesh->mNumFaces) * NUM_POINTS_IN_A_TRIANGLE;
+		this->texture = texture;
+		this->numIndices = (mesh->mNumFaces) * INDICES_PER_TRI;
 	//transform verts to gl format
 		float *verts = new float[mesh->mNumVertices * STRIDE];
 		for (size_t i = 0;i < mesh->mNumVertices;i++)
@@ -41,16 +35,19 @@ BufferedAiMesh::BufferedAiMesh(std::string fileName, GLuint texture, GLuint text
 			verts[vertsPos + 5] = mesh->mTextureCoords[0][i].y;
 		}
 
-		unsigned int *vertIndices = new unsigned int[mesh->mNumFaces * NUM_POINTS_IN_A_TRIANGLE];
+		unsigned int *vertIndices = new unsigned int[mesh->mNumFaces * INDICES_PER_TRI];
 		for (size_t i = 0;i < static_cast<size_t>(mesh->mNumFaces);i++)
-			vertIndices[i * NUM_POINTS_IN_A_TRIANGLE + 0] = (mesh->mFaces[i].mIndices)[0],
-			vertIndices[i * NUM_POINTS_IN_A_TRIANGLE + 1] = (mesh->mFaces[i].mIndices)[1],
-			vertIndices[i * NUM_POINTS_IN_A_TRIANGLE + 2] = (mesh->mFaces[i].mIndices)[2];
-		
-	//generate, bind, copy verts to my buffer
-		glad_glBindVertexArray(VAO);
+			vertIndices[i * INDICES_PER_TRI + 0] = (mesh->mFaces[i].mIndices)[0],
+			vertIndices[i * INDICES_PER_TRI + 1] = (mesh->mFaces[i].mIndices)[1],
+			vertIndices[i * INDICES_PER_TRI + 2] = (mesh->mFaces[i].mIndices)[2];
+	//generate vertex array object
+		VAO = new GLuint;
+		glad_glGenVertexArrays(1, VAO);
+		glad_glBindVertexArray(*VAO);
+	//generate buffers and copy over data
+		buffers = new GLuint[2]; //vertex buffer, and vertex index buffer
 		glad_glGenBuffers(2, buffers); //19.5.21, first argument is the number of buffers, not the size of the buffer. corrupted the heap?
-		
+
 		glad_glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
 		glad_glBufferData( //add verts to buffer
 			GL_ARRAY_BUFFER,
@@ -62,43 +59,44 @@ BufferedAiMesh::BufferedAiMesh(std::string fileName, GLuint texture, GLuint text
 		glad_glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers[1]);
 		glad_glBufferData( //add verts to buffer
 			GL_ELEMENT_ARRAY_BUFFER,
-			static_cast<size_t>(mesh->mNumFaces) * NUM_POINTS_IN_A_TRIANGLE * sizeof(unsigned int),
+			static_cast<size_t>(mesh->mNumFaces) * INDICES_PER_TRI * sizeof(unsigned int),
 			vertIndices,
 			GL_STATIC_DRAW
 		);
 
+		delete[] verts;
+		delete[] vertIndices;
+	//set vertex attrib pointers
 		glad_glVertexAttribPointer( //position
 			0,
 			4,
 			GL_FLOAT,
 			GL_FALSE,
 			STRIDE * sizeof(float), 
-			/*	1.6.22 
+			/*	1.7.22 
 				Value passed here was incorrect, forgot to add the sizeof() here after removing it from STRIDE definition.
 				Resulted in all sorts of bizarre rendering errors, and I was convinced that the problem was with the mesh data.
 			*/
 			NULL
 		);
+
 		glad_glEnableVertexAttribArray(0);
 		glad_glVertexAttribPointer( //texCoord
 			1,
 			2,
 			GL_FLOAT,
 			GL_FALSE,
-			STRIDE * sizeof(float), //1.6.22 same here
+			STRIDE * sizeof(float), //1.7.22 same here
 			(GLvoid*)(4 * sizeof(float)) //offset
 		);
 		glad_glEnableVertexAttribArray(1);
-
-		delete[] verts;
-		delete[] vertIndices;
 	}
 
 void BufferedAiMesh::Draw()
 {
-	//bind the buffer
-		glad_glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
-		glad_glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers[1]);
+	//bind the buffer (no, don't! https://stackoverflow.com/a/27877433) 7.7.22
+	//bind the array object instead
+	glad_glBindVertexArray(*VAO);
 	//draw every polygon
 		//set uniform value
 		glad_glActiveTexture(GL_TEXTURE0);

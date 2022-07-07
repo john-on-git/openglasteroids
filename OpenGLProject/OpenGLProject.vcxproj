@@ -173,6 +173,7 @@
     <ClCompile Include="Libraries\include\glm\detail\glm.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Class\Texture\Texture.cpp" />
+    <ClCompile Include="Class\Model\Model.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="bmp_loader.hpp" />
@@ -550,6 +551,7 @@
     <ClInclude Include="Libraries\include\stb\stb_image.h" />
     <ClInclude Include="main.hpp" />
     <ClInclude Include="Class\Texture\Texture.hpp" />
+    <ClInclude Include="Class\Model\Model.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Libraries\include\assimp\color4.inl" />

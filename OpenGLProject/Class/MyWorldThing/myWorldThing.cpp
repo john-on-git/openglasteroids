@@ -1,31 +1,27 @@
 #pragma once
 
-#include <glad/glad.h>
-//glm
-#include <glm/vec3.hpp>
+#include "myWorldThing.hpp"
+#include "windows.h"
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/scalar_constants.hpp>
-#include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include <string>
-#include <windows.h>
-
 #include "../BufferedAiMesh/BufferedAiMesh.hpp"
-#include "myWorldThing.hpp"
+
 
 MyWorldThing::MyWorldThing()
 {
 	OutputDebugStringW(L"FATAL: called invalid constructor MyWorldThing()\n");
 	exit(1);
 }
-MyWorldThing::MyWorldThing(BufferedAiMesh *model, glm::vec3 position, glm::vec3 angle, GLuint projectionLocation, GLuint viewLocation, GLuint modelLocation)
+MyWorldThing::MyWorldThing(Model* model, glm::vec3 position, glm::vec3 angle, glm::vec3 scale, GLuint projectionLocation, GLuint viewLocation, GLuint modelLocation)
 {
 	this->model = model;
 	this->position = position;
 	this->angle = angle;
+	this->scale = scale;
 	this->projectionLocation = projectionLocation;
 	this->viewLocation = viewLocation;
 	this->modelLocation = modelLocation;
@@ -57,10 +53,10 @@ void MyWorldThing::Draw()
 		//model
 			//init with identity
 				glm::mat4 modelMatrix(1.0f);
-			//translate to the polygon's position
+			//translate
 				//22.5.22 this is broken for points on the origin
 				modelMatrix = glm::translate(modelMatrix, position);
-			//rotate around each axis
+			//rotate
 				modelMatrix = glm::rotate(
 					modelMatrix,
 					glm::radians(angle.x),
@@ -75,6 +71,11 @@ void MyWorldThing::Draw()
 					modelMatrix,
 					glm::radians(angle.z),
 					glm::vec3(0,0,1)
+				);
+			//scale
+				modelMatrix = glm::scale(
+					modelMatrix,
+					scale
 				);
 	//pass matrices to shader
 		glad_glUniformMatrix4fv(
