@@ -167,7 +167,7 @@
   <ItemGroup>
     <ClCompile Include="bmp_loader.cpp" />
     <ClCompile Include="Class\BufferedAiMesh\BufferedAiMesh.cpp" />
-    <ClCompile Include="Class\MyWorldThing\myWorldThing.cpp" />
+    <ClCompile Include="Class\WorldObject\WorldObject.cpp" />
     <ClCompile Include="Class\Program\program.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="Libraries\include\glm\detail\glm.cpp" />
@@ -178,7 +178,7 @@
   <ItemGroup>
     <ClInclude Include="bmp_loader.hpp" />
     <ClInclude Include="Class\BufferedAiMesh\BufferedAiMesh.hpp" />
-    <ClInclude Include="Class\MyWorldThing\myWorldThing.hpp" />
+    <ClInclude Include="Class\WorldObject\WorldObject.hpp" />
     <ClInclude Include="Class\Program\program.hpp" />
     <ClInclude Include="Libraries\include\assimp\aabb.h" />
     <ClInclude Include="Libraries\include\assimp\ai_assert.h" />

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "myWorldThing.hpp"
+#include "WorldObject.hpp"
 #include "windows.h"
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
@@ -11,12 +11,12 @@
 #include "../BufferedAiMesh/BufferedAiMesh.hpp"
 
 
-MyWorldThing::MyWorldThing()
+WorldObject::WorldObject()
 {
 	OutputDebugStringW(L"FATAL: called invalid constructor MyWorldThing()\n");
 	exit(1);
 }
-MyWorldThing::MyWorldThing(Model* model, glm::vec3 position, glm::vec3 angle, glm::vec3 scale, GLuint projectionLocation, GLuint viewLocation, GLuint modelLocation)
+WorldObject::WorldObject(Model* model, glm::vec3 position, glm::vec3 angle, glm::vec3 scale, GLuint projectionLocation, GLuint viewLocation, GLuint modelLocation)
 {
 	this->model = model;
 	this->position = position;
@@ -27,7 +27,7 @@ MyWorldThing::MyWorldThing(Model* model, glm::vec3 position, glm::vec3 angle, gl
 	this->modelLocation = modelLocation;
 }
 
-void MyWorldThing::Draw()
+void WorldObject::Draw()
 {
 	/*
 		22.5.22

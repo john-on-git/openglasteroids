@@ -18,7 +18,7 @@
     <ClCompile Include="Class\BufferedAiMesh\BufferedAiMesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Class\MyWorldThing\myWorldThing.cpp">
+    <ClCompile Include="Class\WorldObject\WorldObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Class\Program\program.cpp">
@@ -47,7 +47,7 @@
     <ClInclude Include="Class\BufferedAiMesh\BufferedAiMesh.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Class\MyWorldThing\myWorldThing.hpp">
+    <ClInclude Include="Class\WorldObject\WorldObject.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Class\Program\program.hpp">

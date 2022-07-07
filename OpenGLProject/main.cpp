@@ -19,7 +19,7 @@
 
 #include "Class/Program/program.hpp"
 #include "Class/BufferedAiMesh/BufferedAiMesh.hpp"
-#include "Class/myWorldThing/myWorldThing.hpp"
+#include "Class/WorldObject/WorldObject.hpp"
 #include "Class/Texture/Texture.hpp"
 #include "main.hpp"
 
@@ -90,8 +90,8 @@ int main()
 		auto dish1	= new Texture("textures/dish_1.jpg");
 		auto dish2	= new Texture("textures/dish_2.jpg");
 	//set up world stuff
-		vector<MyWorldThing*> worldThings{
-			new MyWorldThing(
+		vector<WorldObject*> worldThings{
+			new WorldObject(
 				new Model(
 					"Models/dish.obj",
 					textureLocation,
@@ -105,7 +105,7 @@ int main()
 				viewLocation,
 				modelLocation
 			),
-			new MyWorldThing(
+			new WorldObject(
 				new Model(
 					"Models/utah_teapot_textured.obj",
 					textureLocation,
@@ -135,7 +135,7 @@ int main()
 				modelLocation
 			)*/
 		};
-		MyWorldThing* first = worldThings[1];
+		WorldObject* first = worldThings[1];
 	//render loop
 	while (!glfwWindowShouldClose(window))
 	{
