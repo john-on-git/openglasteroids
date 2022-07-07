@@ -172,6 +172,7 @@
     <ClCompile Include="glad.c" />
     <ClCompile Include="Libraries\include\glm\detail\glm.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Class\Texture\Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="bmp_loader.hpp" />
@@ -548,6 +549,7 @@
     <ClInclude Include="Libraries\include\KHR\khrplatform.h" />
     <ClInclude Include="Libraries\include\stb\stb_image.h" />
     <ClInclude Include="main.hpp" />
+    <ClInclude Include="Class\Texture\Texture.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Libraries\include\assimp\color4.inl" />

@@ -25,8 +25,9 @@
 	#include "Class/Program/program.hpp"
 	#include "Class/BufferedAiMesh/BufferedAiMesh.hpp"
 	#include "Class/myWorldThing/myWorldThing.hpp"
+	#include "Class/Texture/Texture.hpp"
 	#include "main.hpp"
-	#include "bmp_loader.hpp"
+
 
 using namespace std;
 
@@ -92,30 +93,33 @@ int main()
 				OutputDebugStringW(L"FATAL: couldn't get uniform location\n");
 				exit(1);
 			}
-	//load assets from disk
-			bmp* cat = load_bmp("textures/aidens_cat.bmp");
-	//set up textures
-		//todo make a class
-		GLuint textures[1];
-		glad_glGenTextures(1, textures);
-		glad_glBindTexture(GL_TEXTURE_2D, textures[0]);
-		glad_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glad_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		//glad_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-		//glad_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
-		glad_glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, cat->width, cat->height, 0, GL_RGB, GL_UNSIGNED_BYTE, cat->content);
-		delete cat;
+	//textures
+		auto shadow = new Texture("textures/shadow.jpg");
+		auto john	= new Texture("textures/johncat.bmp");
 	//set up world stuff
 		vector<MyWorldThing*> worldThings{
 			new MyWorldThing(
 				new BufferedAiMesh(
 					"Models/utah_teapot_textured.obj",
-					textures[0],
+					shadow->handle,
 					textureLocation,
 					VAOs[0]
 				),
 				glm::vec3(0.0f, 0.0f, -20.0f),
 				glm::vec3(0.0f, 0.0f, 180.0f),
+				projectionLocation,
+				viewLocation,
+				modelLocation
+			),
+			new MyWorldThing(
+				new BufferedAiMesh(
+					"Models/uvmapped_cube.obj",
+					john->handle,
+					textureLocation,
+					VAOs[0]
+				),
+				glm::vec3(-4.0f, -4.0f, -10.0f),
+				glm::vec3(0.0f, 0.0f, 0.0f),
 				projectionLocation,
 				viewLocation,
 				modelLocation
