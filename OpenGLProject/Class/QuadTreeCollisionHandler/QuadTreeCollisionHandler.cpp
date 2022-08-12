@@ -1,4 +1,5 @@
 #include "QuadTreeCollisionHandler.hpp"
+#include <iostream>
 
 QuadTreeCollisionHandler::QuadTreeCollisionHandler(unsigned char maxDepth, glm::vec2 initialBounds[2])
 {
@@ -13,7 +14,7 @@ void QuadTreeCollisionHandler::Update(vector<WorldObject*> v)
 		root->Clear(); //clear it
 	//construct the quadtree
 	root = new qnode(NULL, initialBounds);
-	for(auto obj : v)
+	for (auto obj : v)
 		root->TryInsert(maxDepth, 1, obj);
 }
 
@@ -34,9 +35,11 @@ unordered_set<UnorderedPair<WorldObject*>>* QuadTreeCollisionHandler::GetBroadCo
 
 unordered_set<UnorderedPair<WorldObject*>>* QuadTreeCollisionHandler::GetBroadCollisionsHelper(unordered_set<UnorderedPair<WorldObject*>>* store, qnode* node)
 {
-	//shit code
-	//TODO replace pair with non-directional pair if that makes any sense
-	for (auto item : node->contents)
+	if(node->children[0]!=NULL) //if this is not a leaf node, check subtree first
+		for (char i = 0;i < 4;i++)
+			GetBroadCollisionsHelper(store, node->children[i]);
+
+	for (auto item : node->contents) //check this node
 		for (auto other : *node->UnionOfSubTreeContentsExcludingtarget(item))
 			store->emplace(UnorderedPair<WorldObject*>(item, other));
 	return store;

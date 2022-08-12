@@ -243,7 +243,7 @@ int main()
 			//	{
 			//		//they've collided, do the thing
 			//	}
-			if (broadCollisions!=NULL && broadCollisions->size() > 1)
+			if (broadCollisions!=NULL && broadCollisions->size() > 0)
 				ship->model->meshes[0].colorMask = glm::vec4(2, 1, 1, 1);
 			else
 				ship->model->meshes[0].colorMask = glm::vec4(1, 1, 1, 1);
