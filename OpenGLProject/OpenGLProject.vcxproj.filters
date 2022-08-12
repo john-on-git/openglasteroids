@@ -42,6 +42,15 @@
     <ClCompile Include="Class\Model\Model.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Class\Delta\Delta.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Class\QuadTreeCollisionHandler\QuadTreeCollisionHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UnorderedPair\UnorderedPair.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Class\BufferedAiMesh\BufferedAiMesh.hpp">
@@ -1172,6 +1181,24 @@
     <ClInclude Include="Class\Model\Model.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Class\Delta\Delta.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tag.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Class\ICollisionHandler\ICollisionHandler.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Class\QuadTreeCollisionHandler\QuadTreeCollisionHandler.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UnorderedPair\unorderedPair.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Class\UnorderedPair\UnorderedPair.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Libraries\include\assimp\color4.inl">
@@ -1612,6 +1639,8 @@
     <None Include="Licences\assimp" />
     <None Include="Licences\LICENSE.md" />
     <None Include="Licences\stb" />
+    <None Include="Shaders\TexturedColoredTransform\texturedColoredTransform.frag" />
+    <None Include="Shaders\TexturedColoredTransform\texturedColoredTransform.vert" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="Libraries\lib\glfw3.lib" />

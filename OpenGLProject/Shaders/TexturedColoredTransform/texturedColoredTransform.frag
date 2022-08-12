@@ -6,9 +6,10 @@
 in vec2 texCoords; //this isn't... Because they need to have the same variable name!? WTF is this shit
 
 uniform sampler2D tex;
+uniform vec4 colorMask;
 
 out vec4 colorOut;
 
 void main() {
-	colorOut = texture(tex, texCoords);
+	colorOut = texture(tex, texCoords) * colorMask;
 }

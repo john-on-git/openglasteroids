@@ -2,13 +2,15 @@
 
 #include <string>
 #include "../BufferedAiMesh/BufferedAiMesh.hpp"
+#include <glm/ext/vector_float3.hpp>
 
 class Model
 {
 	public:
-		Model(std::string path, GLuint textureLocation, GLuint* textures, size_t numTextures);
+		BufferedAiMesh* meshes;
+		glm::vec3 bBox[2]; //the bounding box
+		Model(std::string path, GLuint textureLocation, GLuint colorLocation, GLuint* textures, glm::vec4* colorMasks, size_t numTextures);
 		void Draw();
 	protected:
-		BufferedAiMesh* meshes;
 		size_t numMeshes;
 };

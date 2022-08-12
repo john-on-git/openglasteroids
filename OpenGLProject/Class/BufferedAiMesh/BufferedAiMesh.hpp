@@ -2,6 +2,7 @@
 
 #include <glad/glad.h>
 #include <assimp/mesh.h>
+#include <glm/ext/vector_float4.hpp>
 
 /// <summary>
 /// aiMesh, some stuff copied to buffer
@@ -10,8 +11,9 @@
 class BufferedAiMesh
 {
 	public:
+		glm::vec4 colorMask;
 		BufferedAiMesh();
-		BufferedAiMesh(aiMesh* mesh, GLuint texture, GLuint textureLocation);
+		BufferedAiMesh(aiMesh* mesh, GLuint texture, glm::vec4 colorMask, GLuint textureLocation, GLuint colorLocation);
 
 		~BufferedAiMesh();
 
@@ -20,6 +22,7 @@ class BufferedAiMesh
 		GLuint* VAO;
 		GLuint* buffers;
 		GLuint textureLocation;
+		GLuint colorLocation;
 		GLuint texture;
 		GLsizei numIndices;
 };

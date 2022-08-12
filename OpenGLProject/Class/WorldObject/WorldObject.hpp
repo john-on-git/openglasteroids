@@ -2,6 +2,10 @@
 
 #include "../Model/Model.hpp"
 #include <glm/vec3.hpp>
+#include <vector>
+#include "../../tag.hpp"
+
+using namespace std;
 
 /// <summary>
 /// something with a model, position and direction
@@ -10,11 +14,13 @@ class WorldObject {
 	public:
 		Model *model;
 		glm::vec3 position;
-		glm::vec3 angle; //mag, x, y, z
+		glm::vec3 angle;
 		glm::vec3 scale;
+		bool markedForDelete;
+		vector<tag> tags;
 
 		WorldObject();
-		WorldObject(Model *model, glm::vec3 position, glm::vec3 angle, glm::vec3 scale, GLuint projectionLocation, GLuint viewLocation, GLuint modelLocation);
+		WorldObject(Model *model, glm::vec3 position, glm::vec3 angle, glm::vec3 scale, GLuint projectionLocation, GLuint viewLocation, GLuint modelLocation, vector<tag> tags);
 
 		void Draw();
 	protected:

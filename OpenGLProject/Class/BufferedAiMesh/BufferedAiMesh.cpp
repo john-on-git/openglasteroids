@@ -1,6 +1,7 @@
 #include "BufferedAiMesh.hpp"
 #include "windows.h"
 #include <iostream>
+#include <glm/gtc/type_ptr.hpp>
 
 BufferedAiMesh::BufferedAiMesh()
 {
@@ -14,11 +15,13 @@ BufferedAiMesh::BufferedAiMesh()
 constexpr auto STRIDE = 6; //width of each vert
 constexpr auto INDICES_PER_TRI = 3;
 
-BufferedAiMesh::BufferedAiMesh(aiMesh* mesh, GLuint texture, GLuint textureLocation)
+BufferedAiMesh::BufferedAiMesh(aiMesh* mesh, GLuint texture, glm::vec4 colorMask, GLuint textureLocation, GLuint colorLocation)
 {
 	//init properties
-		this->textureLocation = textureLocation;
 		this->texture = texture;
+		this->colorMask = colorMask;
+		this->textureLocation = textureLocation;
+		this->colorLocation = colorLocation;
 		this->numIndices = (mesh->mNumFaces) * INDICES_PER_TRI;
 	//transform verts to gl format
 		float *verts = new float[mesh->mNumVertices * STRIDE];
@@ -102,6 +105,7 @@ void BufferedAiMesh::Draw()
 		glad_glActiveTexture(GL_TEXTURE0);
 		glad_glBindTexture(GL_TEXTURE_2D, texture);
 		glad_glUniform1i(textureLocation, 0);
+		glad_glUniform4fv(colorLocation, 1, glm::value_ptr(colorMask));
 		//draw
 		glad_glDrawElements(
 			GL_TRIANGLES,
