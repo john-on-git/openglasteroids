@@ -114,7 +114,7 @@ class QuadTreeCollisionHandler : public ICollisionHandler {
 								);
 							}
 							int i = 0;
-							while (i<4 && !inSubTree && children[i]!=NULL) {
+							while (i<4 && !inSubTree) {
 								inSubTree = inSubTree || children[i]->TryInsert(maxDepth, currentDepth + 1, obj);
 								i++;
 							}
@@ -122,10 +122,12 @@ class QuadTreeCollisionHandler : public ICollisionHandler {
 							if (!inSubTree)
 							{
 								contents.push_back(obj);
-								return true;
 							}
+							return true;
 						}
-						return false; //failed to insert
+						else {
+							return false; //failed to insert
+						}
 					}
 				}
 				qnode* Find(WorldObject* obj)
@@ -158,15 +160,12 @@ class QuadTreeCollisionHandler : public ICollisionHandler {
 					//calculate world coordinates of object's bounding box
 					glm::vec3 objCoords3 = glm::vec3(obj->position.x, obj->position.y, obj->position.z);
 					glm::vec3 absCoords[]{
-						(obj->model->bBox[0] * obj->scale + objCoords3),
-						(obj->model->bBox[1] * obj->scale + objCoords3)
+						(obj->model->bBox[0] * obj->scale - objCoords3),
+						(obj->model->bBox[1] * obj->scale - objCoords3)
 					};
-					//invert the coords for now, because for some reason it's all intverted VS the worldObject coordinates. should really change that
-					absCoords[0] *= -1;
-					absCoords[1] *= -1;
 					//determine whether the object is located fully inside this region
-					return	(bounds[0].x <= absCoords[0].x) && (bounds[0].y <= absCoords[0].y) && //bottom left
-							(bounds[1].x >= absCoords[1].x) && (bounds[1].y >= absCoords[1].y); //top right
+					return	(bounds[0].x >= absCoords[0].x) && (bounds[0].y >= absCoords[0].y) && //bottom left
+							(bounds[1].x <= absCoords[1].x) && (bounds[1].y <= absCoords[1].y); //top right
 				}
 		};
 		qnode* root;

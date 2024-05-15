@@ -42,10 +42,10 @@ void drawQuadTree(WorldObject* ship, QuadTreeCollisionHandler* collisionHandler,
 		size_t COORDS_LEN = 16;
 		size_t INDICES_LEN = 8;
 		float* verts = new float[] {
-			bounds[0].x, bounds[0].y, -1.0f, 1.0f, //topleft
-				bounds[1].x, bounds[0].y, -1.0f, 1.0f, //topright
-				bounds[1].x, bounds[1].y, -1.0f, 1.0f, //bottomright
-				bounds[0].x, bounds[1].y, -1.0f, 1.0f, //bottomleft
+			bounds[0].x, bounds[1].y, -1.0f, 1.0f, //topleft
+			bounds[1].x, bounds[1].y, -1.0f, 1.0f, //topright
+			bounds[1].x, bounds[0].y, -1.0f, 1.0f, //bottomright
+			bounds[0].x, bounds[0].y, -1.0f, 1.0f, //bottomleft
 		};
 		unsigned int* vertIndices = new unsigned int[] {0, 1, 1, 2, 2, 3, 3, 0};
 
@@ -104,10 +104,10 @@ void drawQuadTree(WorldObject* ship, QuadTreeCollisionHandler* collisionHandler,
 	size_t COORDS_LEN = 16;
 	size_t INDICES_LEN = 8;
 	float* verts = new float[] {
-		bounds[0].x, bounds[0].y, -1.0f, 1.0f, //topleft
-			bounds[1].x, bounds[0].y, -1.0f, 1.0f, //topright
-			bounds[1].x, bounds[1].y, -1.0f, 1.0f, //bottomright
-			bounds[0].x, bounds[1].y, -1.0f, 1.0f, //bottomleft
+		bounds[0].x, bounds[1].y, -1.0f, 1.0f, //topleft
+		bounds[1].x, bounds[1].y, -1.0f, 1.0f, //topright
+		bounds[1].x, bounds[0].y, -1.0f, 1.0f, //bottomright
+		bounds[0].x, bounds[0].y, -1.0f, 1.0f, //bottomleft
 	};
 	unsigned int* vertIndices = new unsigned int[] {0, 1, 1, 2, 2, 3, 3, 0};
 
@@ -275,8 +275,8 @@ int main()
 		QuadTreeCollisionHandler collisionHandler(
 			5,
 			new glm::vec2[]{
-				glm::vec2(-1, -1),
-				glm::vec2(1,1)
+				glm::vec2(1, 1),
+				glm::vec2(-1,-1)
 			}
 		);
 		vector<Delta*> deltas;

@@ -82,30 +82,8 @@ pair<unordered_set<UnorderedPair<WorldObject*>>*, vector<WorldObject*>*> QuadTre
 glm::vec2* QuadTreeCollisionHandler::GetNodeBoundsForObject(WorldObject* target)
 {
 	//bfs the tree for object
-	std::queue<qnode*> queue;
-	queue.push(root);
-	qnode* current = NULL;
-	while (!queue.empty())
-	{
-		current = queue.front();
-		queue.pop();
-		bool targetFound = false;
-		for (int i = 0;i < current->contents.size();i++) {
-			//if this is the target object is, return the current node's bounds
-			if (current->contents[i] == target) {
-				targetFound = true;
-				break;
-			}
-		}
-		if (!targetFound) {
-			for (int j = 0;j < 4;j++) {
-				if (current->children[j] != NULL) {
-					queue.push(current->children[j]);
-				}
-			}
-		}
-	}
-	return current==NULL ? NULL : current->bounds;
+	qnode* result = root->Find(target);
+	return result==NULL ? NULL : result->bounds;
 }
 
 vector<glm::vec2*>* QuadTreeCollisionHandler::GetAllBounds() 
