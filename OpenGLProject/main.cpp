@@ -29,15 +29,79 @@
 
 using namespace std;
 
-//sort of dumped this down here, should be on quadtreecollisionhandler I suppose
-void drawQuadTree(WorldObject* ship, QuadTreeCollisionHandler* collisionHandler, Program* texturedColoredShader, Program* lineShader) {
+//Debug logic for visualizing the quadtree. MASSIVE MEMORY LEAK! sort of dumped this here, should be on quadtreecollisionhandler I suppose.
+void drawQuadTree(bool drawAllRegions, bool drawShipRegion, WorldObject* ship, QuadTreeCollisionHandler* collisionHandler, Program* texturedColoredShader, Program* lineShader) {
+	if (drawAllRegions) {
+		glad_glLineWidth(1);
+		auto flattened = collisionHandler->GetAllBounds();
+		while (!flattened->empty()) {
+			glm::vec2* bounds = flattened->back();
+			flattened->pop_back();
+			//set up line quadtree debugger
+			int STRIDE = 4;
+			size_t COORDS_LEN = 16;
+			size_t INDICES_LEN = 8;
+			float* verts = new float[] {
+				bounds[0].x, bounds[1].y, -1.0f, 1.0f, //topleft
+				bounds[1].x, bounds[1].y, -1.0f, 1.0f, //topright
+				bounds[1].x, bounds[0].y, -1.0f, 1.0f, //bottomright
+				bounds[0].x, bounds[0].y, -1.0f, 1.0f, //bottomleft
+			};
+			unsigned int* vertIndices = new unsigned int[] {0,1, 1,2, 2,3, 3,0};
 
-	glad_glLineWidth(1);
-	auto flattened = collisionHandler->GetAllBounds();
-	while (!flattened->empty()) {
-		glm::vec2* bounds = flattened->back();
-		flattened->pop_back();
+			//generate vertex array object
+			GLuint quadtreeVAO;
+			glad_glGenVertexArrays(1, &quadtreeVAO);
+			glad_glBindVertexArray(quadtreeVAO);
+			//generate buffers and copy over data
+			GLuint buffers[2]; //vertex buffer, and vertex index buffer
+			glad_glGenBuffers(2, buffers); //19.5.21, first argument is the number of buffers, not the size of the buffer. corrupted the heap?
+
+			glad_glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
+			glad_glBufferData( //add verts to buffer
+				GL_ARRAY_BUFFER,
+				COORDS_LEN * sizeof(float),
+				verts,
+				GL_STATIC_DRAW
+			);
+
+			glad_glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers[1]);
+			glad_glBufferData( //add verts to buffer
+				GL_ELEMENT_ARRAY_BUFFER,
+				INDICES_LEN * sizeof(unsigned int),
+				vertIndices,
+				GL_STATIC_DRAW
+			);
+
+			delete[] verts;
+			delete[] vertIndices;
+
+			//set vertex attrib pointers OK
+			glad_glEnableVertexAttribArray(0);
+			glad_glVertexAttribPointer( //position
+				0,
+				4,
+				GL_FLOAT,
+				GL_FALSE,
+				STRIDE * sizeof(float),
+				NULL
+			);
+
+			lineShader->Use();
+			glad_glBindVertexArray(quadtreeVAO);
+			glad_glDrawElements(
+				GL_LINES,
+				INDICES_LEN,
+				GL_UNSIGNED_INT,
+				NULL
+			);
+			texturedColoredShader->Use();
+		}
+	}
+	if (drawShipRegion) {
+		glad_glLineWidth(10);
 		//set up line quadtree debugger
+		auto bounds = collisionHandler->GetNodeBoundsForObject(ship);
 		int STRIDE = 4;
 		size_t COORDS_LEN = 16;
 		size_t INDICES_LEN = 8;
@@ -47,7 +111,7 @@ void drawQuadTree(WorldObject* ship, QuadTreeCollisionHandler* collisionHandler,
 			bounds[1].x, bounds[0].y, -1.0f, 1.0f, //bottomright
 			bounds[0].x, bounds[0].y, -1.0f, 1.0f, //bottomleft
 		};
-		unsigned int* vertIndices = new unsigned int[] {0, 1, 1, 2, 2, 3, 3, 0};
+		unsigned int* vertIndices = new unsigned int[] {0,1, 1,2, 2,3, 3,0};
 
 		//generate vertex array object
 		GLuint quadtreeVAO;
@@ -97,67 +161,6 @@ void drawQuadTree(WorldObject* ship, QuadTreeCollisionHandler* collisionHandler,
 		);
 		texturedColoredShader->Use();
 	}
-	glad_glLineWidth(10);
-	//set up line quadtree debugger
-	auto bounds = collisionHandler->GetNodeBoundsForObject(ship);
-	int STRIDE = 4;
-	size_t COORDS_LEN = 16;
-	size_t INDICES_LEN = 8;
-	float* verts = new float[] {
-		bounds[0].x, bounds[1].y, -1.0f, 1.0f, //topleft
-		bounds[1].x, bounds[1].y, -1.0f, 1.0f, //topright
-		bounds[1].x, bounds[0].y, -1.0f, 1.0f, //bottomright
-		bounds[0].x, bounds[0].y, -1.0f, 1.0f, //bottomleft
-	};
-	unsigned int* vertIndices = new unsigned int[] {0, 1, 1, 2, 2, 3, 3, 0};
-
-	//generate vertex array object
-	GLuint quadtreeVAO;
-	glad_glGenVertexArrays(1, &quadtreeVAO);
-	glad_glBindVertexArray(quadtreeVAO);
-	//generate buffers and copy over data
-	GLuint buffers[2]; //vertex buffer, and vertex index buffer
-	glad_glGenBuffers(2, buffers); //19.5.21, first argument is the number of buffers, not the size of the buffer. corrupted the heap?
-
-	glad_glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
-	glad_glBufferData( //add verts to buffer
-		GL_ARRAY_BUFFER,
-		COORDS_LEN * sizeof(float),
-		verts,
-		GL_STATIC_DRAW
-	);
-
-	glad_glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers[1]);
-	glad_glBufferData( //add verts to buffer
-		GL_ELEMENT_ARRAY_BUFFER,
-		INDICES_LEN * sizeof(unsigned int),
-		vertIndices,
-		GL_STATIC_DRAW
-	);
-
-	delete[] verts;
-	delete[] vertIndices;
-
-	//set vertex attrib pointers OK
-	glad_glEnableVertexAttribArray(0);
-	glad_glVertexAttribPointer( //position
-		0,
-		4,
-		GL_FLOAT,
-		GL_FALSE,
-		STRIDE * sizeof(float),
-		NULL
-	);
-
-	lineShader->Use();
-	glad_glBindVertexArray(quadtreeVAO);
-	glad_glDrawElements(
-		GL_LINES,
-		INDICES_LEN,
-		GL_UNSIGNED_INT,
-		NULL
-	);
-	texturedColoredShader->Use();
 }
 
 /*
@@ -167,7 +170,7 @@ void drawQuadTree(WorldObject* ship, QuadTreeCollisionHandler* collisionHandler,
 	licensing stuff for libs
 */
 
-bool keyPressed[180];
+bool keyPressed[360];
 
 int main()
 {
@@ -259,7 +262,7 @@ int main()
 		);
 		auto dummy = WorldObject(
 			projectileModel,
-			glm::vec3(1, 1, -5.0f),//pos
+			glm::vec3(-0.5f, -0.5f, -5.0f),//pos
 			glm::vec3(270.0f, 0.0f, 0.0f),
 			glm::vec3(0.05f, 0.05f, 0.05f), //scale
 			projectionLocation,
@@ -393,7 +396,7 @@ int main()
 			glad_glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		if (true)//keyPressed[GLFW_KEY_Q]) //draw the bounds of the quadtree, highlighting the node that the ship is in
 		{
-			drawQuadTree(&ship, &collisionHandler, &texturedColoredShader, &lineShader);
+			drawQuadTree(true, true, &ship, &collisionHandler, &texturedColoredShader, &lineShader);
 		}
 		delete broadCollisions;
 		//draw all objects, deleting any that have been marked for delete
