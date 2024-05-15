@@ -81,7 +81,7 @@ pair<unordered_set<UnorderedPair<WorldObject*>>*, vector<WorldObject*>*> QuadTre
 //for debugging
 glm::vec2* QuadTreeCollisionHandler::GetNodeBoundsForObject(WorldObject* target)
 {
-	//dfs the tree for object
+	//bfs the tree for object
 	std::queue<qnode*> queue;
 	queue.push(root);
 	qnode* current = NULL;
@@ -106,4 +106,11 @@ glm::vec2* QuadTreeCollisionHandler::GetNodeBoundsForObject(WorldObject* target)
 		}
 	}
 	return current==NULL ? NULL : current->bounds;
+}
+
+vector<glm::vec2*>* QuadTreeCollisionHandler::GetAllBounds() 
+{
+	vector<glm::vec2*>* vector = new std::vector<glm::vec2*>;
+	root->DepthFirstFlatten(vector);
+	return vector;
 }

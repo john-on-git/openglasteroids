@@ -12,6 +12,7 @@ class QuadTreeCollisionHandler : public ICollisionHandler {
 		virtual unordered_set<UnorderedPair<WorldObject*>>* GetBroadCollisions();
 		virtual bool GetFineCollision(WorldObject* a, WorldObject* b);
 		virtual glm::vec2* GetNodeBoundsForObject(WorldObject* object);
+		vector<glm::vec2*>* GetAllBounds();
 	private:
 		glm::vec2* initialBounds;
 		unsigned char maxDepth;
@@ -49,7 +50,6 @@ class QuadTreeCollisionHandler : public ICollisionHandler {
 				/// <returns>whether the operation was successful</returns>
 				bool TryInsert(unsigned char maxDepth, unsigned char currentDepth, WorldObject* obj)
 				{
-					//TODO should really be breadth-first for performance reasons
 					if (currentDepth >= maxDepth)
 						return false;
 					else
@@ -63,52 +63,52 @@ class QuadTreeCollisionHandler : public ICollisionHandler {
 								children[0] = new qnode( //top left
 									this,
 									new glm::vec2[]{
-										glm::vec2( //top left
+										glm::vec2( //bottom left
 											this->bounds[0].x,
-											this->bounds[0].y
-										),
-										glm::vec2( //bottom right
-											(this->bounds[0].x + this->bounds[1].x) / 2,
 											(this->bounds[0].y + this->bounds[1].y) / 2
+										),
+										glm::vec2( //top right
+											(this->bounds[0].x + this->bounds[1].x) / 2,
+											this->bounds[1].y
 										)
 									}
 								);
 								children[1] = new qnode( //top right
 									this,
 									new glm::vec2[]{
-										glm::vec2( //top left
+										glm::vec2( //bottom left
 											(this->bounds[0].x + this->bounds[1].x) / 2,
-											this->bounds[0].y
-										),
-										glm::vec2( //bottom right
-											this->bounds[1].x,
 											(this->bounds[0].y + this->bounds[1].y) / 2
+										),
+										glm::vec2( //top right
+											this->bounds[1].x,
+											this->bounds[1].y
 										)
 									}
 								);
 								children[2] = new qnode( //bottom left
 									this,
 									new glm::vec2[]{
-										glm::vec2( //top left
+										glm::vec2( //bottom left
 											this->bounds[0].x,
-											(this->bounds[0].y + this->bounds[1].y) / 2
+											this->bounds[0].y
 										),
-										glm::vec2( //bottom right
+										glm::vec2( //top right
 											(this->bounds[0].x + this->bounds[1].x) / 2,
-											this->bounds[1].y
+											(this->bounds[0].y + this->bounds[1].y) / 2
 										)
 									}
 								);
 								children[3] = new qnode( //bottom right
 									this,
 									new glm::vec2[]{
-										glm::vec2( //top left
+										glm::vec2( //bottom left
 											(this->bounds[0].x + this->bounds[1].x) / 2,
-											(this->bounds[0].y + this->bounds[1].y) / 2
+											this->bounds[0].y
 										),
-										glm::vec2( //bottom right
+										glm::vec2( //top right
 											this->bounds[1].x,
-											this->bounds[1].y
+											(this->bounds[0].y + this->bounds[1].y) / 2
 										)
 									}
 								);
@@ -142,18 +142,31 @@ class QuadTreeCollisionHandler : public ICollisionHandler {
 						}
 					return NULL; //not in tree
 				}
+				void DepthFirstFlatten(vector<glm::vec2*>* collector)
+				{
+					collector->push_back(this->bounds);
+					for (auto child : children)
+					{
+						if (child != NULL) {
+							child->DepthFirstFlatten(collector);
+						}
+					}
+				}
 			protected:
 				bool WillFit(WorldObject* obj)
 				{
 					//calculate world coordinates of object's bounding box
 					glm::vec3 objCoords3 = glm::vec3(obj->position.x, obj->position.y, obj->position.z);
 					glm::vec3 absCoords[]{
-						obj->model->bBox[0] * obj->scale + objCoords3,
-						obj->model->bBox[1] * obj->scale + objCoords3
+						(obj->model->bBox[0] * obj->scale + objCoords3),
+						(obj->model->bBox[1] * obj->scale + objCoords3)
 					};
+					//invert the coords for now, because for some reason it's all intverted VS the worldObject coordinates. should really change that
+					absCoords[0] *= -1;
+					absCoords[1] *= -1;
 					//determine whether the object is located fully inside this region
-					return	(bounds[0].x <= absCoords[0].x) && (bounds[0].y >= absCoords[0].y) && //bottom left
-							(bounds[1].x >= absCoords[1].x) && (bounds[1].y <= absCoords[1].y); //top right
+					return	(bounds[0].x <= absCoords[0].x) && (bounds[0].y <= absCoords[0].y) && //bottom left
+							(bounds[1].x >= absCoords[1].x) && (bounds[1].y >= absCoords[1].y); //top right
 				}
 		};
 		qnode* root;
