@@ -70,6 +70,7 @@ BufferedAiMesh::BufferedAiMesh(aiMesh* mesh, GLuint texture, glm::vec4 colorMask
 		delete[] verts;
 		delete[] vertIndices;
 	//set vertex attrib pointers
+		glad_glEnableVertexAttribArray(0);
 		glad_glVertexAttribPointer( //position
 			0,
 			4,
@@ -83,7 +84,7 @@ BufferedAiMesh::BufferedAiMesh(aiMesh* mesh, GLuint texture, glm::vec4 colorMask
 			NULL
 		);
 
-		glad_glEnableVertexAttribArray(0);
+		glad_glEnableVertexAttribArray(1);
 		glad_glVertexAttribPointer( //texCoord
 			1,
 			2,
@@ -92,7 +93,6 @@ BufferedAiMesh::BufferedAiMesh(aiMesh* mesh, GLuint texture, glm::vec4 colorMask
 			STRIDE * sizeof(float), //1.7.22 same here
 			(GLvoid*)(4 * sizeof(float)) //offset
 		);
-		glad_glEnableVertexAttribArray(1);
 	}
 
 void BufferedAiMesh::Draw()

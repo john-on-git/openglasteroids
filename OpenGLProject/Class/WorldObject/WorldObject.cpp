@@ -41,7 +41,6 @@ void WorldObject::Draw()
 	*/
 	//calculate matrices
 		//projection
-			//this is the broken part!
 			glm::mat4 projectionMatrix = glm::perspective(
 				75.0f,
 				1.0f,

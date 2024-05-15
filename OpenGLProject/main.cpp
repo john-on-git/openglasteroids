@@ -71,20 +71,25 @@ int main()
 	//gl drawing config
 		glad_glClearColor(0.0f, 0.0f, 0.0f, 1);
 		glad_glPointSize(5.0f);
+		glad_glLineWidth(10);
 	//shader setup
 		//compile
-			Program shader(
+			Program texturedColoredShader(
 				"Shaders/TexturedColoredTransform/texturedColoredTransform.frag",
 				"Shaders/TexturedColoredTransform/texturedColoredTransform.vert"
 			);
+			Program lineShader(
+				"Shaders/MyFirstShader/myFirst.frag",
+				"Shaders/MyFirstShader/myFirst.vert"
+			);
 		//get uniform locations
-			shader.Use();
+			texturedColoredShader.Use();
 			GLuint
-				textureLocation		= glad_glGetUniformLocation(shader.handle, "tex"),
-				colorLocation		= glad_glGetUniformLocation(shader.handle, "colorMask"),
-				projectionLocation	= glad_glGetUniformLocation(shader.handle, "projection"),
-				viewLocation		= glad_glGetUniformLocation(shader.handle, "view"),
-				modelLocation		= glad_glGetUniformLocation(shader.handle, "model");
+				textureLocation		= glad_glGetUniformLocation(texturedColoredShader.handle, "tex"),
+				colorLocation		= glad_glGetUniformLocation(texturedColoredShader.handle, "colorMask"),
+				projectionLocation	= glad_glGetUniformLocation(texturedColoredShader.handle, "projection"),
+				viewLocation		= glad_glGetUniformLocation(texturedColoredShader.handle, "view"),
+				modelLocation		= glad_glGetUniformLocation(texturedColoredShader.handle, "model");
 			//check for failure
 			if (projectionLocation == -1 || viewLocation == -1 || modelLocation == -1)
 			{
@@ -112,7 +117,7 @@ int main()
 			1
 		);
 	//set up world stuff
-		auto ship = new WorldObject(
+		auto ship = WorldObject(
 			shipModel,
 			glm::vec3(0.0f, 0.0f, -5.0f),//pos
 			glm::vec3(270.0f, 0.0f, 0.0f),
@@ -122,18 +127,19 @@ int main()
 			modelLocation,
 			vector<tag>{ SHIP }
 		);
+		auto dummy = WorldObject(
+			projectileModel,
+			glm::vec3(0.0f, 0.0f, -5.0f),//pos
+			glm::vec3(270.0f, 0.0f, 0.0f),
+			glm::vec3(0.05f, 0.05f, 0.05f), //scale
+			projectionLocation,
+			viewLocation,
+			modelLocation,
+			vector<tag>{}
+		);
 		auto objects = vector<WorldObject*>{
-				ship,
-				new WorldObject(
-				shipModel,
-				glm::vec3(0.0f, 0.0f, -5.0f),//pos
-				glm::vec3(270.0f, 0.0f, 0.0f),
-				glm::vec3(0.05f, 0.05f, 0.05f), //scale
-				projectionLocation,
-				viewLocation,
-				modelLocation,
-				vector<tag>{}
-			)
+				&ship,
+				&dummy
 		};
 	//game stuff
 		QuadTreeCollisionHandler collisionHandler(
@@ -145,7 +151,7 @@ int main()
 		);
 		vector<Delta*> deltas;
 		vector<WorldObject*> projectiles;
-		auto shipVelocity = new Delta(&ship->position, glm::vec3(0.0f, 0.0f, 0.0f), -1);
+		auto shipVelocity = new Delta(&ship.position, glm::vec3(0.0f, 0.0f, 0.0f));
 		deltas.push_back(shipVelocity);
 		unsigned char fireDelay = 0;
 	//render loop
@@ -154,7 +160,7 @@ int main()
 		if (fireDelay > 0)
 			fireDelay--;
 		//get player input
-		auto rad = glm::radians(ship->angle.y);
+		auto rad = glm::radians(ship.angle.y);
 		if (keyPressed[GLFW_KEY_W])
 		{
 			deltas.push_back(new Delta(
@@ -183,7 +189,7 @@ int main()
 		if (keyPressed[GLFW_KEY_A])
 		{
 			deltas.push_back(new Delta(
-				&ship->angle,
+				&ship.angle,
 				glm::vec3(0.0f, SHIP_TURNRATE_MULT * -1, 0.0f),
 				10
 			));
@@ -191,7 +197,7 @@ int main()
 		else if (keyPressed[GLFW_KEY_D])
 		{
 			deltas.push_back(new Delta(
-				&ship->angle,
+				&ship.angle,
 				glm::vec3(0.0f, SHIP_TURNRATE_MULT, 0.0f),
 				10
 			));
@@ -202,9 +208,9 @@ int main()
 			auto projectile = new WorldObject(
 				projectileModel,
 				glm::vec3(
-					ship->position.x + sin(rad) * 0.05,
-					ship->position.y + cos(rad) * 0.05,
-					ship->position.z
+					ship.position.x + sin(rad) * 0.05,
+					ship.position.y + cos(rad) * 0.05,
+					ship.position.z
 				),
 				glm::vec3(270.0f, 0.0f, 0.0f),
 				glm::vec3(0.005f, 0.005f, 0.005f),
@@ -218,9 +224,9 @@ int main()
 			deltas.push_back(new Delta(
 				&projectile->position,
 				glm::vec3(
-					BULLET_VELOCITY_MULT * sin(rad),
-					BULLET_VELOCITY_MULT * cos(rad),
-					0.0f
+					shipVelocity->magnitude.x,
+					shipVelocity->magnitude.y,
+					shipVelocity->magnitude.z + 0.0f
 				)
 			));
 			fireDelay = FIRE_DELAY;
@@ -228,7 +234,7 @@ int main()
 		
 		for (auto object : objects)
 		{
-			//closed space
+			//toroidal space
 				if (object->position.x > ARENA_W)
 					object->position.x -= 2 * ARENA_W;
 				if (object->position.y > ARENA_H)
@@ -241,20 +247,84 @@ int main()
 
 			object->model->meshes[0].colorMask = glm::vec4(1, 1, 1, 1); //reset color
 		}
+
 		//check for collisions
 			collisionHandler.Update(objects); //spatially partition all objects
 			//check collision
 			auto broadCollisions = collisionHandler.GetBroadCollisions();
 			for (auto it = broadCollisions->begin(); it != broadCollisions->end();it++) //for each collision
-				if (collisionHandler.GetFineCollision((*it).first, (*it).second))
+				if (collisionHandler.GetFineCollision(it->first, it->second))
 				{
 					//color change for collision debugging
-					(*it).first->model->meshes[0].colorMask = glm::vec4(2, 1, 1, 1);
-					(*it).second->model->meshes[0].colorMask = glm::vec4(2, 1, 1, 1);
+					it->first->model->meshes[0].colorMask = glm::vec4(2, 1, 1, 1);
+					it->second->model->meshes[0].colorMask = glm::vec4(2, 1, 1, 1);
 				}
-			delete broadCollisions;
 		//clear framebuffers
 			glad_glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		if (true)//keyPressed[GLFW_KEY_Q]) //draw the bounds of the quadtree node that the ship is in
+		{
+			//set up line quadtree debugger
+			auto bounds = collisionHandler.GetNodeBoundsForObject(&ship);
+			int STRIDE = 4;
+			size_t COORDS_LEN = 16;
+			size_t INDICES_LEN = 8;
+			float* verts = new float[] {
+				bounds[0].x, bounds[0].y, -1.0f, 1.0f, //topleft
+				bounds[1].x, bounds[0].y, -1.0f, 1.0f, //topright
+				bounds[1].x, bounds[1].y, -1.0f, 1.0f, //bottomright
+				bounds[0].x, bounds[1].y, -1.0f, 1.0f, //bottomleft
+			};
+			unsigned int* vertIndices = new unsigned int[] {0,1, 1,2, 2,3, 3,0};
+
+			//generate vertex array object
+			GLuint quadtreeVAO;
+			glad_glGenVertexArrays(1, &quadtreeVAO);
+			glad_glBindVertexArray(quadtreeVAO);
+			//generate buffers and copy over data
+			GLuint buffers[2]; //vertex buffer, and vertex index buffer
+			glad_glGenBuffers(2, buffers); //19.5.21, first argument is the number of buffers, not the size of the buffer. corrupted the heap?
+
+			glad_glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
+			glad_glBufferData( //add verts to buffer
+				GL_ARRAY_BUFFER,
+				COORDS_LEN * sizeof(float),
+				verts,
+				GL_STATIC_DRAW
+			);
+
+			glad_glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers[1]);
+			glad_glBufferData( //add verts to buffer
+				GL_ELEMENT_ARRAY_BUFFER,
+				INDICES_LEN * sizeof(unsigned int),
+				vertIndices,
+				GL_STATIC_DRAW
+			);
+
+			delete[] verts;
+			delete[] vertIndices;
+
+			//set vertex attrib pointers OK
+			glad_glEnableVertexAttribArray(0);
+			glad_glVertexAttribPointer( //position
+				0,
+				4,
+				GL_FLOAT,
+				GL_FALSE,
+				STRIDE * sizeof(float),
+				NULL
+			);
+
+			lineShader.Use();
+			glad_glBindVertexArray(quadtreeVAO);
+			glad_glDrawElements(
+				GL_LINES,
+				INDICES_LEN,
+				GL_UNSIGNED_INT,
+				NULL
+			);
+			texturedColoredShader.Use();
+		}
+		delete broadCollisions;
 		//draw all objects, deleting any that have been marked for delete
 			for (auto it = objects.begin(); it != objects.end();)
 			{

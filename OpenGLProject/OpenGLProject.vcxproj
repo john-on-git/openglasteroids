@@ -723,6 +723,7 @@
   <ItemGroup>
     <Text Include="Licences\glad.txt" />
     <Text Include="Licences\license.txt" />
+    <Text Include="notes.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

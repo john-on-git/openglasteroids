@@ -1,5 +1,6 @@
 #include "QuadTreeCollisionHandler.hpp"
 #include <iostream>
+#include <queue>
 
 QuadTreeCollisionHandler::QuadTreeCollisionHandler(unsigned char maxDepth, glm::vec2 initialBounds[2])
 {
@@ -11,7 +12,7 @@ QuadTreeCollisionHandler::QuadTreeCollisionHandler(unsigned char maxDepth, glm::
 void QuadTreeCollisionHandler::Update(vector<WorldObject*> v)
 {
 	if(root!=NULL) //if there's an existing quadtree
-		root->Clear(); //clear it
+		delete root; //clear it
 	//construct the quadtree
 	root = new qnode(NULL, initialBounds);
 	for (auto obj : v)
@@ -51,28 +52,54 @@ pair<unordered_set<UnorderedPair<WorldObject*>>*, vector<WorldObject*>*> QuadTre
 		//iterating the tree a bunch
 		//caching subtree contents in qnode struct
 		//returning cache from function & taking union (doing this one)
-	auto temp = new vector<WorldObject*>;
+	auto cache = new vector<WorldObject*>;
 
 	if (node->children[0] != NULL) //if this is not a leaf node, check subtree first
 		for (char i = 0;i < 4;i++)
 		{
-			//get all content from subtree & move to this cache
-			vector<WorldObject*>* sub = GetBroadCollisionsHelper(store, node->children[i]).second;
-			temp->insert(temp->end(),
-				std::make_move_iterator(sub->begin()),
-				std::make_move_iterator(sub->end())
+			//get all content from subtree & move to this node's cache
+			vector<WorldObject*>* subCache = GetBroadCollisionsHelper(store, node->children[i]).second;
+			cache->insert(cache->end(),
+				std::make_move_iterator(subCache->begin()),
+				std::make_move_iterator(subCache->end())
 			);
-			delete sub;
+			delete subCache;
 		}
 
 	//check this node
 	for (auto item : node->contents)
 	{
-		for (auto other : *temp)
+		for (auto other : *cache)
 			if(item!=other)
 				store->emplace(UnorderedPair<WorldObject*>(item, other));
-		temp->push_back(item);
+		cache->push_back(item);
 	}
 	
-	return pair<unordered_set<UnorderedPair<WorldObject*>>*, vector<WorldObject*>*>(store, temp);
+	return pair<unordered_set<UnorderedPair<WorldObject*>>*, vector<WorldObject*>*>(store, cache);
+}
+
+//for debugging
+glm::vec2* QuadTreeCollisionHandler::GetNodeBoundsForObject(WorldObject* target)
+{
+	//dfs the tree for object
+	std::queue<qnode*> queue;
+	queue.push(root);
+	qnode* current = NULL;
+	while (!queue.empty())
+	{
+		current = queue.front();
+		queue.pop();
+		for (auto worldObject = current->contents.begin(); worldObject != current->contents.end();worldObject++) {
+			//if this is the target object is, return the current node's bounds
+			if ((*worldObject) == target) {
+				break;
+			}
+			else { //otherwise add all child nodes to queue
+				for (int i = 0;i < 4;i++) {
+					queue.push(current->children[i]);
+				}
+			}
+		}
+	}
+	return current==NULL ? NULL : current->bounds;
 }

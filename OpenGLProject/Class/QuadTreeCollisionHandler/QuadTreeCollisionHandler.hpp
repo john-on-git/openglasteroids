@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iostream>
 #include "../ICollisionHandler/ICollisionHandler.hpp"
 #include <glm/ext/vector_float2.hpp>
 
@@ -10,6 +11,7 @@ class QuadTreeCollisionHandler : public ICollisionHandler {
 		virtual void Update(vector<WorldObject*> v);
 		virtual unordered_set<UnorderedPair<WorldObject*>>* GetBroadCollisions();
 		virtual bool GetFineCollision(WorldObject* a, WorldObject* b);
+		virtual glm::vec2* GetNodeBoundsForObject(WorldObject* object);
 	private:
 		glm::vec2* initialBounds;
 		unsigned char maxDepth;
@@ -34,12 +36,10 @@ class QuadTreeCollisionHandler : public ICollisionHandler {
 					this->bounds[1] = bounds[1];
 				}
 
-				void Clear()
+				~qnode()
 				{
-					for (auto child : children)
-						if(child!=NULL)
-							child->Clear();
-					delete this;
+					for (qnode* child : children)
+						delete child;
 				}
 				
 				/// <summary>
@@ -141,11 +141,12 @@ class QuadTreeCollisionHandler : public ICollisionHandler {
 			protected:
 				bool WillFit(WorldObject* obj)
 				{
+					//calculate world coordinates of object's bounding box
 					glm::vec3 absCoords[]{
 						obj->model->bBox[0] + obj->position,
 						obj->model->bBox[1] + obj->position
 					};
-
+					//determine whether the object is located fully inside this region
 					return	(bounds[0].x <= absCoords[0].x) && (bounds[0].y >= absCoords[0].y) && //top left
 							(bounds[1].x >= absCoords[1].x) && (bounds[1].y <= absCoords[1].y); //bottom right
 				}

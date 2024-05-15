@@ -48,9 +48,6 @@
     <ClCompile Include="Class\QuadTreeCollisionHandler\QuadTreeCollisionHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="UnorderedPair\UnorderedPair.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Class\BufferedAiMesh\BufferedAiMesh.hpp">
@@ -1649,5 +1646,6 @@
   <ItemGroup>
     <Text Include="Licences\glad.txt" />
     <Text Include="Licences\license.txt" />
+    <Text Include="notes.md" />
   </ItemGroup>
 </Project>

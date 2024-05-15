@@ -7,18 +7,18 @@ Delta::Delta()
 	this->duration  = 0;
 }
 
-Delta::Delta(glm::vec3* now, glm::vec3 magnitude)
-{
-	this->magnitude = magnitude;
-	this->now = now;
-	this->duration = -1;
-}
-
 Delta::Delta(glm::vec3* now, glm::vec3 magnitude, long long duration)
 {
 	this->magnitude = magnitude;
 	this->now = now;
 	this->duration = duration;
+}
+
+Delta::Delta(glm::vec3* now, glm::vec3 magnitude)
+{
+	this->magnitude = magnitude;
+	this->now = now;
+	this->duration = -1;
 }
 
 Delta::Delta(Delta* now, glm::vec3 magnitude, long long duration)

@@ -9,11 +9,14 @@ Model::Model(std::string path, GLuint textureLocation, GLuint colorLocation, GLu
 	Assimp::Importer importer;
 	const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_JoinIdenticalVertices);
 	numMeshes = scene->mNumMeshes;
+	//initialize the bounding box with the values of an arbitrary vert from the model
+	auto firstVert = scene->mMeshes[0]->mVertices[0];
+	bBox = new glm::vec3[2]{glm::vec3(firstVert.x,firstVert.y,firstVert.z), glm::vec3(firstVert.x,firstVert.y,firstVert.z)}; //should this be on the heap?
 	//calc bounding box. get the min and maximum x, y, & z coordinates of all vertices in the all meshes
 	for (size_t i = 0;i < numMeshes;i++)
 	{
 		auto mesh = scene->mMeshes[i];
-		for (size_t j = 0;j < mesh->mNumVertices;j++)
+		for (size_t j = 1;j < mesh->mNumVertices;j++)
 		{
 			auto vert = mesh->mVertices[i];
 			if (bBox[0].x < vert.x)

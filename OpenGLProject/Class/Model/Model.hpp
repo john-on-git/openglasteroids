@@ -8,7 +8,7 @@ class Model
 {
 	public:
 		BufferedAiMesh* meshes;
-		glm::vec3 bBox[2]; //the bounding box
+		glm::vec3* bBox; //the bounding box
 		Model(std::string path, GLuint textureLocation, GLuint colorLocation, GLuint* textures, glm::vec4* colorMasks, size_t numTextures);
 		void Draw();
 	protected:

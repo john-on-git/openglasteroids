@@ -5,6 +5,8 @@
 class Delta
 {
 	public:
+		glm::vec3 magnitude;
+		long long duration;
 		Delta();
 		Delta(glm::vec3* now, glm::vec3 magnitude);
 		Delta(Delta* now, glm::vec3 magnitude);
@@ -13,7 +15,5 @@ class Delta
 		bool Tick();
 	protected:
 		glm::vec3* now;
-		glm::vec3 magnitude;
-		long long duration;
 };
 
