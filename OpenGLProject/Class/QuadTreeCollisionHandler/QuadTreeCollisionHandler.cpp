@@ -21,7 +21,15 @@ void QuadTreeCollisionHandler::Update(vector<WorldObject*> v)
 bool QuadTreeCollisionHandler::GetFineCollision(WorldObject* a, WorldObject* b)
 {
 	//TODO
-	return false;
+	//https://web.archive.org/web/20141127210836/http://content.gpwiki.org/index.php/Polygon_Collision
+	glm::vec2 temp;
+	//get vector between closest points
+
+	//temp = temp; //get a vector perpendicular to it
+
+	//get the shadows of a & b on vector
+
+	return false;/*do the shadows overlap*/
 }
 
 unordered_set<UnorderedPair<WorldObject*>>* QuadTreeCollisionHandler::GetBroadCollisions()
@@ -30,17 +38,41 @@ unordered_set<UnorderedPair<WorldObject*>>* QuadTreeCollisionHandler::GetBroadCo
 	if (root == NULL) //this has never been updated
 		return NULL;
 	else
-		return GetBroadCollisionsHelper(o, root);
+	{
+		auto pair = GetBroadCollisionsHelper(o, root);
+		delete pair.second;
+		return pair.first;
+	}
 }
 
-unordered_set<UnorderedPair<WorldObject*>>* QuadTreeCollisionHandler::GetBroadCollisionsHelper(unordered_set<UnorderedPair<WorldObject*>>* store, qnode* node)
+pair<unordered_set<UnorderedPair<WorldObject*>>*, vector<WorldObject*>*> QuadTreeCollisionHandler::GetBroadCollisionsHelper(unordered_set<UnorderedPair<WorldObject*>>* store, qnode* node)
 {
-	if(node->children[0]!=NULL) //if this is not a leaf node, check subtree first
-		for (char i = 0;i < 4;i++)
-			GetBroadCollisionsHelper(store, node->children[i]);
+	//methods?
+		//iterating the tree a bunch
+		//caching subtree contents in qnode struct
+		//returning cache from function & taking union (doing this one)
+	auto temp = new vector<WorldObject*>;
 
-	for (auto item : node->contents) //check this node
-		for (auto other : *node->UnionOfSubTreeContentsExcludingtarget(item))
-			store->emplace(UnorderedPair<WorldObject*>(item, other));
-	return store;
+	if (node->children[0] != NULL) //if this is not a leaf node, check subtree first
+		for (char i = 0;i < 4;i++)
+		{
+			//get all content from subtree & move to this cache
+			vector<WorldObject*>* sub = GetBroadCollisionsHelper(store, node->children[i]).second;
+			temp->insert(temp->end(),
+				std::make_move_iterator(sub->begin()),
+				std::make_move_iterator(sub->end())
+			);
+			delete sub;
+		}
+
+	//check this node
+	for (auto item : node->contents)
+	{
+		for (auto other : *temp)
+			if(item!=other)
+				store->emplace(UnorderedPair<WorldObject*>(item, other));
+		temp->push_back(item);
+	}
+	
+	return pair<unordered_set<UnorderedPair<WorldObject*>>*, vector<WorldObject*>*>(store, temp);
 }

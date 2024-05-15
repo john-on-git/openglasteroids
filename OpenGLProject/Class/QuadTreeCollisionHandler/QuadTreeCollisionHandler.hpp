@@ -13,6 +13,7 @@ class QuadTreeCollisionHandler : public ICollisionHandler {
 	private:
 		glm::vec2* initialBounds;
 		unsigned char maxDepth;
+		//15.5.2024, why is this defined in a header file?
 		class qnode {
 			public:
 				vector<WorldObject*> contents;
@@ -120,8 +121,7 @@ class QuadTreeCollisionHandler : public ICollisionHandler {
 								return true;
 							}
 						}
-						else
-							return false; //failed to insert
+						return false; //failed to insert
 					}
 				}
 				qnode* Find(WorldObject* obj)
@@ -138,16 +138,6 @@ class QuadTreeCollisionHandler : public ICollisionHandler {
 						}
 					return NULL; //not in tree
 				}
-				/// <summary>
-				/// returns all unique items in contents vectors of subtree excluding the 
-				/// </summary>
-				/// <returns></returns>
-				vector<WorldObject*>* UnionOfSubTreeContentsExcludingtarget(WorldObject* target)
-				{
-					auto store = new vector<WorldObject*>();
-					UnionOfSubTreeContentsExcludingtarget(store, target);
-					return store;
-				}
 			protected:
 				bool WillFit(WorldObject* obj)
 				{
@@ -159,16 +149,7 @@ class QuadTreeCollisionHandler : public ICollisionHandler {
 					return	(bounds[0].x <= absCoords[0].x) && (bounds[0].y >= absCoords[0].y) && //top left
 							(bounds[1].x >= absCoords[1].x) && (bounds[1].y <= absCoords[1].y); //bottom right
 				}
-				void UnionOfSubTreeContentsExcludingtarget(vector<WorldObject*>* store, WorldObject* target)
-				{
-					for (auto item : contents) //check this
-						if (item != target)
-							store->push_back(item);
-					if (children[0] != NULL) //if not a leaf, check children
-						for (auto child : children)
-							child->UnionOfSubTreeContentsExcludingtarget(store, target);
-				}
 		};
 		qnode* root;
-		unordered_set<UnorderedPair<WorldObject*>>* GetBroadCollisionsHelper(unordered_set<UnorderedPair<WorldObject*>>* store, qnode* node);
+		pair<unordered_set<UnorderedPair<WorldObject*>>*, vector<WorldObject*>*> GetBroadCollisionsHelper(unordered_set<UnorderedPair<WorldObject*>>* store, qnode* node);
 };

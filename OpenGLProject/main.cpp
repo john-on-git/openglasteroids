@@ -123,7 +123,17 @@ int main()
 			vector<tag>{ SHIP }
 		);
 		auto objects = vector<WorldObject*>{
-			ship
+				ship,
+				new WorldObject(
+				shipModel,
+				glm::vec3(0.0f, 0.0f, -5.0f),//pos
+				glm::vec3(270.0f, 0.0f, 0.0f),
+				glm::vec3(0.05f, 0.05f, 0.05f), //scale
+				projectionLocation,
+				viewLocation,
+				modelLocation,
+				vector<tag>{}
+			)
 		};
 	//game stuff
 		QuadTreeCollisionHandler collisionHandler(
@@ -215,38 +225,34 @@ int main()
 			));
 			fireDelay = FIRE_DELAY;
 		}
-		keyPressed[GLFW_KEY_W] = false;
-		keyPressed[GLFW_KEY_A] = false;
-		keyPressed[GLFW_KEY_S] = false;
-		keyPressed[GLFW_KEY_D] = false;
-		keyPressed[GLFW_KEY_SPACE] = false;
 		
-		//closed space
 		for (auto object : objects)
 		{
-			if (object->position.x > ARENA_W)
-				object->position.x -= 2 * ARENA_W;
-			if (object->position.y > ARENA_H)
-				object->position.y -= 2 * ARENA_W;
+			//closed space
+				if (object->position.x > ARENA_W)
+					object->position.x -= 2 * ARENA_W;
+				if (object->position.y > ARENA_H)
+					object->position.y -= 2 * ARENA_W;
 
-			if (object->position.x < -1 * ARENA_W)
-				object->position.x += 2 * ARENA_W;
-			if (object->position.y < -1 * ARENA_H)
-				object->position.y += 2 * ARENA_W;
+				if (object->position.x < -1 * ARENA_W)
+					object->position.x += 2 * ARENA_W;
+				if (object->position.y < -1 * ARENA_H)
+					object->position.y += 2 * ARENA_W;
+
+			object->model->meshes[0].colorMask = glm::vec4(1, 1, 1, 1); //reset color
 		}
 		//check for collisions
 			collisionHandler.Update(objects); //spatially partition all objects
 			//check collision
 			auto broadCollisions = collisionHandler.GetBroadCollisions();
-			//for (auto it = broadCollisions->begin(); it != broadCollisions->end();it++) //for each collision
-			//	if (collisionHandler.GetFineCollision((*it).first, (*it).second))
-			//	{
-			//		//they've collided, do the thing
-			//	}
-			if (broadCollisions!=NULL && broadCollisions->size() > 0)
-				ship->model->meshes[0].colorMask = glm::vec4(2, 1, 1, 1);
-			else
-				ship->model->meshes[0].colorMask = glm::vec4(1, 1, 1, 1);
+			for (auto it = broadCollisions->begin(); it != broadCollisions->end();it++) //for each collision
+				if (collisionHandler.GetFineCollision((*it).first, (*it).second))
+				{
+					//color change for collision debugging
+					(*it).first->model->meshes[0].colorMask = glm::vec4(2, 1, 1, 1);
+					(*it).second->model->meshes[0].colorMask = glm::vec4(2, 1, 1, 1);
+				}
+			delete broadCollisions;
 		//clear framebuffers
 			glad_glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		//draw all objects, deleting any that have been marked for delete
@@ -296,5 +302,12 @@ int main()
 /// </summary>
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-	keyPressed[key] = true;
+	if (action == GLFW_PRESS)
+	{
+		keyPressed[key] = true;
+	}
+	else if (action==GLFW_RELEASE)
+	{
+		keyPressed[key] = false;
+	}
 }

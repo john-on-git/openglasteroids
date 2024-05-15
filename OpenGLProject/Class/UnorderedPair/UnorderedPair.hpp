@@ -6,24 +6,24 @@ template <class T> class UnorderedPair
 	public:
 		UnorderedPair()
 		{
-			this->a = NULL;
-			this->b = NULL;
+			this->first = NULL;
+			this->second = NULL;
 		}
 		UnorderedPair(T a, T b)
 		{
-			this->a = a;
-			this->b = b;
+			this->first = a;
+			this->second = b;
 		}
 		bool operator == (const UnorderedPair<T>& other) const
 		{
-			return (other.a == a && other.b == b) || (other.b == a && other.a == b);
+			return (other.first == first && other.second == second) || (other.second == first && other.first == second);
 		}
 		bool operator < (const UnorderedPair<T>& other) const
 		{
 			return true;
 		}
-		T a;
-		T b;
+		T first;
+		T second;
 	private:
 };
 
@@ -32,8 +32,8 @@ namespace std {
 	{
 		size_t operator()(const UnorderedPair<T> & p) const
 		{
-			size_t hashA = hash<T>()(p.a);
-			size_t hashB = hash<T>()(p.b);
+			size_t hashA = hash<T>()(p.first);
+			size_t hashB = hash<T>()(p.second);
 			return hashA ^ hashB; //stack says not to do this but I don't care
 		}
 	};
