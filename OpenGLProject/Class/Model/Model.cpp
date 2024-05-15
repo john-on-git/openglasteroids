@@ -11,7 +11,10 @@ Model::Model(std::string path, GLuint textureLocation, GLuint colorLocation, GLu
 	numMeshes = scene->mNumMeshes;
 	//initialize the bounding box with the values of an arbitrary vert from the model
 	auto firstVert = scene->mMeshes[0]->mVertices[0];
-	bBox = new glm::vec3[2]{glm::vec3(firstVert.x,firstVert.y,firstVert.z), glm::vec3(firstVert.x,firstVert.y,firstVert.z)}; //should this be on the heap?
+	bBox = new glm::vec3[2]{
+		glm::vec3(firstVert.x,firstVert.y,firstVert.z),
+		glm::vec3(firstVert.x,firstVert.y,firstVert.z)
+	}; //should this be on the heap?
 	//calc bounding box. get the min and maximum x, y, & z coordinates of all vertices in the all meshes
 	for (size_t i = 0;i < numMeshes;i++)
 	{
@@ -19,20 +22,14 @@ Model::Model(std::string path, GLuint textureLocation, GLuint colorLocation, GLu
 		for (size_t j = 1;j < mesh->mNumVertices;j++)
 		{
 			auto vert = mesh->mVertices[i];
-			if (bBox[0].x < vert.x)
-				bBox[0].x = vert.x;
-			else if (bBox[1].x > vert.x)
-				bBox[1].x = vert.x;
+			bBox[0].x = std::min(bBox[0].x, vert.x);
+			bBox[1].x = std::max(bBox[1].x, vert.x);
 
-			if (bBox[0].y < vert.y)
-				bBox[0].y = vert.y;
-			else if (bBox[1].y > vert.y)
-				bBox[1].y = vert.y;
+			bBox[0].y = std::min(bBox[0].y, vert.y);
+			bBox[1].y = std::max(bBox[1].y, vert.y);
 
-			if (bBox[0].z < vert.z)
-				bBox[0].z = vert.z;
-			else if (bBox[1].z > vert.z)
-				bBox[1].z = vert.z;
+			bBox[0].y = std::min(bBox[0].y, vert.y);
+			bBox[1].y = std::max(bBox[1].y, vert.y);
 		}
 	}
 	//convert to buffered meshes

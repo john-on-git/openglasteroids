@@ -89,14 +89,18 @@ glm::vec2* QuadTreeCollisionHandler::GetNodeBoundsForObject(WorldObject* target)
 	{
 		current = queue.front();
 		queue.pop();
-		for (auto worldObject = current->contents.begin(); worldObject != current->contents.end();worldObject++) {
+		bool targetFound = false;
+		for (int i = 0;i < current->contents.size();i++) {
 			//if this is the target object is, return the current node's bounds
-			if ((*worldObject) == target) {
+			if (current->contents[i] == target) {
+				targetFound = true;
 				break;
 			}
-			else { //otherwise add all child nodes to queue
-				for (int i = 0;i < 4;i++) {
-					queue.push(current->children[i]);
+		}
+		if (!targetFound) {
+			for (int j = 0;j < 4;j++) {
+				if (current->children[j] != NULL) {
+					queue.push(current->children[j]);
 				}
 			}
 		}

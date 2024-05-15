@@ -49,13 +49,14 @@ class QuadTreeCollisionHandler : public ICollisionHandler {
 				/// <returns>whether the operation was successful</returns>
 				bool TryInsert(unsigned char maxDepth, unsigned char currentDepth, WorldObject* obj)
 				{
+					//TODO should really be breadth-first for performance reasons
 					if (currentDepth >= maxDepth)
 						return false;
 					else
 					{
 						if (WillFit(obj)) //if the object can fit in this node
 						{
-							//try to fit it in a child first
+							//try to insert in the subtree first
 							bool inSubTree = false; //true if the object has been inserted somewhere in the subtree
 							if (children[0] == NULL) //if this is a leaf node, create the children
 							{
@@ -112,8 +113,11 @@ class QuadTreeCollisionHandler : public ICollisionHandler {
 									}
 								);
 							}
-							for (int i = 0;i < 4;i++)
+							int i = 0;
+							while (i<4 && !inSubTree && children[i]!=NULL) {
 								inSubTree = inSubTree || children[i]->TryInsert(maxDepth, currentDepth + 1, obj);
+								i++;
+							}
 							//if it did not fit anywhere in the subtree, put it in this node
 							if (!inSubTree)
 							{
@@ -142,13 +146,14 @@ class QuadTreeCollisionHandler : public ICollisionHandler {
 				bool WillFit(WorldObject* obj)
 				{
 					//calculate world coordinates of object's bounding box
+					glm::vec3 objCoords3 = glm::vec3(obj->position.x, obj->position.y, obj->position.z);
 					glm::vec3 absCoords[]{
-						obj->model->bBox[0] + obj->position,
-						obj->model->bBox[1] + obj->position
+						obj->model->bBox[0] * obj->scale + objCoords3,
+						obj->model->bBox[1] * obj->scale + objCoords3
 					};
 					//determine whether the object is located fully inside this region
-					return	(bounds[0].x <= absCoords[0].x) && (bounds[0].y >= absCoords[0].y) && //top left
-							(bounds[1].x >= absCoords[1].x) && (bounds[1].y <= absCoords[1].y); //bottom right
+					return	(bounds[0].x <= absCoords[0].x) && (bounds[0].y >= absCoords[0].y) && //bottom left
+							(bounds[1].x >= absCoords[1].x) && (bounds[1].y <= absCoords[1].y); //top right
 				}
 		};
 		qnode* root;
