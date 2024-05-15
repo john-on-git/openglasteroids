@@ -1,4 +1,4 @@
-#include <iostream>
+﻿#include <iostream>
 #include <fstream>
 #include <windows.h>
 #include <cmath>
@@ -47,7 +47,7 @@ void drawQuadTree(bool drawAllRegions, bool drawShipRegion, WorldObject* ship, Q
 				bounds[1].x, bounds[0].y, -1.0f, 1.0f, //bottomright
 				bounds[0].x, bounds[0].y, -1.0f, 1.0f, //bottomleft
 			};
-			unsigned int* vertIndices = new unsigned int[] {0,1, 1,2, 2,3, 3,0};
+			unsigned int* vertIndices = new unsigned int[] {0,1, 1,2, 2,3, 3, 0};
 
 			//generate vertex array object
 			GLuint quadtreeVAO;
@@ -163,12 +163,12 @@ void drawQuadTree(bool drawAllRegions, bool drawShipRegion, WorldObject* ship, Q
 	}
 }
 
-/*
-	TODO
-	texture support
-	loading models from file
-	licensing stuff for libs
-*/
+/*	TODO TODO TODO TODO TODO	*\
+	texture support			 ✓
+	loading models from file ✓
+	licensing stuff for libs ✓
+	collision detection		
+\*								*/
 
 bool keyPressed[360];
 
@@ -278,8 +278,8 @@ int main()
 		QuadTreeCollisionHandler collisionHandler(
 			5,
 			new glm::vec2[]{
-				glm::vec2(1, 1),
-				glm::vec2(-1,-1)
+				glm::vec2( 1.1f, 1.1f),
+				glm::vec2(-1.1f,-1.1f)
 			}
 		);
 		vector<Delta*> deltas;
@@ -368,15 +368,23 @@ int main()
 		for (auto object : objects)
 		{
 			//toroidal space
-				if (object->position.x > ARENA_W)
-					object->position.x -= 2 * ARENA_W;
-				if (object->position.y > ARENA_H)
-					object->position.y -= 2 * ARENA_W;
+				if (object->position.x > ARENA_W) //off left
+				{
+					object->position.x = -ARENA_W;
+				}
+				else if (object->position.x < -ARENA_W) //off right
+				{
+					object->position.x = ARENA_W;
+				}
 
-				if (object->position.x < -1 * ARENA_W)
-					object->position.x += 2 * ARENA_W;
-				if (object->position.y < -1 * ARENA_H)
-					object->position.y += 2 * ARENA_W;
+				if (object->position.y < -ARENA_H) //off top
+				{
+					object->position.y = ARENA_W;
+				}
+				else if (object->position.y > ARENA_H) //off bottom
+				{
+					object->position.y = -ARENA_W;
+				}
 
 			object->model->meshes[0].colorMask = glm::vec4(1, 1, 1, 1); //reset color
 		}
