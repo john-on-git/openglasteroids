@@ -162,8 +162,8 @@ void drawQuadTree(bool drawAllRegions, bool drawShipRegion, WorldObject* ship, Q
 	float* verts = new float[] {
 		bounds[0].x, bounds[0].y, //topleft
 		bounds[1].x, bounds[1].y, //topright
-		bounds[5].x, bounds[5].y, //bottomright
-		bounds[4].x, bounds[4].y, //bottomleft
+		bounds[7].x, bounds[7].y, //bottomright
+		bounds[6].x, bounds[6].y, //bottomleft
 	};
 	//generate vertex array object
 	GLuint quadtreeVAO;

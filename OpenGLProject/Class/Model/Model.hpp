@@ -9,7 +9,7 @@ class Model
 {
 	public:
 		BufferedAiMesh* meshes;
-		std::vector<glm::vec4> verts;
+		glm::vec4* boundingBox;
 		Model(std::string path, GLuint textureLocation, GLuint colorLocation, GLuint* textures, glm::vec4* colorMasks, size_t numTextures);
 		void Draw();
 	protected:
