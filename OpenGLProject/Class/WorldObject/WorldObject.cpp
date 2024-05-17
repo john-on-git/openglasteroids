@@ -16,7 +16,7 @@ WorldObject::WorldObject()
 	OutputDebugStringW(L"FATAL: called invalid constructor MyWorldThing()\n");
 	exit(1);
 }
-WorldObject::WorldObject(Model* model, glm::vec3 position, glm::vec3 angle, glm::vec3 scale, GLuint projectionLocation, GLuint viewLocation, GLuint modelLocation, vector<tag> tags)
+WorldObject::WorldObject(Model* model, glm::vec3 position, glm::vec3 angle, glm::vec3 scale, GLuint projectionLocation, GLuint viewLocation, GLuint modelLocation, vector<tag>* tags)
 {
 	this->model = model;
 	this->position = position;
@@ -26,6 +26,11 @@ WorldObject::WorldObject(Model* model, glm::vec3 position, glm::vec3 angle, glm:
 	this->viewLocation = viewLocation;
 	this->modelLocation = modelLocation;
 	this->tags = tags;
+}
+
+WorldObject::~WorldObject()
+{
+	delete tags;
 }
 
 void WorldObject::Draw()

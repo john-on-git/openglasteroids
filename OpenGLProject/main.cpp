@@ -258,7 +258,7 @@ int main()
 			projectionLocation,
 			viewLocation,
 			modelLocation,
-			vector<tag>{ SHIP }
+			new vector<tag>{ SHIP }
 		);
 		auto dummy = WorldObject(
 			projectileModel,
@@ -268,7 +268,7 @@ int main()
 			projectionLocation,
 			viewLocation,
 			modelLocation,
-			vector<tag>{}
+			new vector<tag>{}
 		);
 		auto objects = vector<WorldObject*>{
 				&ship,
@@ -277,7 +277,8 @@ int main()
 	//game stuff
 		QuadTreeCollisionHandler collisionHandler(
 			5,
-			new glm::vec2[]{
+			new glm::vec2[]
+			{
 				glm::vec2( 1.1f, 1.1f),
 				glm::vec2(-1.1f,-1.1f)
 			}
@@ -350,12 +351,12 @@ int main()
 				projectionLocation,
 				viewLocation,
 				modelLocation,
-				vector<tag>{ PROJECTILE }
+				new vector<tag>{ PROJECTILE }
 			);
 			objects.push_back(projectile);
 			projectiles.push_back(projectile);
 			deltas.push_back(new Delta(
-				&projectile->position,
+				&(projectile->position),
 				glm::vec3(
 					shipVelocity->magnitude.x,
 					shipVelocity->magnitude.y,
@@ -402,18 +403,20 @@ int main()
 				}
 		//clear framebuffers
 			glad_glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		if (true)//keyPressed[GLFW_KEY_Q]) //draw the bounds of the quadtree, highlighting the node that the ship is in
-		{
-			drawQuadTree(true, true, &ship, &collisionHandler, &texturedColoredShader, &lineShader);
-		}
+		
 		delete broadCollisions;
+		//draw the bounds of the quadtree, highlighting the node that the ship is in
+			//if (true)//keyPressed[GLFW_KEY_Q])
+			//{
+			//	drawQuadTree(true, true, &ship, &collisionHandler, &texturedColoredShader, &lineShader);
+			//}
 		//draw all objects, deleting any that have been marked for delete
 			for (auto it = objects.begin(); it != objects.end();)
 			{
 				(*it)->Draw();
 				if ((*it)->markedForDelete)
 				{
-					delete (*it);
+					delete *it;
 					it = objects.erase(it);
 				}
 				else
@@ -423,7 +426,7 @@ int main()
 			for (auto it = deltas.begin(); it != deltas.end();)
 				if ((*it)->Tick())
 				{
-					delete (*it);
+					delete *it;
 					it = deltas.erase(it);
 				}
 				else 

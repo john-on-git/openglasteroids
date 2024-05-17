@@ -2,11 +2,11 @@
 #include <iostream>
 #include <queue>
 
-QuadTreeCollisionHandler::QuadTreeCollisionHandler(unsigned char maxDepth, glm::vec2 initialBounds[2])
+QuadTreeCollisionHandler::QuadTreeCollisionHandler(unsigned char maxDepth, glm::vec2* initialBounds)
 {
 	this->maxDepth = maxDepth;
 	this->initialBounds = initialBounds;
-	this->root = NULL;
+	root = NULL;
 }
 
 void QuadTreeCollisionHandler::Update(vector<WorldObject*> v)
@@ -14,7 +14,7 @@ void QuadTreeCollisionHandler::Update(vector<WorldObject*> v)
 	if(root!=NULL) //if there's an existing quadtree
 		delete root; //clear it
 	//construct the quadtree
-	root = new qnode(NULL, initialBounds);
+	root = new qnode(NULL, initialBounds[0], initialBounds[1]);
 	for (auto obj : v)
 		root->TryInsert(maxDepth, 1, obj);
 }

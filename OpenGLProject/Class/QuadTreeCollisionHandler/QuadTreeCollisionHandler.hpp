@@ -7,7 +7,7 @@
 
 class QuadTreeCollisionHandler : public ICollisionHandler {
 	public:
-		QuadTreeCollisionHandler(unsigned char maxDepth, glm::vec2 initialBounds[2]);
+		QuadTreeCollisionHandler(unsigned char maxDepth, glm::vec2* initialBounds);
 		virtual void Update(vector<WorldObject*> v);
 		virtual unordered_set<UnorderedPair<WorldObject*>>* GetBroadCollisions();
 		virtual bool GetFineCollision(WorldObject* a, WorldObject* b);
@@ -23,8 +23,7 @@ class QuadTreeCollisionHandler : public ICollisionHandler {
 				qnode* parent;
 				qnode* children[4];
 				glm::vec2 bounds[2];
-
-				qnode(qnode* parent, glm::vec2 bounds[2])
+				qnode(qnode* parent, glm::vec2 bottomLeft, glm::vec2 topRight)
 				{
 					this->parent = parent;
 
@@ -33,14 +32,15 @@ class QuadTreeCollisionHandler : public ICollisionHandler {
 					children[2] = NULL;
 					children[3] = NULL;
 
-					this->bounds[0] = bounds[0],
-					this->bounds[1] = bounds[1];
+					this->bounds[0] = bottomLeft;
+					this->bounds[1] = topRight;
 				}
 
 				~qnode()
 				{
-					for (qnode* child : children)
+					for (qnode* child : children) {
 						delete child;
+					}
 				}
 				
 				/// <summary>
@@ -62,55 +62,47 @@ class QuadTreeCollisionHandler : public ICollisionHandler {
 							{
 								children[0] = new qnode( //top left
 									this,
-									new glm::vec2[]{
-										glm::vec2( //bottom left
-											this->bounds[0].x,
-											(this->bounds[0].y + this->bounds[1].y) / 2
-										),
-										glm::vec2( //top right
-											(this->bounds[0].x + this->bounds[1].x) / 2,
-											this->bounds[1].y
-										)
-									}
+									glm::vec2( //bottom left
+										this->bounds[0].x,
+										(this->bounds[0].y + this->bounds[1].y) / 2
+									),
+									glm::vec2( //top right
+										(this->bounds[0].x + this->bounds[1].x) / 2,
+										this->bounds[1].y
+									)
 								);
 								children[1] = new qnode( //top right
 									this,
-									new glm::vec2[]{
-										glm::vec2( //bottom left
-											(this->bounds[0].x + this->bounds[1].x) / 2,
-											(this->bounds[0].y + this->bounds[1].y) / 2
-										),
-										glm::vec2( //top right
-											this->bounds[1].x,
-											this->bounds[1].y
-										)
-									}
+									glm::vec2( //bottom left
+										(this->bounds[0].x + this->bounds[1].x) / 2,
+										(this->bounds[0].y + this->bounds[1].y) / 2
+									),
+									glm::vec2( //top right
+										this->bounds[1].x,
+										this->bounds[1].y
+									)
 								);
 								children[2] = new qnode( //bottom left
 									this,
-									new glm::vec2[]{
-										glm::vec2( //bottom left
-											this->bounds[0].x,
-											this->bounds[0].y
-										),
-										glm::vec2( //top right
-											(this->bounds[0].x + this->bounds[1].x) / 2,
-											(this->bounds[0].y + this->bounds[1].y) / 2
-										)
-									}
+									glm::vec2( //bottom left
+										this->bounds[0].x,
+										this->bounds[0].y
+									),
+									glm::vec2( //top right
+										(this->bounds[0].x + this->bounds[1].x) / 2,
+										(this->bounds[0].y + this->bounds[1].y) / 2
+									)
 								);
 								children[3] = new qnode( //bottom right
 									this,
-									new glm::vec2[]{
-										glm::vec2( //bottom left
-											(this->bounds[0].x + this->bounds[1].x) / 2,
-											this->bounds[0].y
-										),
-										glm::vec2( //top right
-											this->bounds[1].x,
-											(this->bounds[0].y + this->bounds[1].y) / 2
-										)
-									}
+									glm::vec2( //bottom left
+										(this->bounds[0].x + this->bounds[1].x) / 2,
+										this->bounds[0].y
+									),
+									glm::vec2( //top right
+										this->bounds[1].x,
+										(this->bounds[0].y + this->bounds[1].y) / 2
+									)
 								);
 							}
 							int i = 0;
@@ -168,6 +160,6 @@ class QuadTreeCollisionHandler : public ICollisionHandler {
 							(bounds[1].x <= absCoords[1].x) && (bounds[1].y <= absCoords[1].y); //top right
 				}
 		};
-		qnode* root;
+		qnode* root; //here instead of at the top as qnode needs to be defined first
 		pair<unordered_set<UnorderedPair<WorldObject*>>*, vector<WorldObject*>*> GetBroadCollisionsHelper(unordered_set<UnorderedPair<WorldObject*>>* store, qnode* node);
 };
