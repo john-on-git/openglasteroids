@@ -104,21 +104,37 @@ glm::vec3* WorldObject::getBoundingBox()
 		}
 		//construct the rotation matrix
 		glm::mat4 rotationMatrix = glm::mat4(1.0); //create identity matrix
-		rotationMatrix = glm::scale(rotationMatrix, this->scale);
+		rotationMatrix = glm::translate(rotationMatrix, position);
 		rotationMatrix = glm::rotate(rotationMatrix, glm::radians(angle.x), glm::vec3(1,0,0));
 		rotationMatrix = glm::rotate(rotationMatrix, glm::radians(angle.y), glm::vec3(0,1,0));
 		rotationMatrix = glm::rotate(rotationMatrix, glm::radians(angle.z), glm::vec3(0,0,1));
+		rotationMatrix = glm::scale(rotationMatrix, scale);
 
-		//rotate the verts
+		//calculate the rotated bounding box
 		boundingBox = new glm::vec3[8];
-		//calc bounding box. get the min and maximum x, y, & z coordinates of all vertices in the all meshes
 		for (char i = 0;i < 8;i++)
 		{
-			//rotate & scale the vert (we'll translate/reposition the final bounding box afterward)
-			boundingBox[i] = glm::vec3(rotationMatrix * model->boundingBox[i]);
-			boundingBox[i].x += position.x;
-			boundingBox[i].y += position.y;
-			boundingBox[i].z += position.z;
+			glm::vec4 vert;
+			switch (i)
+			{
+				case 0:
+					vert = glm::vec4(model->boundingMin.x, model->boundingMax.y, model->boundingMin.z, 1.0f);
+				case 1:
+					vert = glm::vec4(model->boundingMax.x, model->boundingMax.y, model->boundingMin.z, 1.0f);
+				case 2:
+					vert = glm::vec4(model->boundingMin.x, model->boundingMax.y, model->boundingMax.z, 1.0f);
+				case 3:
+					vert = glm::vec4(model->boundingMax.x, model->boundingMax.y, model->boundingMax.z, 1.0f);
+				case 4:
+					vert = glm::vec4(model->boundingMin.x, model->boundingMin.y, model->boundingMin.z, 1.0f);
+				case 5:
+					vert = glm::vec4(model->boundingMax.x, model->boundingMin.y, model->boundingMin.z, 1.0f);
+				case 6:
+					vert = glm::vec4(model->boundingMin.x, model->boundingMin.y, model->boundingMax.z, 1.0f);
+				case 7:
+					vert = glm::vec4(model->boundingMax.x, model->boundingMin.y, model->boundingMax.z, 1.0f);
+			}
+			boundingBox[i] = glm::vec3(rotationMatrix * vert);
 		}
 	}
 	return boundingBox;

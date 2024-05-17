@@ -29,7 +29,7 @@
 
 using namespace std;
 
-//Debug logic for visualizing the quadtree. MASSIVE MEMORY LEAK! sort of dumped this here, should be on quadtreecollisionhandler I suppose.
+//Debug logic for visualizing the quadtree. Not very efficient but idc.
 void drawQuadTree(bool drawAllRegions, bool drawShipRegion, WorldObject* ship, QuadTreeCollisionHandler* collisionHandler, Program* texturedColoredShader, Program* blockColorShader, GLuint colorLocation) {
 	blockColorShader->Use();
 	int STRIDE = 2;
@@ -220,7 +220,7 @@ void drawQuadTree(bool drawAllRegions, bool drawShipRegion, WorldObject* ship, Q
 	loading models from file ✓
 	licensing stuff for libs ✓
 	fix memory leak			 ✓
-	fix bullet shooting		 
+	fix bullet shooting		 ✓ 
 	collision detection		
 \*								*/
 
