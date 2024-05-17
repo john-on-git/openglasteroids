@@ -236,7 +236,7 @@ int main()
 		auto projectileTex = new Texture("textures/projectile.png");
 	//model
 		auto shipModel = new Model(
-			"Models/plane.obj",
+			"Models/ship.obj",
 			textureLocation,
 			colorLocation,
 			new GLuint[]{ shipTex->handle },
@@ -244,7 +244,7 @@ int main()
 			1
 		);
 		auto projectileModel = new Model(
-			"Models/plane.obj",
+			"Models/sphere.obj",
 			textureLocation,
 			colorLocation,
 			new GLuint[]{ projectileTex->handle },
@@ -289,7 +289,7 @@ int main()
 		vector<WorldObject*> projectiles;
 		auto shipVelocity = new Delta(
 			&ship.position,
-			new glm::vec3(0.0f,  0.0f,  0.0f)
+			new glm::vec3(0.0f, 0.0f, 0.0f)
 		);
 		deltas.push_back(shipVelocity);
 		unsigned char fireDelay = 0;
