@@ -10,9 +10,9 @@ class QuadTreeCollisionHandler : public ICollisionHandler {
 		QuadTreeCollisionHandler(unsigned char maxDepth, glm::vec2* initialBounds);
 		virtual void Update(vector<WorldObject*> v);
 		virtual unordered_set<UnorderedPair<WorldObject*>>* GetBroadCollisions();
-		virtual bool GetFineCollision(WorldObject* a, WorldObject* b);
+		bool GetFineCollision(WorldObject* a, WorldObject* b);
 		virtual glm::vec2* GetNodeBoundsForObject(WorldObject* object);
-		vector<glm::vec2*>* GetAllBounds();
+		vector<glm::vec2**>* GetAllBounds(vector<glm::vec2**>* store);
 	private:
 		glm::vec2* initialBounds;
 		unsigned char maxDepth;
@@ -22,7 +22,7 @@ class QuadTreeCollisionHandler : public ICollisionHandler {
 				vector<WorldObject*> contents;
 				qnode* parent;
 				qnode* children[4];
-				glm::vec2 bounds[2];
+				glm::vec2* bounds;
 				qnode(qnode* parent, glm::vec2 bottomLeft, glm::vec2 topRight)
 				{
 					this->parent = parent;
@@ -32,8 +32,7 @@ class QuadTreeCollisionHandler : public ICollisionHandler {
 					children[2] = NULL;
 					children[3] = NULL;
 
-					this->bounds[0] = bottomLeft;
-					this->bounds[1] = topRight;
+					bounds = new glm::vec2[]{ bottomLeft, topRight };
 				}
 
 				~qnode()
@@ -41,6 +40,7 @@ class QuadTreeCollisionHandler : public ICollisionHandler {
 					for (qnode* child : children) {
 						delete child;
 					}
+					delete [] bounds;
 				}
 				
 				/// <summary>
@@ -136,9 +136,9 @@ class QuadTreeCollisionHandler : public ICollisionHandler {
 						}
 					return NULL; //not in tree
 				}
-				void DepthFirstFlatten(vector<glm::vec2*>* collector)
+				void DepthFirstFlatten(vector<glm::vec2**>* collector)
 				{
-					collector->push_back(this->bounds);
+					collector->push_back(&bounds);
 					for (auto child : children)
 					{
 						if (child != NULL) {
@@ -150,14 +150,11 @@ class QuadTreeCollisionHandler : public ICollisionHandler {
 				bool WillFit(WorldObject* obj)
 				{
 					//calculate world coordinates of object's bounding box
-					glm::vec3 objCoords3 = glm::vec3(obj->position.x, obj->position.y, obj->position.z);
-					glm::vec3 absCoords[]{
-						(obj->model->bBox[0] * obj->scale - objCoords3),
-						(obj->model->bBox[1] * obj->scale - objCoords3)
-					};
+					auto objBBox = obj->getBoundingBox();
 					//determine whether the object is located fully inside this region
-					return	(bounds[0].x >= absCoords[0].x) && (bounds[0].y >= absCoords[0].y) && //bottom left
-							(bounds[1].x <= absCoords[1].x) && (bounds[1].y <= absCoords[1].y); //top right
+					auto result = (bounds[0].x >= objBBox[0].x) && (bounds[0].y >= objBBox[0].y) && //bottom left
+								  (bounds[1].x <= objBBox[1].x) && (bounds[1].y <= objBBox[1].y); //top right
+					return result;
 				}
 		};
 		qnode* root; //here instead of at the top as qnode needs to be defined first

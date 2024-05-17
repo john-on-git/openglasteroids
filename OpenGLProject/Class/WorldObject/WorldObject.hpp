@@ -23,8 +23,11 @@ class WorldObject {
 		WorldObject(Model *model, glm::vec3 position, glm::vec3 angle, glm::vec3 scale, GLuint projectionLocation, GLuint viewLocation, GLuint modelLocation, vector<tag>* tags);
 		~WorldObject();
 		void Draw();
+		glm::vec3* getBoundingBox();
 	protected:
 		GLuint projectionLocation;
 		GLuint viewLocation;
 		GLuint modelLocation;
+		glm::vec3* boundingBox;
+		glm::vec3 boundingBoxAngle; //angle at which the current value of boundingBox^ was calculated
 };

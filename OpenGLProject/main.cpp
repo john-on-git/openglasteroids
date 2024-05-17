@@ -33,10 +33,10 @@ using namespace std;
 void drawQuadTree(bool drawAllRegions, bool drawShipRegion, WorldObject* ship, QuadTreeCollisionHandler* collisionHandler, Program* texturedColoredShader, Program* lineShader) {
 	if (drawAllRegions) {
 		glad_glLineWidth(1);
-		auto flattened = collisionHandler->GetAllBounds();
-		while (!flattened->empty()) {
-			glm::vec2* bounds = flattened->back();
-			flattened->pop_back();
+		vector<glm::vec2**> flattened;
+		collisionHandler->GetAllBounds(&flattened);
+		while (!flattened.empty()) {
+			glm::vec2* bounds = *(flattened.back());
 			//set up line quadtree debugger
 			int STRIDE = 4;
 			size_t COORDS_LEN = 16;
@@ -48,7 +48,6 @@ void drawQuadTree(bool drawAllRegions, bool drawShipRegion, WorldObject* ship, Q
 				bounds[0].x, bounds[0].y, -1.0f, 1.0f, //bottomleft
 			};
 			unsigned int* vertIndices = new unsigned int[] {0,1, 1,2, 2,3, 3, 0};
-
 			//generate vertex array object
 			GLuint quadtreeVAO;
 			glad_glGenVertexArrays(1, &quadtreeVAO);
@@ -75,7 +74,6 @@ void drawQuadTree(bool drawAllRegions, bool drawShipRegion, WorldObject* ship, Q
 
 			delete[] verts;
 			delete[] vertIndices;
-
 			//set vertex attrib pointers OK
 			glad_glEnableVertexAttribArray(0);
 			glad_glVertexAttribPointer( //position
@@ -96,6 +94,7 @@ void drawQuadTree(bool drawAllRegions, bool drawShipRegion, WorldObject* ship, Q
 				NULL
 			);
 			texturedColoredShader->Use();
+			flattened.pop_back();
 		}
 	}
 	if (drawShipRegion) {
@@ -161,6 +160,67 @@ void drawQuadTree(bool drawAllRegions, bool drawShipRegion, WorldObject* ship, Q
 		);
 		texturedColoredShader->Use();
 	}
+	lineShader->Use();
+	glad_glLineWidth(5);
+	//set up line quadtree debugger
+	glm::vec3* bounds = ship->getBoundingBox();
+	int STRIDE = 4;
+	size_t COORDS_LEN = 16;
+	size_t INDICES_LEN = 8;
+	float* verts = new float[] {
+		bounds[0].x, bounds[0].y, -1, 1.0f, //topleft
+		bounds[1].x, bounds[1].y, -1, 1.0f, //topright
+		bounds[5].x, bounds[5].y, -1, 1.0f, //bottomright
+		bounds[4].x, bounds[4].y, -1, 1.0f, //bottomleft
+	};
+	unsigned int* vertIndices = new unsigned int[] {0, 1, 1, 2, 2, 3, 3, 0};
+	//generate vertex array object
+	GLuint quadtreeVAO;
+	glad_glGenVertexArrays(1, &quadtreeVAO);
+	glad_glBindVertexArray(quadtreeVAO);
+	//generate buffers and copy over data
+	GLuint buffers[2]; //vertex buffer, and vertex index buffer
+	glad_glGenBuffers(2, buffers); //19.5.21, first argument is the number of buffers, not the size of the buffer. corrupted the heap?
+
+	glad_glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
+	glad_glBufferData( //add verts to buffer
+		GL_ARRAY_BUFFER,
+		COORDS_LEN * sizeof(float),
+		verts,
+		GL_STATIC_DRAW
+	);
+
+	glad_glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers[1]);
+	glad_glBufferData( //add verts to buffer
+		GL_ELEMENT_ARRAY_BUFFER,
+		INDICES_LEN * sizeof(unsigned int),
+		vertIndices,
+		GL_STATIC_DRAW
+	);
+
+	delete[] verts;
+	delete[] vertIndices;
+
+	//set vertex attrib pointers OK
+	glad_glEnableVertexAttribArray(0);
+	glad_glVertexAttribPointer( //position
+		0,
+		4,
+		GL_FLOAT,
+		GL_FALSE,
+		STRIDE * sizeof(float),
+		NULL
+	);
+
+	lineShader->Use();
+	glad_glBindVertexArray(quadtreeVAO);
+	glad_glDrawElements(
+		GL_LINES,
+		INDICES_LEN,
+		GL_UNSIGNED_INT,
+		NULL
+	);
+	texturedColoredShader->Use();
 }
 
 /*	TODO TODO TODO TODO TODO	*\
@@ -255,7 +315,7 @@ int main()
 		auto ship = WorldObject(
 			shipModel,
 			glm::vec3(0.0f, 0.0f, -5.0f),//pos
-			glm::vec3(270.0f, 0.0f, 0.0f),
+			glm::vec3(270.0f, 45.1f, 0.0f),
 			glm::vec3(0.05f, 0.05f, 0.05f), //scale
 			projectionLocation,
 			viewLocation,
@@ -264,7 +324,7 @@ int main()
 		);
 		auto dummy = WorldObject(
 			projectileModel,
-			glm::vec3(-0.5f, -0.5f, -5.0f),//pos
+			glm::vec3(-0.4f, -0.4f, -5.0f),//pos
 			glm::vec3(270.0f, 0.0f, 0.0f),
 			glm::vec3(0.05f, 0.05f, 0.05f), //scale
 			projectionLocation,
@@ -287,15 +347,31 @@ int main()
 		);
 		vector<Delta*> deltas;
 		vector<WorldObject*> projectiles;
-		auto shipVelocity = new Delta(
+		auto shipVelocity = Delta(
 			&ship.position,
 			new glm::vec3(0.0f, 0.0f, 0.0f)
 		);
-		deltas.push_back(shipVelocity);
+		deltas.push_back(&shipVelocity);
+		auto shipDrag = Delta(
+			&shipVelocity,
+			new glm::vec3(
+				-SHIP_DRAG_COEFFICIENT * shipVelocity.magnitude->x,
+				-SHIP_DRAG_COEFFICIENT * shipVelocity.magnitude->y,
+				-SHIP_DRAG_COEFFICIENT * shipVelocity.magnitude->z
+			),
+			SHIP_MAX_VELOCITY,
+			-1
+		);
+		deltas.push_back(&shipDrag);
 		unsigned char fireDelay = 0;
 	//render loop
 	while (!glfwWindowShouldClose(window))
 	{
+		//manually update ship drag (TODO this sort of behaviour should be generalised & encapsulated in Delta)
+		shipDrag.magnitude->x = -SHIP_DRAG_COEFFICIENT * shipVelocity.magnitude->x;
+		shipDrag.magnitude->y = -SHIP_DRAG_COEFFICIENT * shipVelocity.magnitude->y;
+		shipDrag.magnitude->z = -SHIP_DRAG_COEFFICIENT * shipVelocity.magnitude->z;
+
 		if (fireDelay > 0)
 			fireDelay--;
 		//get player input
@@ -303,13 +379,12 @@ int main()
 		if (keyPressed[GLFW_KEY_W])
 		{
 			deltas.push_back(new Delta(
-				shipVelocity,
+				&shipVelocity,
 				new glm::vec3(
 					SHIP_MOVERATE_MULT * sin(rad),
 					SHIP_MOVERATE_MULT * cos(rad),
 					0.0f
 				),
-				SHIP_MIN_VELOCITY,
 				SHIP_MAX_VELOCITY,
 				10
 			));
@@ -317,14 +392,12 @@ int main()
 		else if (keyPressed[GLFW_KEY_S])
 		{
 			deltas.push_back(new Delta(
-				shipVelocity,
+				&shipVelocity,
 				new glm::vec3(
 					-1 * SHIP_MOVERATE_MULT * sin(rad),
 					-1 * SHIP_MOVERATE_MULT * cos(rad),
 					0.0f
 				),
-				SHIP_MIN_VELOCITY,
-				SHIP_MAX_VELOCITY,
 				10
 			));
 		}
@@ -367,9 +440,9 @@ int main()
 			deltas.push_back(new Delta(
 				&(projectile->position),
 				new glm::vec3(
-					shipVelocity->magnitude->x + (sin(rad) * BULLET_VELOCITY_MULT),
-					shipVelocity->magnitude->y + (cos(rad) * BULLET_VELOCITY_MULT),
-					shipVelocity->magnitude->z + 0.0f
+					shipVelocity.magnitude->x + (sin(rad) * BULLET_VELOCITY_MULT),
+					shipVelocity.magnitude->y + (cos(rad) * BULLET_VELOCITY_MULT),
+					shipVelocity.magnitude->z + 0.0f
 				)
 			));
 			fireDelay = FIRE_DELAY;
@@ -415,10 +488,7 @@ int main()
 		
 		delete broadCollisions;
 		//draw the bounds of the quadtree, highlighting the node that the ship is in
-			//if (true)//keyPressed[GLFW_KEY_Q])
-			//{
-			//	drawQuadTree(true, true, &ship, &collisionHandler, &texturedColoredShader, &lineShader);
-			//}
+		drawQuadTree(false, false, &ship, &collisionHandler, &texturedColoredShader, &lineShader);
 		//draw all objects, deleting any that have been marked for delete
 			for (auto it = objects.begin(); it != objects.end();)
 			{

@@ -19,20 +19,6 @@ void QuadTreeCollisionHandler::Update(vector<WorldObject*> v)
 		root->TryInsert(maxDepth, 1, obj);
 }
 
-bool QuadTreeCollisionHandler::GetFineCollision(WorldObject* a, WorldObject* b)
-{
-	//TODO
-	//https://web.archive.org/web/20141127210836/http://content.gpwiki.org/index.php/Polygon_Collision
-	glm::vec2 temp;
-	//get vector between closest points
-
-	//temp = temp; //get a vector perpendicular to it
-
-	//get the shadows of a & b on vector
-
-	return false;/*do the shadows overlap*/
-}
-
 unordered_set<UnorderedPair<WorldObject*>>* QuadTreeCollisionHandler::GetBroadCollisions()
 {
 	auto o = new unordered_set<UnorderedPair<WorldObject*>>;
@@ -86,9 +72,22 @@ glm::vec2* QuadTreeCollisionHandler::GetNodeBoundsForObject(WorldObject* target)
 	return result==NULL ? NULL : result->bounds;
 }
 
-vector<glm::vec2*>* QuadTreeCollisionHandler::GetAllBounds() 
+vector<glm::vec2**>* QuadTreeCollisionHandler::GetAllBounds(vector<glm::vec2**>* store)
 {
-	vector<glm::vec2*>* vector = new std::vector<glm::vec2*>;
-	root->DepthFirstFlatten(vector);
-	return vector;
+	root->DepthFirstFlatten(store);
+	return store;
+}
+
+bool QuadTreeCollisionHandler::GetFineCollision(WorldObject* a, WorldObject* b)
+{
+	//TODO
+	//https://web.archive.org/web/20141127210836/http://content.gpwiki.org/index.php/Polygon_Collision
+	glm::vec2 temp;
+	//get vector between closest points
+
+	//temp = temp; //get a vector perpendicular to it
+
+	//get the shadows of a & b on vector
+
+	return false;/*do the shadows overlap*/
 }
