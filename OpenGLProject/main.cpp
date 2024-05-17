@@ -167,6 +167,8 @@ void drawQuadTree(bool drawAllRegions, bool drawShipRegion, WorldObject* ship, Q
 	texture support			 ✓
 	loading models from file ✓
 	licensing stuff for libs ✓
+	fix memory leak			 ✓
+	fix bullet shooting		 
 	collision detection		
 \*								*/
 
@@ -285,7 +287,10 @@ int main()
 		);
 		vector<Delta*> deltas;
 		vector<WorldObject*> projectiles;
-		auto shipVelocity = new Delta(&ship.position, glm::vec3(0.0f, 0.0f, 0.0f));
+		auto shipVelocity = new Delta(
+			&ship.position,
+			new glm::vec3(0.0f,  0.0f,  0.0f)
+		);
 		deltas.push_back(shipVelocity);
 		unsigned char fireDelay = 0;
 	//render loop
@@ -299,11 +304,13 @@ int main()
 		{
 			deltas.push_back(new Delta(
 				shipVelocity,
-				glm::vec3(
+				new glm::vec3(
 					SHIP_MOVERATE_MULT * sin(rad),
 					SHIP_MOVERATE_MULT * cos(rad),
 					0.0f
 				),
+				SHIP_MIN_VELOCITY,
+				SHIP_MAX_VELOCITY,
 				10
 			));
 		}
@@ -311,11 +318,13 @@ int main()
 		{
 			deltas.push_back(new Delta(
 				shipVelocity,
-				glm::vec3(
+				new glm::vec3(
 					-1 * SHIP_MOVERATE_MULT * sin(rad),
 					-1 * SHIP_MOVERATE_MULT * cos(rad),
 					0.0f
 				),
+				SHIP_MIN_VELOCITY,
+				SHIP_MAX_VELOCITY,
 				10
 			));
 		}
@@ -324,7 +333,7 @@ int main()
 		{
 			deltas.push_back(new Delta(
 				&ship.angle,
-				glm::vec3(0.0f, SHIP_TURNRATE_MULT * -1, 0.0f),
+				new glm::vec3(0.0f, SHIP_TURNRATE_MULT * -1, 0.0f),
 				10
 			));
 		}
@@ -332,7 +341,7 @@ int main()
 		{
 			deltas.push_back(new Delta(
 				&ship.angle,
-				glm::vec3(0.0f, SHIP_TURNRATE_MULT, 0.0f),
+				new glm::vec3(0.0f, SHIP_TURNRATE_MULT, 0.0f),
 				10
 			));
 		}
@@ -342,8 +351,8 @@ int main()
 			auto projectile = new WorldObject(
 				projectileModel,
 				glm::vec3(
-					ship.position.x + sin(rad) * 0.05,
-					ship.position.y + cos(rad) * 0.05,
+					ship.position.x + (sin(rad) * 0.05), //second half moves the spawn point away from the center of the ship
+					ship.position.y + (cos(rad) * 0.05), //0.05 is the distance between the center and tip
 					ship.position.z
 				),
 				glm::vec3(270.0f, 0.0f, 0.0f),
@@ -357,10 +366,10 @@ int main()
 			projectiles.push_back(projectile);
 			deltas.push_back(new Delta(
 				&(projectile->position),
-				glm::vec3(
-					shipVelocity->magnitude.x,
-					shipVelocity->magnitude.y,
-					shipVelocity->magnitude.z + 0.0f
+				new glm::vec3(
+					shipVelocity->magnitude->x + (sin(rad) * BULLET_VELOCITY_MULT),
+					shipVelocity->magnitude->y + (cos(rad) * BULLET_VELOCITY_MULT),
+					shipVelocity->magnitude->z + 0.0f
 				)
 			));
 			fireDelay = FIRE_DELAY;

@@ -1,38 +1,64 @@
+
+#include <glm/glm.hpp>
 #include "Delta.hpp"
 
 Delta::Delta()
 {
-	this->magnitude = glm::vec3(0.0f, 0.0f, 0.0f);
+	this->magnitude = new glm::vec3(0.0f, 0.0f, 0.0f);
 	this->now = NULL;
 	this->duration  = 0;
+	this->minimum = -1;
+	this->maximum = -1;
 }
 
-Delta::Delta(glm::vec3* now, glm::vec3 magnitude, long long duration)
+Delta::Delta(glm::vec3* now, glm::vec3* magnitude, long long duration)
 {
 	this->magnitude = magnitude;
 	this->now = now;
 	this->duration = duration;
+	this->minimum = -1;
+	this->maximum = -1;
 }
 
-Delta::Delta(glm::vec3* now, glm::vec3 magnitude)
+Delta::Delta(glm::vec3* now, glm::vec3* magnitude)
 {
 	this->magnitude = magnitude;
 	this->now = now;
 	this->duration = -1;
+	this->minimum = -1;
+	this->maximum = -1;
 }
 
-Delta::Delta(Delta* now, glm::vec3 magnitude, long long duration)
+Delta::Delta(Delta* now, glm::vec3* magnitude)
 {
 	this->magnitude = magnitude;
-	this->now = now->now;
-	this->duration = duration;
-}
-
-Delta::Delta(Delta* now, glm::vec3 magnitude)
-{
-	this->magnitude = magnitude;
-	this->now = now->now;
+	this->now = now->magnitude;
 	this->duration = -1;
+	this->minimum = -1;
+	this->maximum = -1;
+}
+
+Delta::Delta(Delta* now, glm::vec3* magnitude, long long duration)
+{
+	this->magnitude = magnitude;
+	this->now = now->magnitude;
+	this->duration = duration;
+	this->minimum = -1;
+	this->maximum = -1;
+}
+
+Delta::Delta(Delta* now, glm::vec3* magnitude, float minimumMagnitude, float maximumMagnitude, long long duration)
+{
+	this->magnitude = magnitude;
+	this->now = now->magnitude;
+	this->duration = duration;
+	this->minimum = minimumMagnitude;
+	this->maximum = maximumMagnitude;
+}
+
+Delta::~Delta()
+{
+	delete this->magnitude;
 }
 
 /// <summary>
@@ -41,8 +67,19 @@ Delta::Delta(Delta* now, glm::vec3 magnitude)
 /// <returns>true if this is finished</returns>
 bool Delta::Tick()
 {
-	if (duration != 0)
-		*now += magnitude;
+	if (duration != 0) { 
+		//update the value, limiting its magnitude between
+		*now += *magnitude;
+		float nowMag = glm::length(*now);
+		if (!(minimum<0 || nowMag >= minimum))
+		{
+			*now *= minimum/nowMag;
+		}
+		else if (!(maximum < 0 || nowMag <= maximum))
+		{
+			*now *= maximum / nowMag;
+		}
+	}
 	if (duration > 0)
 		duration--;
 	return duration == 0;
