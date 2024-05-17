@@ -48,43 +48,29 @@ void WorldObject::Draw()
 		it's working!
 	*/
 	//calculate matrices
+		//THESE ARE IN REVERSE ORDER FOR A REASON. BECAUSE OPENGL USES COLUMN-MAJOR MATRICES.
 		//projection
-			glm::mat4 projectionMatrix = glm::perspective(
-				75.0f,
-				1.0f,
-				0.1f,
-				100.0f
+			//init with identity
+			glm::mat4 projectionMatrix = glm::ortho(
+				-1.0f, 1.0f,	//left-right
+				-1.0f, 1.0f,	//bottom-top
+				1.0f, 100.0f	//near-far
 			);
+			//glm::mat4 projectionMatrix = glm::perspective(75.0f, 1.0f, 1.0f, 100.0f);
 		//view
 			//init with identity
-				glm::mat4 viewMatrix(1.0f);
+			glm::mat4 viewMatrix(1.0f);
 		//model
 			//init with identity
-				glm::mat4 modelMatrix(1.0f);
+			glm::mat4 modelMatrix(1.0f);
 			//translate
-				//22.5.22 this is broken for points on the origin
-				modelMatrix = glm::translate(modelMatrix, position);
+			modelMatrix = glm::translate(modelMatrix, position);
 			//rotate
-				modelMatrix = glm::rotate(
-					modelMatrix,
-					glm::radians(angle.x),
-					glm::vec3(1,0,0)
-				);
-				modelMatrix = glm::rotate(
-					modelMatrix,
-					glm::radians(angle.y),
-					glm::vec3(0,1,0)
-				);
-				modelMatrix = glm::rotate(
-					modelMatrix,
-					glm::radians(angle.z),
-					glm::vec3(0,0,1)
-				);
+			modelMatrix = glm::rotate(modelMatrix, glm::radians(angle.x), glm::vec3(1, 0, 0));
+			modelMatrix = glm::rotate(modelMatrix, glm::radians(angle.y), glm::vec3(0, 1, 0));
+			modelMatrix = glm::rotate(modelMatrix, glm::radians(angle.z), glm::vec3(0, 0, 1));
 			//scale
-				modelMatrix = glm::scale(
-					modelMatrix,
-					scale
-				);
+			modelMatrix = glm::scale(modelMatrix, scale);
 	//pass matrices to shader
 		glad_glUniformMatrix4fv(
 			projectionLocation,
@@ -119,9 +105,9 @@ glm::vec3* WorldObject::getBoundingBox()
 		//construct the rotation matrix
 		glm::mat4 rotationMatrix = glm::mat4(1.0); //create identity matrix
 		rotationMatrix = glm::scale(rotationMatrix, this->scale);
-		rotationMatrix = glm::rotate(rotationMatrix, glm::radians(angle.x), glm::vec3{ 1,0,0 });
-		rotationMatrix = glm::rotate(rotationMatrix, glm::radians(angle.y), glm::vec3{ 0,1,0 });
-		rotationMatrix = glm::rotate(rotationMatrix, glm::radians(angle.z), glm::vec3{ 0,0,1 });
+		rotationMatrix = glm::rotate(rotationMatrix, glm::radians(angle.x), glm::vec3(1,0,0));
+		rotationMatrix = glm::rotate(rotationMatrix, glm::radians(angle.y), glm::vec3(0,1,0));
+		rotationMatrix = glm::rotate(rotationMatrix, glm::radians(angle.z), glm::vec3(0,0,1));
 
 		//rotate the verts
 		auto firstVert = glm::vec3(rotationMatrix * model->verts.at(0));
@@ -173,8 +159,8 @@ glm::vec3* WorldObject::getBoundingBox()
 		//translate the bounding box
 		for (int i = 0;i < 8;i++)
 		{
-			boundingBox[i].x -= (position.x);
-			boundingBox[i].y -= (position.y);
+			boundingBox[i].x += (position.x);
+			boundingBox[i].y += (position.y);
 			boundingBox[i].z += (position.z);
 		}
 	}
