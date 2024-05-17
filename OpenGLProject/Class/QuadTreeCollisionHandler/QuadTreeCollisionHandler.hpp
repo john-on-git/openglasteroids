@@ -152,8 +152,8 @@ class QuadTreeCollisionHandler : public ICollisionHandler {
 					//calculate world coordinates of object's bounding box
 					auto objBBox = obj->getBoundingBox();
 					//determine whether the object is located fully inside this region
-					auto result = (bounds[0].x >= objBBox[0].x) && (bounds[0].y >= objBBox[0].y) && //bottom left
-								  (bounds[1].x <= objBBox[1].x) && (bounds[1].y <= objBBox[1].y); //top right
+					auto result = (bounds[0].x >= objBBox[3].x) && (bounds[0].y >= objBBox[3].y) && //bottom left
+								  (bounds[1].x <= objBBox[4].x) && (bounds[1].y <= objBBox[4].y); //top right
 					return result;
 				}
 		};

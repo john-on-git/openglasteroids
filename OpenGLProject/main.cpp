@@ -30,7 +30,13 @@
 using namespace std;
 
 //Debug logic for visualizing the quadtree. MASSIVE MEMORY LEAK! sort of dumped this here, should be on quadtreecollisionhandler I suppose.
-void drawQuadTree(bool drawAllRegions, bool drawShipRegion, WorldObject* ship, QuadTreeCollisionHandler* collisionHandler, Program* texturedColoredShader, Program* lineShader) {
+void drawQuadTree(bool drawAllRegions, bool drawShipRegion, WorldObject* ship, QuadTreeCollisionHandler* collisionHandler, Program* texturedColoredShader, Program* blockColorShader, GLuint colorLocation) {
+	blockColorShader->Use();
+	int STRIDE = 2;
+	size_t COORDS_LEN = 8;
+	size_t INDICES_LEN = 8;
+	glad_glUniform4fv(colorLocation, 1, glm::value_ptr(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)));
+	unsigned int* vertIndices = new unsigned int[] {0, 1, 1, 2, 2, 3, 3, 0};
 	if (drawAllRegions) {
 		glad_glLineWidth(1);
 		vector<glm::vec2**> flattened;
@@ -38,16 +44,12 @@ void drawQuadTree(bool drawAllRegions, bool drawShipRegion, WorldObject* ship, Q
 		while (!flattened.empty()) {
 			glm::vec2* bounds = *(flattened.back());
 			//set up line quadtree debugger
-			int STRIDE = 4;
-			size_t COORDS_LEN = 16;
-			size_t INDICES_LEN = 8;
 			float* verts = new float[] {
-				bounds[0].x, bounds[1].y, -1.0f, 1.0f, //topleft
-				bounds[1].x, bounds[1].y, -1.0f, 1.0f, //topright
-				bounds[1].x, bounds[0].y, -1.0f, 1.0f, //bottomright
-				bounds[0].x, bounds[0].y, -1.0f, 1.0f, //bottomleft
+				bounds[0].x, bounds[1].y, //topleft
+				bounds[1].x, bounds[1].y, //topright
+				bounds[1].x, bounds[0].y, //bottomright
+				bounds[0].x, bounds[0].y, //bottomleft
 			};
-			unsigned int* vertIndices = new unsigned int[] {0,1, 1,2, 2,3, 3, 0};
 			//generate vertex array object
 			GLuint quadtreeVAO;
 			glad_glGenVertexArrays(1, &quadtreeVAO);
@@ -73,19 +75,17 @@ void drawQuadTree(bool drawAllRegions, bool drawShipRegion, WorldObject* ship, Q
 			);
 
 			delete[] verts;
-			delete[] vertIndices;
 			//set vertex attrib pointers OK
 			glad_glEnableVertexAttribArray(0);
 			glad_glVertexAttribPointer( //position
 				0,
-				4,
+				2,
 				GL_FLOAT,
 				GL_FALSE,
 				STRIDE * sizeof(float),
 				NULL
 			);
 
-			lineShader->Use();
 			glad_glBindVertexArray(quadtreeVAO);
 			glad_glDrawElements(
 				GL_LINES,
@@ -93,7 +93,8 @@ void drawQuadTree(bool drawAllRegions, bool drawShipRegion, WorldObject* ship, Q
 				GL_UNSIGNED_INT,
 				NULL
 			);
-			texturedColoredShader->Use();
+			glad_glDeleteBuffers(2, buffers);
+			glad_glDeleteVertexArrays(1, &quadtreeVAO);
 			flattened.pop_back();
 		}
 	}
@@ -101,17 +102,12 @@ void drawQuadTree(bool drawAllRegions, bool drawShipRegion, WorldObject* ship, Q
 		glad_glLineWidth(10);
 		//set up line quadtree debugger
 		auto bounds = collisionHandler->GetNodeBoundsForObject(ship);
-		int STRIDE = 4;
-		size_t COORDS_LEN = 16;
-		size_t INDICES_LEN = 8;
 		float* verts = new float[] {
-			bounds[0].x, bounds[1].y, -1.0f, 1.0f, //topleft
-			bounds[1].x, bounds[1].y, -1.0f, 1.0f, //topright
-			bounds[1].x, bounds[0].y, -1.0f, 1.0f, //bottomright
-			bounds[0].x, bounds[0].y, -1.0f, 1.0f, //bottomleft
+			bounds[0].x, bounds[1].y, //topleft
+			bounds[1].x, bounds[1].y, //topright
+			bounds[1].x, bounds[0].y, //bottomright
+			bounds[0].x, bounds[0].y, //bottomleft
 		};
-		unsigned int* vertIndices = new unsigned int[] {0,1, 1,2, 2,3, 3,0};
-
 		//generate vertex array object
 		GLuint quadtreeVAO;
 		glad_glGenVertexArrays(1, &quadtreeVAO);
@@ -137,20 +133,18 @@ void drawQuadTree(bool drawAllRegions, bool drawShipRegion, WorldObject* ship, Q
 		);
 
 		delete[] verts;
-		delete[] vertIndices;
 
 		//set vertex attrib pointers OK
 		glad_glEnableVertexAttribArray(0);
 		glad_glVertexAttribPointer( //position
 			0,
-			4,
+			2,
 			GL_FLOAT,
 			GL_FALSE,
 			STRIDE * sizeof(float),
 			NULL
 		);
 
-		lineShader->Use();
 		glad_glBindVertexArray(quadtreeVAO);
 		glad_glDrawElements(
 			GL_LINES,
@@ -158,22 +152,19 @@ void drawQuadTree(bool drawAllRegions, bool drawShipRegion, WorldObject* ship, Q
 			GL_UNSIGNED_INT,
 			NULL
 		);
-		texturedColoredShader->Use();
+		glad_glDeleteBuffers(2, buffers);
+		glad_glDeleteVertexArrays(1, &quadtreeVAO);
 	}
-	lineShader->Use();
+	glad_glUniform4fv(colorLocation, 1, glm::value_ptr(glm::vec4(0.0f, 0.0f, 1.0f, 1.0f)));
 	glad_glLineWidth(5);
 	//set up line quadtree debugger
 	glm::vec3* bounds = ship->getBoundingBox();
-	int STRIDE = 4;
-	size_t COORDS_LEN = 16;
-	size_t INDICES_LEN = 8;
 	float* verts = new float[] {
-		bounds[0].x, bounds[0].y, -1, 1.0f, //topleft
-		bounds[1].x, bounds[1].y, -1, 1.0f, //topright
-		bounds[5].x, bounds[5].y, -1, 1.0f, //bottomright
-		bounds[4].x, bounds[4].y, -1, 1.0f, //bottomleft
+		bounds[0].x, bounds[0].y, //topleft
+		bounds[1].x, bounds[1].y, //topright
+		bounds[5].x, bounds[5].y, //bottomright
+		bounds[4].x, bounds[4].y, //bottomleft
 	};
-	unsigned int* vertIndices = new unsigned int[] {0, 1, 1, 2, 2, 3, 3, 0};
 	//generate vertex array object
 	GLuint quadtreeVAO;
 	glad_glGenVertexArrays(1, &quadtreeVAO);
@@ -205,14 +196,13 @@ void drawQuadTree(bool drawAllRegions, bool drawShipRegion, WorldObject* ship, Q
 	glad_glEnableVertexAttribArray(0);
 	glad_glVertexAttribPointer( //position
 		0,
-		4,
+		2,
 		GL_FLOAT,
 		GL_FALSE,
 		STRIDE * sizeof(float),
 		NULL
 	);
 
-	lineShader->Use();
 	glad_glBindVertexArray(quadtreeVAO);
 	glad_glDrawElements(
 		GL_LINES,
@@ -220,6 +210,8 @@ void drawQuadTree(bool drawAllRegions, bool drawShipRegion, WorldObject* ship, Q
 		GL_UNSIGNED_INT,
 		NULL
 	);
+	glad_glDeleteBuffers(2, buffers);
+	glad_glDeleteVertexArrays(1, &quadtreeVAO);
 	texturedColoredShader->Use();
 }
 
@@ -273,15 +265,18 @@ int main()
 				"Shaders/TexturedColoredTransform/texturedColoredTransform.frag",
 				"Shaders/TexturedColoredTransform/texturedColoredTransform.vert"
 			);
-			Program lineShader(
-				"Shaders/MyFirstShader/myFirst.frag",
-				"Shaders/MyFirstShader/myFirst.vert"
+			Program blockColorShader(
+				"Shaders/BlockColor/blockColor.frag",
+				"Shaders/BlockColor/blockColor.vert"
 			);
 		//get uniform locations
+			blockColorShader.Use();
+			GLuint colorLocation = glad_glGetUniformLocation(blockColorShader.handle, "color");
+
 			texturedColoredShader.Use();
 			GLuint
 				textureLocation		= glad_glGetUniformLocation(texturedColoredShader.handle, "tex"),
-				colorLocation		= glad_glGetUniformLocation(texturedColoredShader.handle, "colorMask"),
+				colorMaskLocation	= glad_glGetUniformLocation(texturedColoredShader.handle, "colorMask"),
 				projectionLocation	= glad_glGetUniformLocation(texturedColoredShader.handle, "projection"),
 				viewLocation		= glad_glGetUniformLocation(texturedColoredShader.handle, "view"),
 				modelLocation		= glad_glGetUniformLocation(texturedColoredShader.handle, "model");
@@ -298,7 +293,7 @@ int main()
 		auto shipModel = new Model(
 			"Models/ship.obj",
 			textureLocation,
-			colorLocation,
+			colorMaskLocation,
 			new GLuint[]{ shipTex->handle },
 			new glm::vec4[]{ glm::vec4(1,1,1,1) },
 			1
@@ -306,7 +301,7 @@ int main()
 		auto projectileModel = new Model(
 			"Models/sphere.obj",
 			textureLocation,
-			colorLocation,
+			colorMaskLocation,
 			new GLuint[]{ projectileTex->handle },
 			new glm::vec4[]{ glm::vec4(2,2,2,1) },
 			1
@@ -314,8 +309,8 @@ int main()
 	//set up world stuff
 		auto ship = WorldObject(
 			shipModel,
-			glm::vec3(0.0f, 0.0f, -5.0f),//pos
-			glm::vec3(270.0f, 45.1f, 0.0f),
+			glm::vec3(0.0f, 0.0f, -5.0f),	//pos
+			glm::vec3(270.0f, 45.1f, 0.0f),	//rot
 			glm::vec3(0.05f, 0.05f, 0.05f), //scale
 			projectionLocation,
 			viewLocation,
@@ -324,9 +319,9 @@ int main()
 		);
 		auto dummy = WorldObject(
 			projectileModel,
-			glm::vec3(-0.4f, -0.4f, -5.0f),//pos
-			glm::vec3(270.0f, 0.0f, 0.0f),
-			glm::vec3(0.05f, 0.05f, 0.05f), //scale
+			glm::vec3(0.4f, 0.4f, -5.0f),	//pos
+			glm::vec3(270.0f, 0.0f, 0.0f),	//rot
+			glm::vec3(0.05f, 0.05f, 0.05f),	//scale
 			projectionLocation,
 			viewLocation,
 			modelLocation,
@@ -488,7 +483,7 @@ int main()
 		
 		delete broadCollisions;
 		//draw the bounds of the quadtree, highlighting the node that the ship is in
-		drawQuadTree(false, false, &ship, &collisionHandler, &texturedColoredShader, &lineShader);
+		drawQuadTree(true, true, &ship, &collisionHandler, &texturedColoredShader, &blockColorShader, colorLocation);
 		//draw all objects, deleting any that have been marked for delete
 			for (auto it = objects.begin(); it != objects.end();)
 			{
