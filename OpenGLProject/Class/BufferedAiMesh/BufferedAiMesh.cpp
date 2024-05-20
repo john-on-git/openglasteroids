@@ -6,7 +6,7 @@
 BufferedAiMesh::BufferedAiMesh()
 {
 	VAO = 0;
-	buffers = NULL;
+	buffers = nullptr;
 	textureLocation = 0;
 	texture = 0;
 	numIndices = 0;
@@ -81,7 +81,7 @@ BufferedAiMesh::BufferedAiMesh(aiMesh* mesh, GLuint texture, glm::vec4 colorMask
 				Value passed here was incorrect, forgot to add the sizeof() here after removing it from STRIDE definition.
 				Resulted in all sorts of bizarre rendering errors, and I was convinced that the problem was with the mesh data.
 			*/
-			NULL
+			nullptr
 		);
 
 		glad_glEnableVertexAttribArray(1);
@@ -111,7 +111,7 @@ void BufferedAiMesh::Draw()
 			GL_TRIANGLES,
 			numIndices,
 			GL_UNSIGNED_INT,
-			NULL
+			nullptr
 		);
 }
 

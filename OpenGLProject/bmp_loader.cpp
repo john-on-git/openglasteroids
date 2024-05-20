@@ -25,7 +25,7 @@ bmp* load_bmp(std::string path)
     };
 
     ifstream file(path, std::ios::binary);
-    bmp* o = NULL;
+    bmp* o = nullptr;
 
     if (file.is_open()) {
         //read the file header
@@ -40,7 +40,7 @@ bmp* load_bmp(std::string path)
             //read the DIB header
             dibheader dib = {};
             file.read(((char*)&dib.size), sizeof(unsigned int)); //read the size
-            o = new bmp{ 0, 0, NULL };
+            o = new bmp{ 0, 0, nullptr };
             switch (dib.size) {
                 //not implemented
             case 12:

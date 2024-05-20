@@ -83,7 +83,7 @@ void drawQuadTree(bool drawAllRegions, bool drawShipRegion, WorldObject* ship, Q
 				GL_FLOAT,
 				GL_FALSE,
 				STRIDE * sizeof(float),
-				NULL
+				nullptr
 			);
 
 			glad_glBindVertexArray(quadtreeVAO);
@@ -91,7 +91,7 @@ void drawQuadTree(bool drawAllRegions, bool drawShipRegion, WorldObject* ship, Q
 				GL_LINES,
 				INDICES_LEN,
 				GL_UNSIGNED_INT,
-				NULL
+				nullptr
 			);
 			glad_glDeleteBuffers(2, buffers);
 			glad_glDeleteVertexArrays(1, &quadtreeVAO);
@@ -142,7 +142,7 @@ void drawQuadTree(bool drawAllRegions, bool drawShipRegion, WorldObject* ship, Q
 			GL_FLOAT,
 			GL_FALSE,
 			STRIDE * sizeof(float),
-			NULL
+			nullptr
 		);
 
 		glad_glBindVertexArray(quadtreeVAO);
@@ -150,7 +150,7 @@ void drawQuadTree(bool drawAllRegions, bool drawShipRegion, WorldObject* ship, Q
 			GL_LINES,
 			INDICES_LEN,
 			GL_UNSIGNED_INT,
-			NULL
+			nullptr
 		);
 		glad_glDeleteBuffers(2, buffers);
 		glad_glDeleteVertexArrays(1, &quadtreeVAO);
@@ -200,7 +200,7 @@ void drawQuadTree(bool drawAllRegions, bool drawShipRegion, WorldObject* ship, Q
 		GL_FLOAT,
 		GL_FALSE,
 		STRIDE * sizeof(float),
-		NULL
+		nullptr
 	);
 
 	glad_glBindVertexArray(quadtreeVAO);
@@ -208,21 +208,12 @@ void drawQuadTree(bool drawAllRegions, bool drawShipRegion, WorldObject* ship, Q
 		GL_LINES,
 		INDICES_LEN,
 		GL_UNSIGNED_INT,
-		NULL
+		nullptr
 	);
 	glad_glDeleteBuffers(2, buffers);
 	glad_glDeleteVertexArrays(1, &quadtreeVAO);
 	texturedColoredShader->Use();
 }
-
-/*	TODO TODO TODO TODO TODO	*\
-	texture support			 ✓
-	loading models from file ✓
-	licensing stuff for libs ✓
-	fix memory leak			 ✓
-	fix bullet shooting		 ✓ 
-	collision detection		
-\*								*/
 
 bool keyPressed[360];
 
@@ -235,8 +226,8 @@ int main()
 			exit(1);
 		}
 	//initialize window
-		GLFWwindow* window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE, NULL, NULL);
-		if (window == NULL)
+		GLFWwindow* window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE, nullptr, nullptr);
+		if (window == nullptr)
 		{
 			OutputDebugStringW(L"FATAL: failed to initialize glfw window\n");
 			exit(1);

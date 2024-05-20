@@ -5,7 +5,7 @@
 Delta::Delta()
 {
 	this->magnitude = new glm::vec3(0.0f, 0.0f, 0.0f);
-	this->now = NULL;
+	this->now = nullptr;
 	this->duration  = 0;
 	this->maximum = -1;
 }
