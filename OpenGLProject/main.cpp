@@ -39,10 +39,10 @@ void drawQuadTree(bool drawAllRegions, bool drawShipRegion, WorldObject* ship, Q
 	unsigned int* vertIndices = new unsigned int[] {0, 1, 1, 2, 2, 3, 3, 0};
 	if (drawAllRegions) {
 		glad_glLineWidth(1);
-		vector<glm::vec2**> flattened;
+		vector<glm::vec2*> flattened;
 		collisionHandler->GetAllBounds(&flattened);
 		while (!flattened.empty()) {
-			glm::vec2* bounds = *(flattened.back());
+			glm::vec2* bounds =flattened.back();
 			//set up line quadtree debugger
 			float* verts = new float[] {
 				bounds[0].x, bounds[1].y, //topleft
@@ -158,7 +158,7 @@ void drawQuadTree(bool drawAllRegions, bool drawShipRegion, WorldObject* ship, Q
 	glad_glUniform4fv(colorLocation, 1, glm::value_ptr(glm::vec4(0.0f, 0.0f, 1.0f, 1.0f)));
 	glad_glLineWidth(5);
 	//set up line quadtree debugger
-	glm::vec3* bounds = ship->getBoundingBox();
+	glm::vec3* bounds = ship->getObjectAlignedBoundingBox();
 	float* verts = new float[] {
 		bounds[0].x, bounds[0].y, //topleft
 		bounds[1].x, bounds[1].y, //topright
@@ -294,16 +294,16 @@ int main()
 			"Models/ship.obj",
 			textureLocation,
 			colorMaskLocation,
-			new GLuint[]{ shipTex->handle },
-			new glm::vec4[]{ glm::vec4(1,1,1,1) },
+			std::vector<GLuint>{ shipTex->handle },
+			std::vector<glm::vec4>{ glm::vec4(1, 1, 1, 1) },
 			1
 		);
 		auto projectileModel = new Model(
 			"Models/sphere.obj",
 			textureLocation,
 			colorMaskLocation,
-			new GLuint[]{ projectileTex->handle },
-			new glm::vec4[]{ glm::vec4(2,2,2,1) },
+			std::vector<GLuint>{ projectileTex->handle },
+			std::vector<glm::vec4>{ glm::vec4(2, 2, 2, 1) },
 			1
 		);
 	//set up world stuff
@@ -315,7 +315,7 @@ int main()
 			projectionLocation,
 			viewLocation,
 			modelLocation,
-			new vector<tag>{ SHIP }
+			vector<tag>{ SHIP }
 		);
 		auto dummy = WorldObject(
 			projectileModel,
@@ -325,7 +325,7 @@ int main()
 			projectionLocation,
 			viewLocation,
 			modelLocation,
-			new vector<tag>{}
+			vector<tag>{}
 		);
 		auto objects = vector<WorldObject*>{
 				&ship,
@@ -334,11 +334,8 @@ int main()
 	//game stuff
 		QuadTreeCollisionHandler collisionHandler(
 			5,
-			new glm::vec2[]
-			{
-				glm::vec2( 1.1f, 1.1f),
-				glm::vec2(-1.1f,-1.1f)
-			}
+			glm::vec2(-1.1f, -1.1f),
+			glm::vec2( 1.1f,  1.1f)
 		);
 		vector<Delta*> deltas;
 		vector<WorldObject*> projectiles;
@@ -428,7 +425,7 @@ int main()
 				projectionLocation,
 				viewLocation,
 				modelLocation,
-				new vector<tag>{ PROJECTILE }
+				vector<tag>{ PROJECTILE }
 			);
 			objects.push_back(projectile);
 			projectiles.push_back(projectile);

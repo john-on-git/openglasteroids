@@ -11,7 +11,7 @@ class Model
 		BufferedAiMesh* meshes;
 		glm::vec4 boundingMin;
 		glm::vec4 boundingMax;
-		Model(std::string path, GLuint textureLocation, GLuint colorLocation, GLuint* textures, glm::vec4* colorMasks, size_t numTextures);
+		Model(std::string path, GLuint textureLocation, GLuint colorLocation, std::vector<GLuint> textures, std::vector<glm::vec4> colorMasks, size_t numTextures);
 		void Draw();
 	protected:
 		size_t numMeshes;

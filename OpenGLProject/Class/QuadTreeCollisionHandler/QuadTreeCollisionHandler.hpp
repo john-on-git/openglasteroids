@@ -7,14 +7,14 @@
 
 class QuadTreeCollisionHandler : public ICollisionHandler {
 	public:
-		QuadTreeCollisionHandler(unsigned char maxDepth, glm::vec2* initialBounds);
+		QuadTreeCollisionHandler(unsigned char maxDepth, glm::vec2 bottomLeft, glm::vec2 topRight);
 		virtual void Update(vector<WorldObject*> v);
 		virtual unordered_set<UnorderedPair<WorldObject*>>* GetBroadCollisions();
 		bool GetFineCollision(WorldObject* a, WorldObject* b);
 		virtual glm::vec2* GetNodeBoundsForObject(WorldObject* object);
-		vector<glm::vec2**>* GetAllBounds(vector<glm::vec2**>* store);
+		vector<glm::vec2*>* GetAllBounds(vector<glm::vec2*>* store);
 	private:
-		glm::vec2* initialBounds;
+		glm::vec2 initialBounds[2];
 		unsigned char maxDepth;
 		//15.5.2024, why is this defined in a header file?
 		class qnode {
@@ -22,7 +22,7 @@ class QuadTreeCollisionHandler : public ICollisionHandler {
 				vector<WorldObject*> contents;
 				qnode* parent;
 				qnode* children[4];
-				glm::vec2* bounds;
+				glm::vec2 bounds[2];
 				qnode(qnode* parent, glm::vec2 bottomLeft, glm::vec2 topRight)
 				{
 					this->parent = parent;
@@ -32,7 +32,8 @@ class QuadTreeCollisionHandler : public ICollisionHandler {
 					children[2] = NULL;
 					children[3] = NULL;
 
-					bounds = new glm::vec2[]{ bottomLeft, topRight };
+					bounds[0] = bottomLeft;
+					bounds[1] = topRight;
 				}
 
 				~qnode()
@@ -40,7 +41,6 @@ class QuadTreeCollisionHandler : public ICollisionHandler {
 					for (qnode* child : children) {
 						delete child;
 					}
-					delete [] bounds;
 				}
 				
 				/// <summary>
@@ -136,9 +136,10 @@ class QuadTreeCollisionHandler : public ICollisionHandler {
 						}
 					return NULL; //not in tree
 				}
-				void DepthFirstFlatten(vector<glm::vec2**>* collector)
+				void DepthFirstFlatten(vector<glm::vec2*>* collector)
 				{
-					collector->push_back(&bounds);
+					auto heapCopy = new glm::vec2[]{ bounds[0], bounds[1] };
+					collector->push_back(heapCopy);
 					for (auto child : children)
 					{
 						if (child != NULL) {
@@ -149,14 +150,21 @@ class QuadTreeCollisionHandler : public ICollisionHandler {
 			protected:
 				bool WillFit(WorldObject* obj)
 				{
-					//calculate world coordinates of object's bounding box
-					auto objBBox = obj->getBoundingBox();
-					//determine whether the object is located fully inside this region
-					auto result = (bounds[0].x >= objBBox[3].x) && (bounds[0].y >= objBBox[3].y) && //bottom left
-								  (bounds[1].x <= objBBox[4].x) && (bounds[1].y <= objBBox[4].y); //top right
-					return result;
+					//calculate world coordinates of object's object-aligned bounding box
+					auto objBBox = obj->getObjectAlignedBoundingBox();
+					//determine whether the OABB is located fully inside this region
+					for (char i=0;i<8;i++)
+					{
+						auto point = objBBox[i];
+						auto result = point.x >= bounds[0].x && point.y >= bounds[0].y && //bottom left
+							point.x <= bounds[1].x && point.y <= bounds[1].y; //top right
+						if (!result) {
+							return false;
+						}
+					}
+					return true;
 				}
 		};
-		qnode* root; //here instead of at the top as qnode needs to be defined first
+		qnode* root; //the root node of the quadtree. here instead of at the top because qnode needs to be defined first
 		pair<unordered_set<UnorderedPair<WorldObject*>>*, vector<WorldObject*>*> GetBroadCollisionsHelper(unordered_set<UnorderedPair<WorldObject*>>* store, qnode* node);
 };

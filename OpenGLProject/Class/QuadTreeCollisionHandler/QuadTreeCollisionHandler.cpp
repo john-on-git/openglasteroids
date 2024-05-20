@@ -1,11 +1,14 @@
 #include "QuadTreeCollisionHandler.hpp"
+#include "../Model/Model.hpp"
 #include <iostream>
 #include <queue>
+#include <glm/geometric.hpp>
 
-QuadTreeCollisionHandler::QuadTreeCollisionHandler(unsigned char maxDepth, glm::vec2* initialBounds)
+QuadTreeCollisionHandler::QuadTreeCollisionHandler(unsigned char maxDepth, glm::vec2 bottomLeft, glm::vec2 topRight)
 {
 	this->maxDepth = maxDepth;
-	this->initialBounds = initialBounds;
+	initialBounds[0] = bottomLeft;
+	initialBounds[1] = topRight;
 	root = NULL;
 }
 
@@ -72,22 +75,40 @@ glm::vec2* QuadTreeCollisionHandler::GetNodeBoundsForObject(WorldObject* target)
 	return result==NULL ? NULL : result->bounds;
 }
 
-vector<glm::vec2**>* QuadTreeCollisionHandler::GetAllBounds(vector<glm::vec2**>* store)
+vector<glm::vec2*>* QuadTreeCollisionHandler::GetAllBounds(vector<glm::vec2*>* store)
 {
 	root->DepthFirstFlatten(store);
 	return store;
 }
 
-bool QuadTreeCollisionHandler::GetFineCollision(WorldObject* a, WorldObject* b)
+/**
+* 
+* @param e vector representing the line segment, starting at the origin
+* @param q the model to check for intersection with
+* @param qPosition the position of q relative to the start of e
+* @return true if the line intersects the model, else false
+*/
+bool LineIntersectsPolygon(glm::vec4 e, WorldObject* q, glm::vec4 qPosition)
 {
-	//TODO
-	//https://web.archive.org/web/20141127210836/http://content.gpwiki.org/index.php/Polygon_Collision
-	glm::vec2 temp;
-	//get vector between closest points
+	//TODO, there's actually no class containing the vector positions as this info is stored on the GPU
+	//so this data needs to be added to q/its components
 
-	//temp = temp; //get a vector perpendicular to it
+	//based on Eric Haines - Fast Ray-Convex Polyhedron Intersection
+	
+	glm::vec2 intersection = glm::vec2(0.0f, glm::length(e)); //x = tnear, y = tfar
+	//TODO the worldobject q should contain a representation of the faces
+	//for each face of q
+		//find the POI
+		//branch? updating the tnear/tfar
+	return false;
+}
 
-	//get the shadows of a & b on vector
-
-	return false;/*do the shadows overlap*/
+bool QuadTreeCollisionHandler::GetFineCollision(WorldObject* p, WorldObject* q)
+{
+	//based on the polygon intersection algorithm detailed by The Morgan Kaufmann Series in Interactive 3D Technology
+	
+	//if any of the edges of p intersect q
+	//if any of the edges of q intersect p
+	//special case for identical & aligned shapes
+	return false;
 }

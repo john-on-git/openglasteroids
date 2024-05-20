@@ -5,7 +5,7 @@
 #include <iostream>
 #include <vector>
 
-Model::Model(std::string path, GLuint textureLocation, GLuint colorLocation, GLuint* textures, glm::vec4* colorMasks, size_t numTextures)
+Model::Model(std::string path, GLuint textureLocation, GLuint colorLocation, std::vector<GLuint> textures, std::vector<glm::vec4> colorMasks, size_t numTextures)
 {
 	//load mesh
 	Assimp::Importer importer;
@@ -20,7 +20,7 @@ Model::Model(std::string path, GLuint textureLocation, GLuint colorLocation, GLu
 	meshes = new BufferedAiMesh[numMeshes];
 	for (size_t i = 0;i < numMeshes;i++)
 	{
-		meshes[i] = BufferedAiMesh(aiMeshes[i], textures[i], colorMasks[i], textureLocation, colorLocation);
+		meshes[i] = BufferedAiMesh(aiMeshes[i], textures.at(i), colorMasks.at(i), textureLocation, colorLocation);
 		//also store the verts here for collision stuff
 		for (size_t j = 0;j < aiMeshes[i]->mNumVertices;j++)
 		{
