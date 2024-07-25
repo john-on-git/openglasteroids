@@ -4,6 +4,7 @@
 #include "../BufferedAiMesh/BufferedAiMesh.hpp"
 #include <glm/vec4.hpp>
 #include <glm/mat2x4.hpp>
+#include <glm/mat2x3.hpp>
 #include <vector>
 
 class Model
@@ -12,8 +13,8 @@ class Model
 		BufferedAiMesh* meshes;
 		glm::vec4 boundingMin;
 		glm::vec4 boundingMax;
-		glm::mat2x4* edges;
-		glm::vec4* faces;
+		std::vector<glm::mat2x4> edges;
+		std::vector<glm::vec4> faces; //normal vector, then distance
 		Model(std::string path, GLuint textureLocation, GLuint colorLocation, std::vector<GLuint> textures, std::vector<glm::vec4> colorMasks, size_t numTextures);
 		void Draw();
 	protected:

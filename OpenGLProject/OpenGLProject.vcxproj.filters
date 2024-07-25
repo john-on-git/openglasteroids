@@ -39,9 +39,6 @@
     <ClCompile Include="Class\Model\Model.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Class\Delta\Delta.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Class\QuadTreeCollisionHandler\QuadTreeCollisionHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -49,6 +46,18 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Libraries\include\glm\glm.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Class\Delta\DeltaProviders\Vec3Provider.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Class\Delta\DeltaTargets\Vec3Target.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Class\Delta\DeltaProviders\DragProvider.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Class\Delta\DeltaTargets\WorldObjectAngleTarget.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -87,9 +96,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Class\Model\Model.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Class\Delta\Delta.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="tag.hpp">
@@ -971,6 +977,27 @@
     <ClInclude Include="Libraries\include\glm\vector_relational.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Class\Delta\DeltaProvider.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Class\Delta\DeltaTarget.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Class\Delta\DeltaProviders\Vec3Provider.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Class\Delta\DeltaTargets\Vec3Target.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Class\Delta\DeltaProviders\DragProvider.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Class\Delta\DeltaTargets\WorldObjectAngleTarget.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Class\Delta\Delta.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Libraries\dll\assimp-vc142-mt.dll" />
@@ -1403,6 +1430,11 @@
   <ItemGroup>
     <Text Include="Licences\glad.txt" />
     <Text Include="Licences\license.txt" />
-    <Text Include="notes.md" />
+    <Text Include="Docs\notes.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Docs\delta_redo.drawio.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

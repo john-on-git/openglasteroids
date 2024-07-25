@@ -11,7 +11,6 @@ constexpr auto SHIP_MOVERATE_MULT		= 0.00009f;
 constexpr auto SHIP_TURNRATE_MULT		= 0.666f;
 constexpr auto SHIP_MIN_VELOCITY		= 0.0f;
 constexpr auto SHIP_MAX_VELOCITY		= 0.0333f;
-constexpr auto SHIP_DRAG_COEFFICIENT	= 0.02f;
 
 constexpr auto BULLET_VELOCITY_MULT = 0.02f;
 constexpr auto FIRE_DELAY			= FRAMERATE / 4;

@@ -95,6 +95,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <CompileAsManaged>false</CompileAsManaged>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -114,6 +115,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <CompileAsManaged>false</CompileAsManaged>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -133,6 +135,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <CompileAsManaged>false</CompileAsManaged>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -152,6 +155,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <CompileAsManaged>false</CompileAsManaged>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -168,6 +172,7 @@
   <ItemGroup>
     <ClCompile Include="bmp_loader.cpp" />
     <ClCompile Include="Class\BufferedAiMesh\BufferedAiMesh.cpp" />
+    <ClCompile Include="Class\Delta\DeltaProviders\DragProvider.cpp" />
     <ClCompile Include="Class\QuadTreeCollisionHandler\QuadTreeCollisionHandler.cpp" />
     <ClCompile Include="Class\WorldObject\WorldObject.cpp" />
     <ClCompile Include="Class\Program\program.cpp" />
@@ -177,16 +182,22 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Class\Texture\Texture.cpp" />
     <ClCompile Include="Class\Model\Model.cpp" />
-    <ClCompile Include="Class\Delta\Delta.cpp" />
+    <ClCompile Include="Class\Delta\DeltaProviders\Vec3Provider.cpp" />
+    <ClCompile Include="Class\Delta\DeltaTargets\Vec3Target.cpp" />
+    <ClCompile Include="Class\Delta\DeltaTargets\WorldObjectAngleTarget.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="bmp_loader.hpp" />
     <ClInclude Include="Class\BufferedAiMesh\BufferedAiMesh.hpp" />
+    <ClInclude Include="Class\Delta\Delta.hpp" />
+    <ClInclude Include="Class\Delta\DeltaProviders\DragProvider.hpp" />
     <ClInclude Include="Class\QuadTreeCollisionHandler\QuadTreeCollisionHandler.hpp" />
     <ClInclude Include="Class\UnorderedPair\UnorderedPair.hpp" />
     <ClInclude Include="Class\WorldObject\WorldObject.hpp" />
     <ClInclude Include="Class\Program\program.hpp" />
     <ClInclude Include="Class\ICollisionHandler\ICollisionHandler.hpp" />
+    <ClInclude Include="Class\Delta\DeltaProvider.hpp" />
+    <ClInclude Include="Class\Delta\DeltaTarget.hpp" />
     <ClInclude Include="Libraries\include\glm\common.hpp" />
     <ClInclude Include="Libraries\include\glm\detail\compute_common.hpp" />
     <ClInclude Include="Libraries\include\glm\detail\compute_vector_decl.hpp" />
@@ -485,7 +496,9 @@
     <ClInclude Include="main.hpp" />
     <ClInclude Include="Class\Texture\Texture.hpp" />
     <ClInclude Include="Class\Model\Model.hpp" />
-    <ClInclude Include="Class\Delta\Delta.hpp" />
+    <ClInclude Include="Class\Delta\DeltaProviders\Vec3Provider.hpp" />
+    <ClInclude Include="Class\Delta\DeltaTargets\Vec3Target.hpp" />
+    <ClInclude Include="Class\Delta\DeltaTargets\WorldObjectAngleTarget.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Libraries\dll\assimp-vc142-mt.dll" />
@@ -642,7 +655,10 @@
   <ItemGroup>
     <Text Include="Licences\glad.txt" />
     <Text Include="Licences\license.txt" />
-    <Text Include="notes.md" />
+    <Text Include="Docs\notes.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Docs\delta_redo.drawio.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

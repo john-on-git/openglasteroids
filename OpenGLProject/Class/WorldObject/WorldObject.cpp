@@ -25,6 +25,25 @@ WorldObject::WorldObject(Model* model, glm::vec3 position, glm::vec3 angle, glm:
 	boundingBoxAngle = glm::vec3(-1, -1, -1);
 }
 
+void WorldObject::setAngle(glm::vec3 angle)
+{
+	this->angle = angle;
+
+	//update world matrix
+	this->modelMatrix = glm::mat4(1.0); //create identity matrix
+	this->modelMatrix = glm::translate(this->modelMatrix, position);
+	this->modelMatrix = glm::rotate(this->modelMatrix, glm::radians(angle.x), glm::vec3(1, 0, 0));
+	this->modelMatrix = glm::rotate(this->modelMatrix, glm::radians(angle.y), glm::vec3(0, 1, 0));
+	this->modelMatrix = glm::rotate(this->modelMatrix, glm::radians(angle.z), glm::vec3(0, 0, 1));
+	this->modelMatrix = glm::scale(this->modelMatrix, scale);
+}
+
+glm::vec3 WorldObject::getAngle()
+{
+	return this->angle;
+}
+
+
 void WorldObject::Draw()
 {
 	/*
@@ -50,16 +69,6 @@ void WorldObject::Draw()
 			//init with identity
 			glm::mat4 viewMatrix(1.0f);
 		//model
-			//init with identity
-			glm::mat4 modelMatrix(1.0f);
-			//translate
-			modelMatrix = glm::translate(modelMatrix, position);
-			//rotate
-			modelMatrix = glm::rotate(modelMatrix, glm::radians(angle.x), glm::vec3(1, 0, 0));
-			modelMatrix = glm::rotate(modelMatrix, glm::radians(angle.y), glm::vec3(0, 1, 0));
-			modelMatrix = glm::rotate(modelMatrix, glm::radians(angle.z), glm::vec3(0, 0, 1));
-			//scale
-			modelMatrix = glm::scale(modelMatrix, scale);
 	//pass matrices to shader
 		glad_glUniformMatrix4fv(
 			projectionLocation,
@@ -77,7 +86,7 @@ void WorldObject::Draw()
 			modelLocation,
 			1,
 			GL_FALSE,
-			glm::value_ptr(modelMatrix)
+			glm::value_ptr(this->modelMatrix)
 		);
 	//draw
 	model->Draw();
@@ -92,16 +101,10 @@ glm::vec3* WorldObject::getObjectAlignedBoundingBox()
 			boundingBox = NULL;
 		}
 		//construct the rotation matrix
-		glm::mat4 rotationMatrix = glm::mat4(1.0); //create identity matrix
-		rotationMatrix = glm::translate(rotationMatrix, position);
-		rotationMatrix = glm::rotate(rotationMatrix, glm::radians(angle.x), glm::vec3(1,0,0));
-		rotationMatrix = glm::rotate(rotationMatrix, glm::radians(angle.y), glm::vec3(0,1,0));
-		rotationMatrix = glm::rotate(rotationMatrix, glm::radians(angle.z), glm::vec3(0,0,1));
-		rotationMatrix = glm::scale(rotationMatrix, scale);
 
 		//calculate the rotated bounding box
 		boundingBox = new glm::vec3[8];
-		for (char i = 0;i < 8;i++)
+		for (unsigned char i = 0;i < 8;i++)
 		{
 			glm::vec4 vert;
 			switch (i)
@@ -131,8 +134,25 @@ glm::vec3* WorldObject::getObjectAlignedBoundingBox()
 					vert = glm::vec4(model->boundingMax.x, model->boundingMin.y, model->boundingMax.z, 1.0f);
 					break;
 			}
-			boundingBox[i] = glm::vec3(rotationMatrix * vert);
+			boundingBox[i] = glm::vec3(this->modelMatrix * vert);
 		}
 	}
 	return boundingBox;
+}
+
+std::vector<glm::vec4>* WorldObject::calcFaces(glm::vec3 position, glm::vec3 rotation)
+{
+	auto faces = new std::vector<glm::vec4>();
+	for (unsigned int i = 0;i < this->model->faces.size();i++)
+	{
+		//construct the rotation matrix
+
+		glm::vec4 face = this->model->faces.at(i); //get the face representation
+
+		//rotate the normal vector (does this work?) (why wouldn't it?)
+		auto rotatedNormal = this->modelMatrix * glm::vec4(face.x, face.y, face.z, 0);
+		rotatedNormal.w = face.w; //re-set the d
+		faces->push_back(rotatedNormal);
+	}
+	return faces;
 }

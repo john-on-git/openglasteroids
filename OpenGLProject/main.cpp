@@ -25,6 +25,12 @@
 #include "Class/Delta/Delta.hpp"
 #include "tag.hpp"
 #include "Class/QuadTreeCollisionHandler/QuadTreeCollisionHandler.hpp"
+#include "Class/Delta/DeltaProvider.hpp"
+#include "Class/Delta/DeltaTarget.hpp"
+#include "Class/Delta/DeltaProviders/Vec3Provider.hpp"
+#include "Class/Delta/DeltaTargets/Vec3Target.hpp"
+#include "Class/Delta/DeltaProviders/DragProvider.hpp"
+#include "Class/Delta/DeltaTargets/WorldObjectAngleTarget.hpp"
 
 
 using namespace std;
@@ -323,83 +329,80 @@ int main()
 				&dummy
 		};
 	//game stuff
+		vector<WorldObject*> projectiles;
+		glm::vec3 shipVelocity(0.0f, 0.0f, 0.0f);
+
 		QuadTreeCollisionHandler collisionHandler(
 			5,
 			glm::vec2(-1.1f, -1.1f),
 			glm::vec2( 1.1f,  1.1f)
 		);
-		vector<Delta*> deltas;
-		vector<WorldObject*> projectiles;
-		auto shipVelocity = Delta(
-			&ship.position,
-			new glm::vec3(0.0f, 0.0f, 0.0f)
-		);
-		deltas.push_back(&shipVelocity);
-		auto shipDrag = Delta(
-			&shipVelocity,
-			new glm::vec3(
-				-SHIP_DRAG_COEFFICIENT * shipVelocity.magnitude->x,
-				-SHIP_DRAG_COEFFICIENT * shipVelocity.magnitude->y,
-				-SHIP_DRAG_COEFFICIENT * shipVelocity.magnitude->z
-			),
-			SHIP_MAX_VELOCITY,
-			-1
-		);
-		deltas.push_back(&shipDrag);
+		//set up deltas stuff
+		vector<Delta<glm::vec3>*> deltas;
+		auto shipAngleTarget = WorldObjectAngleTarget(&ship);
+		auto shipVelocityTarget = Vec3Target(&shipVelocity);
+
+		//add velocity delta
+		auto shipVelocityDelta = Delta<glm::vec3>(new Vec3Provider(&shipVelocity));
+		shipVelocityDelta.AddTarget(new Vec3Target(&ship.position));
+		deltas.push_back(&shipVelocityDelta);
+
+		//add drag delta
+		auto shipDragDelta = Delta<glm::vec3>(new DragProvider(&shipVelocity), SHIP_MAX_VELOCITY);
+		shipDragDelta.AddTarget(&shipVelocityTarget);
+		deltas.push_back(&shipDragDelta);
+
 		unsigned char fireDelay = 0;
 	//render loop
 	while (!glfwWindowShouldClose(window))
 	{
-		//manually update ship drag (TODO this sort of behaviour should be generalised & encapsulated in Delta)
-		shipDrag.magnitude->x = -SHIP_DRAG_COEFFICIENT * shipVelocity.magnitude->x;
-		shipDrag.magnitude->y = -SHIP_DRAG_COEFFICIENT * shipVelocity.magnitude->y;
-		shipDrag.magnitude->z = -SHIP_DRAG_COEFFICIENT * shipVelocity.magnitude->z;
-
 		if (fireDelay > 0)
 			fireDelay--;
 		//get player input
-		auto rad = glm::radians(ship.angle.y);
+		auto rad = glm::radians(ship.getAngle().y);
 		if (keyPressed[GLFW_KEY_W])
 		{
-			deltas.push_back(new Delta(
-				&shipVelocity,
-				new glm::vec3(
-					SHIP_MOVERATE_MULT * sin(rad),
-					SHIP_MOVERATE_MULT * cos(rad),
-					0.0f
-				),
-				SHIP_MAX_VELOCITY,
-				10
-			));
+			auto move = glm::vec3(
+				SHIP_MOVERATE_MULT * sin(rad),
+				SHIP_MOVERATE_MULT * cos(rad),
+				0.0f
+			);
+			deltas.push_back(new Delta<glm::vec3>(new Vec3Provider(&move), 10));
+			shipVelocityDelta.AddTarget(&shipVelocityTarget);
 		}
 		else if (keyPressed[GLFW_KEY_S])
 		{
-			deltas.push_back(new Delta(
-				&shipVelocity,
-				new glm::vec3(
-					-1 * SHIP_MOVERATE_MULT * sin(rad),
-					-1 * SHIP_MOVERATE_MULT * cos(rad),
-					0.0f
-				),
-				10
-			));
+			auto move = glm::vec3(
+				-SHIP_MOVERATE_MULT * sin(rad),
+				-SHIP_MOVERATE_MULT * cos(rad),
+				0.0f
+			);
+			auto moveDelta = new Delta<glm::vec3>(new Vec3Provider(&move), 10);
+			deltas.push_back(moveDelta);
+			moveDelta->AddTarget(&shipVelocityTarget);
 		}
 
 		if (keyPressed[GLFW_KEY_A])
 		{
-			deltas.push_back(new Delta(
-				&ship.angle,
-				new glm::vec3(0.0f, SHIP_TURNRATE_MULT * -1, 0.0f),
-				10
-			));
+			auto move = glm::vec3(
+				0.0f,
+				-SHIP_TURNRATE_MULT,
+				0.0f
+			);	
+			auto moveDelta = new Delta<glm::vec3>(new Vec3Provider(&move), 10);
+			deltas.push_back(moveDelta);
+			moveDelta->AddTarget(&shipVelocityTarget);
 		}
 		else if (keyPressed[GLFW_KEY_D])
 		{
-			deltas.push_back(new Delta(
-				&ship.angle,
-				new glm::vec3(0.0f, SHIP_TURNRATE_MULT, 0.0f),
-				10
-			));
+			auto move = glm::vec3(
+				0.0f,
+				SHIP_TURNRATE_MULT,
+				0.0f
+			);
+			auto moveDelta = new Delta<glm::vec3>(new Vec3Provider(&move), 10);
+			deltas.push_back(moveDelta);
+			moveDelta->AddTarget(&shipVelocityTarget);
 		}
 
 		if (keyPressed[GLFW_KEY_SPACE] && fireDelay==0)
@@ -420,15 +423,20 @@ int main()
 			);
 			objects.push_back(projectile);
 			projectiles.push_back(projectile);
-			deltas.push_back(new Delta(
-				&(projectile->position),
-				new glm::vec3(
-					shipVelocity.magnitude->x + (sin(rad) * BULLET_VELOCITY_MULT),
-					shipVelocity.magnitude->y + (cos(rad) * BULLET_VELOCITY_MULT),
-					shipVelocity.magnitude->z + 0.0f
-				)
-			));
-			fireDelay = FIRE_DELAY;
+
+			auto projectileVelocity = glm::vec3(
+				shipVelocity.x + (sin(rad) * BULLET_VELOCITY_MULT),
+				shipVelocity.y + (cos(rad) * BULLET_VELOCITY_MULT),
+				shipVelocity.z + 0.0f
+			);
+
+			//set up the delta
+			auto projectilePositionTarget = Vec3Target(&projectile->position);
+			auto projectileVelocityDelta = new Delta<glm::vec3>(new Vec3Provider(&projectileVelocity));
+			projectileVelocityDelta->AddTarget(&projectilePositionTarget);
+			deltas.push_back(projectileVelocityDelta);
+			
+			fireDelay = FIRE_DELAY; //reset fire delay
 		}
 		
 		for (auto object : objects)
@@ -460,12 +468,14 @@ int main()
 			//check collision
 			auto broadCollisions = collisionHandler.GetBroadCollisions();
 			for (auto it = broadCollisions->begin(); it != broadCollisions->end();it++) //for each collision
+			{
 				if (collisionHandler.GetFineCollision(it->first, it->second))
 				{
 					//color change for collision debugging
 					it->first->model->meshes[0].colorMask = glm::vec4(2, 1, 1, 1);
 					it->second->model->meshes[0].colorMask = glm::vec4(2, 1, 1, 1);
 				}
+			}
 		//clear framebuffers
 			glad_glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		

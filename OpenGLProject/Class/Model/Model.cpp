@@ -4,6 +4,7 @@
 #include <assimp/scene.h>
 #include <iostream>
 #include <vector>
+#include <glm/mat4x4.hpp>
 
 Model::Model(std::string path, GLuint textureLocation, GLuint colorLocation, std::vector<GLuint> textures, std::vector<glm::vec4> colorMasks, size_t numTextures)
 {
@@ -22,18 +23,52 @@ Model::Model(std::string path, GLuint textureLocation, GLuint colorLocation, std
 	{
 		meshes[i] = BufferedAiMesh(aiMeshes[i], textures.at(i), colorMasks.at(i), textureLocation, colorLocation);
 		//also store the verts here for collision stuff
-		for (size_t j = 0;j < aiMeshes[i]->mNumVertices;j++)
+		auto firstVert = aiMeshes[i]->mVertices[0];
+		boundingMin.x = std::min(boundingMin.x, firstVert.x);
+		boundingMax.x = std::max(boundingMax.x, firstVert.x);
+
+		boundingMin.y = std::max(boundingMin.y, firstVert.y);
+		boundingMax.y = std::max(boundingMax.y, firstVert.y);
+
+		boundingMin.z = std::min(boundingMin.z, firstVert.z);
+		boundingMax.z = std::max(boundingMax.z, firstVert.z);
+		for (unsigned int j = 1;j < aiMeshes[i]->mNumVertices;j++)
 		{
 			//also update the bounding box
-			auto vert = aiMeshes[i]->mVertices[j];
-			boundingMin.x = std::min(boundingMin.x, vert.x);
-			boundingMax.x = std::max(boundingMax.x, vert.x);
+			auto secondVert = aiMeshes[i]->mVertices[j];
+			boundingMin.x = std::min(boundingMin.x, secondVert.x);
+			boundingMax.x = std::max(boundingMax.x, secondVert.x);
 
-			boundingMin.y = std::max(boundingMin.y, vert.y);
-			boundingMax.y = std::max(boundingMax.y, vert.y);
+			boundingMin.y = std::max(boundingMin.y, secondVert.y);
+			boundingMax.y = std::max(boundingMax.y, secondVert.y);
 
-			boundingMin.z = std::min(boundingMin.z, vert.z);
-			boundingMax.z = std::max(boundingMax.z, vert.z);
+			boundingMin.z = std::min(boundingMin.z, secondVert.z);
+			boundingMax.z = std::max(boundingMax.z, secondVert.z);
+
+			//add the edge
+			edges.push_back(glm::mat2x4(
+				glm::vec4(firstVert.x,   firstVert.y,  firstVert.z, 0),
+				glm::vec4(secondVert.x, secondVert.y, secondVert.z, 0)
+			));
+			firstVert = secondVert;
+		}
+		//add each face
+		for (unsigned int j = 0;j < aiMeshes[i]->mNumFaces;j++)
+		{
+			aiFace face = aiMeshes[i]->mFaces[j];
+			//get the normal vector for the face by taking the cross product of the first two edges
+			auto start = aiMeshes[i]->mVertices[face.mIndices[0]];
+			auto middle = aiMeshes[i]->mVertices[face.mIndices[1]];
+			auto end = aiMeshes[i]->mVertices[face.mIndices[2]];
+
+			auto firstEdge = glm::vec3(middle.x-start.x, middle.y-start.y, middle.z-start.z);
+			auto secondEdge = glm::vec3(end.x-start.x, end.y-start.y, end.z-start.z);
+
+			//calculate the equation of the plane intersecting this face 
+			auto normal = glm::cross(firstEdge, secondEdge); //calculate the x, y, z
+			auto d = glm::dot(firstEdge, normal); //calculate the d ;)
+
+			faces.push_back(glm::vec4(normal, d));
 		}
 	}
 }
