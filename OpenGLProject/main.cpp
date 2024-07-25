@@ -391,7 +391,7 @@ int main()
 			);	
 			auto moveDelta = new Delta<glm::vec3>(new Vec3Provider(&move), 10);
 			deltas.push_back(moveDelta);
-			moveDelta->AddTarget(&shipVelocityTarget);
+			moveDelta->AddTarget(&shipAngleTarget);
 		}
 		else if (keyPressed[GLFW_KEY_D])
 		{
@@ -402,7 +402,7 @@ int main()
 			);
 			auto moveDelta = new Delta<glm::vec3>(new Vec3Provider(&move), 10);
 			deltas.push_back(moveDelta);
-			moveDelta->AddTarget(&shipVelocityTarget);
+			moveDelta->AddTarget(&shipAngleTarget);
 		}
 
 		if (keyPressed[GLFW_KEY_SPACE] && fireDelay==0)
@@ -496,13 +496,16 @@ int main()
 			}
 		//apply all deltas, deleting any that have expired
 			for (auto it = deltas.begin(); it != deltas.end();)
+			{
 				if ((*it)->Tick())
 				{
-					delete *it;
 					it = deltas.erase(it);
 				}
-				else 
+				else
+				{
 					it++;
+				}
+			}
 		//check for GL errors
 			GLenum err = glad_glGetError();
 			while(err!=GL_NO_ERROR)

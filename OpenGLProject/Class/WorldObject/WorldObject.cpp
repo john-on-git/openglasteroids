@@ -23,13 +23,11 @@ WorldObject::WorldObject(Model* model, glm::vec3 position, glm::vec3 angle, glm:
 	this->markedForDelete = false;
 	boundingBox = NULL;
 	boundingBoxAngle = glm::vec3(-1, -1, -1);
+	UpdateModelMatrix();
 }
 
-void WorldObject::setAngle(glm::vec3 angle)
+void WorldObject::UpdateModelMatrix()
 {
-	this->angle = angle;
-
-	//update world matrix
 	this->modelMatrix = glm::mat4(1.0); //create identity matrix
 	this->modelMatrix = glm::translate(this->modelMatrix, position);
 	this->modelMatrix = glm::rotate(this->modelMatrix, glm::radians(angle.x), glm::vec3(1, 0, 0));
@@ -38,11 +36,35 @@ void WorldObject::setAngle(glm::vec3 angle)
 	this->modelMatrix = glm::scale(this->modelMatrix, scale);
 }
 
+glm::vec3 WorldObject::getPosition()
+{
+	return this->position;
+}
+void WorldObject::setPosition(glm::vec3 position)
+{
+	this->position = position;
+	UpdateModelMatrix();
+}
+
 glm::vec3 WorldObject::getAngle()
 {
 	return this->angle;
 }
+void WorldObject::setAngle(glm::vec3 angle)
+{
+	this->angle = angle;
+	UpdateModelMatrix();
+}
 
+glm::vec3 WorldObject::getScale()
+{
+	return this->scale;
+}
+void WorldObject::setScale(glm::vec3 scale)
+{
+	this->scale = scale;
+	UpdateModelMatrix();
+}
 
 void WorldObject::Draw()
 {
@@ -82,6 +104,7 @@ void WorldObject::Draw()
 			GL_FALSE,
 			glm::value_ptr(viewMatrix)
 		);
+
 		glad_glUniformMatrix4fv(
 			modelLocation,
 			1,

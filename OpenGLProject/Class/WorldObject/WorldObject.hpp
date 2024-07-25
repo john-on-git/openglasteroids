@@ -22,8 +22,12 @@ class WorldObject {
 
 		WorldObject(Model *model, glm::vec3 position, glm::vec3 angle, glm::vec3 scale, GLuint projectionLocation, GLuint viewLocation, GLuint modelLocation, vector<tag> tags);
 		void Draw();
+		glm::vec3 getPosition();
+		void setPosition(glm::vec3 position);
 		glm::vec3 getAngle();
 		void setAngle(glm::vec3 angle);
+		glm::vec3 getScale();
+		void setScale(glm::vec3 scale);
 		glm::vec3* getObjectAlignedBoundingBox();
 		std::vector<glm::vec4>* calcFaces(glm::vec3 position, glm::vec3 rotation);
 	protected:
@@ -33,4 +37,5 @@ class WorldObject {
 		GLuint modelLocation;
 		glm::vec3* boundingBox;
 		glm::vec3 boundingBoxAngle; //angle at which the current value of boundingBox^ was calculated
+		void UpdateModelMatrix();
 };
