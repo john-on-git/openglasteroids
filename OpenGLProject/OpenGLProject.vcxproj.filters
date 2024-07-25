@@ -60,6 +60,9 @@
     <ClCompile Include="Class\Delta\DeltaTargets\WorldObjectAngleTarget.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Class\Delta\DeltaTargets\WorldObjectPositionTarget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Class\BufferedAiMesh\BufferedAiMesh.hpp">
@@ -996,6 +999,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Class\Delta\Delta.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Class\Delta\DeltaTargets\WorldObjectPositionTarget.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

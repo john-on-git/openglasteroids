@@ -14,8 +14,6 @@ using namespace std;
 class WorldObject {
 	public:
 		Model *model;
-		glm::vec3 position;
-		glm::vec3 scale;
 		bool markedForDelete;
 		vector<tag> tags;
 		glm::mat4 modelMatrix;
@@ -31,7 +29,9 @@ class WorldObject {
 		glm::vec3* getObjectAlignedBoundingBox();
 		std::vector<glm::vec4>* calcFaces(glm::vec3 position, glm::vec3 rotation);
 	protected:
+		glm::vec3 position;
 		glm::vec3 angle;
+		glm::vec3 scale;
 		GLuint projectionLocation;
 		GLuint viewLocation;
 		GLuint modelLocation;

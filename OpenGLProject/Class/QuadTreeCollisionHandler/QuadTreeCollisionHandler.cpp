@@ -162,7 +162,7 @@ bool QuadTreeCollisionHandler::GetFineCollision(WorldObject* p, WorldObject* q)
 	{
 		glm::mat2x4 edge = p->model->edges.at(i);
 		//return true if this edge intersects the polygon, transforming everything so the start of the edge is the origin
-		std::vector<glm::vec4>* faces = q->calcFaces(glm::vec4(q->position, 0) - edge[0], q->getAngle());
+		std::vector<glm::vec4>* faces = q->calcFaces(glm::vec4(q->getPosition(), 0) - edge[0], q->getAngle());
 		if (LineIntersectsPolygon(edge[1] - edge[0], faces)) //TODO
 		{
 			delete faces;
@@ -175,7 +175,7 @@ bool QuadTreeCollisionHandler::GetFineCollision(WorldObject* p, WorldObject* q)
 	{
 		glm::mat2x4 edge = q->model->edges.at(i);
 		//return true if this edge intersects the polygon, transforming everything so the start of the edge is the origin
-		std::vector<glm::vec4>* faces = p->calcFaces(glm::vec4(p->position, 0) - edge[0], p->getAngle());
+		std::vector<glm::vec4>* faces = p->calcFaces(glm::vec4(p->getPosition(), 0) - edge[0], p->getAngle());
 		if (LineIntersectsPolygon(edge[1] - edge[0], faces)) //TODO
 		{
 			delete faces;

@@ -48,6 +48,7 @@ Delta<T>::Delta(DeltaProvider<T>* provider, long long duration, float maximumMag
 template<typename T>
 Delta<T>::~Delta()
 {
+	delete this->provider;
 	this->targets.clear();
 	delete this;
 }

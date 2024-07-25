@@ -31,6 +31,7 @@
 #include "Class/Delta/DeltaTargets/Vec3Target.hpp"
 #include "Class/Delta/DeltaProviders/DragProvider.hpp"
 #include "Class/Delta/DeltaTargets/WorldObjectAngleTarget.hpp"
+#include "Class/Delta/DeltaTargets/WorldObjectPositionTarget.hpp"
 
 
 using namespace std;
@@ -344,7 +345,7 @@ int main()
 
 		//add velocity delta
 		auto shipVelocityDelta = Delta<glm::vec3>(new Vec3Provider(&shipVelocity));
-		shipVelocityDelta.AddTarget(new Vec3Target(&ship.position));
+		shipVelocityDelta.AddTarget(new WorldObjectPositionTarget(&ship));
 		deltas.push_back(&shipVelocityDelta);
 
 		//add drag delta
@@ -367,8 +368,9 @@ int main()
 				SHIP_MOVERATE_MULT * cos(rad),
 				0.0f
 			);
-			deltas.push_back(new Delta<glm::vec3>(new Vec3Provider(&move), 10));
-			shipVelocityDelta.AddTarget(&shipVelocityTarget);
+			auto moveDelta = new Delta<glm::vec3>(new Vec3Provider(&move), 10, SHIP_MAX_VELOCITY);
+			moveDelta->AddTarget(&shipVelocityTarget);
+			deltas.push_back(moveDelta);
 		}
 		else if (keyPressed[GLFW_KEY_S])
 		{
@@ -377,9 +379,9 @@ int main()
 				-SHIP_MOVERATE_MULT * cos(rad),
 				0.0f
 			);
-			auto moveDelta = new Delta<glm::vec3>(new Vec3Provider(&move), 10);
-			deltas.push_back(moveDelta);
+			auto moveDelta = new Delta<glm::vec3>(new Vec3Provider(&move), 10, SHIP_MAX_VELOCITY);
 			moveDelta->AddTarget(&shipVelocityTarget);
+			deltas.push_back(moveDelta);
 		}
 
 		if (keyPressed[GLFW_KEY_A])
@@ -390,8 +392,8 @@ int main()
 				0.0f
 			);	
 			auto moveDelta = new Delta<glm::vec3>(new Vec3Provider(&move), 10);
-			deltas.push_back(moveDelta);
 			moveDelta->AddTarget(&shipAngleTarget);
+			deltas.push_back(moveDelta);
 		}
 		else if (keyPressed[GLFW_KEY_D])
 		{
@@ -401,8 +403,8 @@ int main()
 				0.0f
 			);
 			auto moveDelta = new Delta<glm::vec3>(new Vec3Provider(&move), 10);
-			deltas.push_back(moveDelta);
 			moveDelta->AddTarget(&shipAngleTarget);
+			deltas.push_back(moveDelta);
 		}
 
 		if (keyPressed[GLFW_KEY_SPACE] && fireDelay==0)
@@ -410,9 +412,9 @@ int main()
 			auto projectile = new WorldObject(
 				projectileModel,
 				glm::vec3(
-					ship.position.x + (sin(rad) * 0.05), //second half moves the spawn point away from the center of the ship
-					ship.position.y + (cos(rad) * 0.05), //0.05 is the distance between the center and tip
-					ship.position.z
+					ship.getPosition().x + (sin(rad) * 0.05), //second half moves the spawn point away from the center of the ship
+					ship.getPosition().y + (cos(rad) * 0.05), //0.05 is the distance between the center and tip
+					ship.getPosition().z
 				),
 				glm::vec3(270.0f, 0.0f, 0.0f),
 				glm::vec3(0.005f, 0.005f, 0.005f),
@@ -431,7 +433,7 @@ int main()
 			);
 
 			//set up the delta
-			auto projectilePositionTarget = Vec3Target(&projectile->position);
+			auto projectilePositionTarget = WorldObjectPositionTarget(projectile);
 			auto projectileVelocityDelta = new Delta<glm::vec3>(new Vec3Provider(&projectileVelocity));
 			projectileVelocityDelta->AddTarget(&projectilePositionTarget);
 			deltas.push_back(projectileVelocityDelta);
@@ -442,23 +444,25 @@ int main()
 		for (auto object : objects)
 		{
 			//toroidal space
-				if (object->position.x > ARENA_W) //off left
+				auto objectPosition = object->getPosition();
+				if (objectPosition.x > ARENA_W) //off right
 				{
-					object->position.x = -ARENA_W;
+					objectPosition.x = -ARENA_W;
 				}
-				else if (object->position.x < -ARENA_W) //off right
+				else if (objectPosition.x < -ARENA_W) //off left
 				{
-					object->position.x = ARENA_W;
+					objectPosition.x = ARENA_W;
 				}
 
-				if (object->position.y < -ARENA_H) //off top
+				if (objectPosition.y < -ARENA_H) //off top
 				{
-					object->position.y = ARENA_W;
+					objectPosition.y = ARENA_W;
 				}
-				else if (object->position.y > ARENA_H) //off bottom
+				else if (objectPosition.y > ARENA_H) //off bottom
 				{
-					object->position.y = -ARENA_W;
+					objectPosition.y = -ARENA_W;
 				}
+				object->setPosition(objectPosition);
 
 			object->model->meshes[0].colorMask = glm::vec4(1, 1, 1, 1); //reset color
 		}
