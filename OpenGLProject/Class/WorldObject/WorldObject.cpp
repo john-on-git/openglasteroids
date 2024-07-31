@@ -9,6 +9,7 @@
 #include <glm/ext/scalar_constants.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include "../BufferedAiMesh/BufferedAiMesh.hpp"
+#include <iostream>
 
 WorldObject::WorldObject(Model* model, glm::vec3 position, glm::vec3 angle, glm::vec3 scale, GLuint projectionLocation, GLuint viewLocation, GLuint modelLocation, vector<tag> tags)
 {
@@ -163,19 +164,19 @@ glm::vec3* WorldObject::getObjectAlignedBoundingBox()
 	return boundingBox;
 }
 
-std::vector<glm::vec4>* WorldObject::calcFaces(glm::vec3 position, glm::vec3 rotation)
+std::vector<glm::vec4>* WorldObject::calcFaces(glm::vec3 position)
 {
 	auto faces = new std::vector<glm::vec4>();
 	for (unsigned int i = 0;i < this->model->faces.size();i++)
 	{
-		//construct the rotation matrix
+		glm::mat2x3 face = this->model->faces.at(i); //get the face representation
+		auto vec1 = glm::vec3(this->modelMatrix * glm::vec4(face[0] + position, 0));
+		auto vec2 = glm::vec3(this->modelMatrix * glm::vec4(face[1] + position, 0));
 
-		glm::vec4 face = this->model->faces.at(i); //get the face representation
-
-		//rotate the normal vector (does this work?) (why wouldn't it?)
-		auto rotatedNormal = this->modelMatrix * glm::vec4(face.x, face.y, face.z, 0);
-		rotatedNormal.w = face.w; //re-set the d
-		faces->push_back(rotatedNormal);
+		//calculate the equation of the plane intersecting this face 
+		auto normal = glm::normalize(glm::cross(vec1, vec2));
+		auto d = glm::dot(normal, vec1);
+		faces->push_back(glm::vec4(normal, d));
 	}
 	return faces;
 }

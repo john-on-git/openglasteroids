@@ -88,7 +88,7 @@ vector<glm::vec2*>* QuadTreeCollisionHandler::GetAllBounds(vector<glm::vec2*>* s
 * @param qPosition the position of q relative to the start of e
 * @return true if the line intersects the model, else false
 */
-bool LineIntersectsPolygon(glm::vec4 e, vector<glm::vec4>* faces)
+bool LineIntersectsPolygon(glm::vec3 e, vector<glm::vec4>* faces)
 {
 	//TODO, there's actually no class containing the vector positions as this info is stored on the GPU
 	//so this data needs to be added to q/its components
@@ -96,22 +96,19 @@ bool LineIntersectsPolygon(glm::vec4 e, vector<glm::vec4>* faces)
 
 	//based on Eric Haines - Fast Ray-Convex Polyhedron Intersection
 	
-	glm::vec2 intersection = glm::vec2(0.0f, glm::length(e)); //x = tnear, y = tfar
 	double tNear = 0;
-	double tFar = std::numeric_limits<double>::max();
+	double tFar = glm::length(e);
 	//TODO the worldobject q should contain a representation of the faces
 	for (unsigned int i = 0;i < faces->size();i++) //for each face of q
 	{
-		//find the POI
 		glm::vec4 pn = faces->at(i);
-		auto vd = glm::dot(pn, e); //calculate Vd
+		auto vd = glm::dot(glm::vec3(pn), e); //calculate Vd
 		auto vn = pn.w; //ray origin is always *the* origin, so vn = d;
-		auto t = -vn/ vd;
+		auto t = -vn / vd;
 		if (vd == 0)
 		{
 			//"if vd is 0 then the ray is parallel and no intersection takes place"
 			//"in such a case, we check if the ray origin is inside the plane's half space"
-
 
 			if (vn > 0) //"if vn is positive... the ray must miss the polygon, so testing is done."
 			{
@@ -128,10 +125,6 @@ bool LineIntersectsPolygon(glm::vec4 e, vector<glm::vec4>* faces)
 			else if (t<tFar)
 			{
 				tFar = t;
-				if (tNear > tFar)
-				{
-					return false;
-				}
 			}
 		}
 		else //"if vd is negative, it is front-facing."
@@ -143,13 +136,13 @@ bool LineIntersectsPolygon(glm::vec4 e, vector<glm::vec4>* faces)
 			else if (t > tNear)
 			{
 				tNear = t;
-				if (tNear > tFar)
-				{
-					return false;
-				}
 			}
 		}
 		//branch? updating the tnear/tfar
+		if (tNear > tFar)
+		{
+			return false;
+		}
 	}
 	return true;
 }
@@ -162,8 +155,8 @@ bool QuadTreeCollisionHandler::GetFineCollision(WorldObject* p, WorldObject* q)
 	{
 		glm::mat2x4 edge = p->model->edges.at(i);
 		//return true if this edge intersects the polygon, transforming everything so the start of the edge is the origin
-		std::vector<glm::vec4>* faces = q->calcFaces(glm::vec4(q->getPosition(), 0) - edge[0], q->getAngle());
-		if (LineIntersectsPolygon(edge[1] - edge[0], faces)) //TODO
+		std::vector<glm::vec4>* faces = q->calcFaces(edge[0]);
+		if (LineIntersectsPolygon(glm::vec3(edge[1] - edge[0]), faces)) //TODO
 		{
 			delete faces;
 			return true;
@@ -175,8 +168,8 @@ bool QuadTreeCollisionHandler::GetFineCollision(WorldObject* p, WorldObject* q)
 	{
 		glm::mat2x4 edge = q->model->edges.at(i);
 		//return true if this edge intersects the polygon, transforming everything so the start of the edge is the origin
-		std::vector<glm::vec4>* faces = p->calcFaces(glm::vec4(p->getPosition(), 0) - edge[0], p->getAngle());
-		if (LineIntersectsPolygon(edge[1] - edge[0], faces)) //TODO
+		std::vector<glm::vec4>* faces = p->calcFaces(edge[0]);
+		if (LineIntersectsPolygon(glm::vec3(edge[1] - edge[0]), faces)) //TODO
 		{
 			delete faces;
 			return true;

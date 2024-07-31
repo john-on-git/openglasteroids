@@ -186,6 +186,7 @@
     <ClCompile Include="Class\Delta\DeltaProviders\Vec3Provider.cpp" />
     <ClCompile Include="Class\Delta\DeltaTargets\Vec3Target.cpp" />
     <ClCompile Include="Class\Delta\DeltaTargets\WorldObjectAngleTarget.cpp" />
+    <ClCompile Include="Tests\testnMain.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="bmp_loader.hpp" />

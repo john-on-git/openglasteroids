@@ -17,6 +17,7 @@ class WorldObject {
 		bool markedForDelete;
 		vector<tag> tags;
 		glm::mat4 modelMatrix;
+		glm::mat4 rotationMatrix;
 
 		WorldObject(Model *model, glm::vec3 position, glm::vec3 angle, glm::vec3 scale, GLuint projectionLocation, GLuint viewLocation, GLuint modelLocation, vector<tag> tags);
 		void Draw();
@@ -27,7 +28,7 @@ class WorldObject {
 		glm::vec3 getScale();
 		void setScale(glm::vec3 scale);
 		glm::vec3* getObjectAlignedBoundingBox();
-		std::vector<glm::vec4>* calcFaces(glm::vec3 position, glm::vec3 rotation);
+		std::vector<glm::vec4>* calcFaces(glm::vec3 position);
 	protected:
 		glm::vec3 position;
 		glm::vec3 angle;

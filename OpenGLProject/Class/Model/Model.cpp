@@ -57,18 +57,17 @@ Model::Model(std::string path, GLuint textureLocation, GLuint colorLocation, std
 		{
 			aiFace face = aiMeshes[i]->mFaces[j];
 			//get the normal vector for the face by taking the cross product of the first two edges
-			auto start = aiMeshes[i]->mVertices[face.mIndices[0]];
-			auto middle = aiMeshes[i]->mVertices[face.mIndices[1]];
-			auto end = aiMeshes[i]->mVertices[face.mIndices[2]];
+			auto a = aiMeshes[i]->mVertices[face.mIndices[0]];
+			auto b = aiMeshes[i]->mVertices[face.mIndices[1]];
+			auto c = aiMeshes[i]->mVertices[face.mIndices[2]];
 
-			auto firstEdge = glm::vec3(middle.x-start.x, middle.y-start.y, middle.z-start.z);
-			auto secondEdge = glm::vec3(end.x-start.x, end.y-start.y, end.z-start.z);
+			auto firstEdge = b - a;
+			auto secondEdge = c - a;
 
-			//calculate the equation of the plane intersecting this face 
-			auto normal = glm::cross(firstEdge, secondEdge); //calculate the x, y, z
-			auto d = glm::dot(firstEdge, normal); //calculate the d ;)
+			auto firstVec = glm::vec3(firstEdge.x, firstEdge.y, firstEdge.z);
+			auto secondVec = glm::vec3(secondEdge.x, secondEdge.y, secondEdge.z);
 
-			faces.push_back(glm::vec4(normal, d));
+			faces.push_back(glm::mat2x3(firstVec, secondVec));
 		}
 	}
 }

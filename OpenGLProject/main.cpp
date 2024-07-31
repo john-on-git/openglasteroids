@@ -289,7 +289,7 @@ int main()
 		auto projectileTex = new Texture("textures/projectile.png");
 	//model
 		auto shipModel = new Model(
-			"Models/ship.obj",
+			"Models/uvmapped_cube.obj",
 			textureLocation,
 			colorMaskLocation,
 			std::vector<GLuint>{ shipTex->handle },
@@ -297,7 +297,7 @@ int main()
 			1
 		);
 		auto projectileModel = new Model(
-			"Models/sphere.obj",
+			"Models/uvmapped_cube.obj",
 			textureLocation,
 			colorMaskLocation,
 			std::vector<GLuint>{ projectileTex->handle },
@@ -308,7 +308,7 @@ int main()
 		auto ship = WorldObject(
 			shipModel,
 			glm::vec3(0.0f, 0.0f, -5.0f),	//pos
-			glm::vec3(270.0f, 45.1f, 0.0f),	//rot
+			glm::vec3(270.0f, 0.0f, 0.0f),	//rot
 			glm::vec3(0.05f, 0.05f, 0.05f), //scale
 			projectionLocation,
 			viewLocation,
@@ -349,7 +349,7 @@ int main()
 		deltas.push_back(&shipVelocityDelta);
 
 		//add drag delta
-		auto shipDragDelta = Delta<glm::vec3>(new DragProvider(&shipVelocity), SHIP_MAX_VELOCITY);
+		auto shipDragDelta = Delta<glm::vec3>(new DragProvider(&shipVelocity));
 		shipDragDelta.AddTarget(&shipVelocityTarget);
 		deltas.push_back(&shipDragDelta);
 

@@ -16,3 +16,7 @@
 	- first attempt at implementation, doesn't work
 
 	- Delta rework, "a pointer to a bound function may only be used to call the function", needs fixed, nontrivial.
+26.7.2024
+	- Got the deltas working, started work on the collision detection but it's still broke.
+	- Needs to be unit-tested but oooohhh my gawddd, do not want to. IDK no way I'm figuring it out without that tho.
+	- *think* it's an issue with the plane equations, but it's quite simple so idk how it could be...
