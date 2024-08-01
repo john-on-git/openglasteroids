@@ -63,9 +63,6 @@
     <ClCompile Include="Class\Delta\DeltaTargets\WorldObjectPositionTarget.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Tests\testnMain.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Class\BufferedAiMesh\BufferedAiMesh.hpp">
@@ -1431,6 +1428,7 @@
     <None Include="Libraries\include\glm\gtx\wrap.inl">
       <Filter>Header Files</Filter>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="Libraries\lib\glfw3.lib" />

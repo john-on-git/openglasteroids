@@ -96,6 +96,8 @@
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <CompileAsManaged>false</CompileAsManaged>
+      <AdditionalIncludeDirectories>Libraries/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -116,6 +118,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <CompileAsManaged>false</CompileAsManaged>
+      <AdditionalIncludeDirectories>Libraries/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -136,6 +139,8 @@
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <CompileAsManaged>false</CompileAsManaged>
+      <AdditionalIncludeDirectories>Libraries/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -156,6 +161,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <CompileAsManaged>false</CompileAsManaged>
+      <AdditionalIncludeDirectories>Libraries/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -186,7 +192,6 @@
     <ClCompile Include="Class\Delta\DeltaProviders\Vec3Provider.cpp" />
     <ClCompile Include="Class\Delta\DeltaTargets\Vec3Target.cpp" />
     <ClCompile Include="Class\Delta\DeltaTargets\WorldObjectAngleTarget.cpp" />
-    <ClCompile Include="Tests\testnMain.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="bmp_loader.hpp" />
@@ -646,6 +651,7 @@
     <None Include="Licences\assimp" />
     <None Include="Licences\LICENSE.md" />
     <None Include="Licences\stb" />
+    <None Include="packages.config" />
     <None Include="Shaders\TexturedColoredTransform\texturedColoredTransform.frag" />
     <None Include="Shaders\TexturedColoredTransform\texturedColoredTransform.vert" />
     <None Include="Shaders\TexturedTransform\texturedTransform.frag" />
