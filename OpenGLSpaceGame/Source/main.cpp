@@ -279,28 +279,28 @@ int main()
 				exit(1);
 			}
 	//textures
-		auto shipTex = new Texture("textures/ship.png");
-		auto projectileTex = new Texture("textures/projectile.png");
+		auto shipTex = Texture("textures/ship.png");
+		auto projectileTex = Texture("textures/projectile.png");
 	//model
-		auto shipModel = new Model(
+		auto shipModel = Model(
 			"Models/uvmapped_cube.obj",
 			textureLocation,
 			colorMaskLocation,
-			std::vector<GLuint>{ shipTex->handle },
+			std::vector<GLuint>{ shipTex.handle },
 			std::vector<glm::vec4>{ glm::vec4(1, 1, 1, 1) },
 			1
 		);
-		auto projectileModel = new Model(
+		auto projectileModel = Model(
 			"Models/uvmapped_cube.obj",
 			textureLocation,
 			colorMaskLocation,
-			std::vector<GLuint>{ projectileTex->handle },
+			std::vector<GLuint>{ projectileTex.handle },
 			std::vector<glm::vec4>{ glm::vec4(2, 2, 2, 1) },
 			1
 		);
 	//set up world stuff
 		auto ship = WorldObject(
-			shipModel,
+			&shipModel,
 			glm::vec3(0.0f, 0.0f, -5.0f),	//pos
 			glm::vec3(270.0f, 0.0f, 0.0f),	//rot
 			glm::vec3(0.05f, 0.05f, 0.05f), //scale
@@ -310,7 +310,7 @@ int main()
 			vector<tag>{ SHIP }
 		);
 		auto dummy = WorldObject(
-			projectileModel,
+			&projectileModel,
 			glm::vec3(0.4f, 0.4f, -5.0f),	//pos
 			glm::vec3(270.0f, 0.0f, 0.0f),	//rot
 			glm::vec3(0.05f, 0.05f, 0.05f),	//scale
@@ -404,7 +404,7 @@ int main()
 		if (keyPressed[GLFW_KEY_SPACE] && fireDelay==0)
 		{
 			auto projectile = new WorldObject(
-				projectileModel,
+				&projectileModel,
 				glm::vec3(
 					ship.getPosition().x + (sin(rad) * 0.05), //second half moves the spawn point away from the center of the ship
 					ship.getPosition().y + (cos(rad) * 0.05), //0.05 is the distance between the center and tip
@@ -486,7 +486,7 @@ int main()
 				(*it)->Draw();
 				if ((*it)->markedForDelete)
 				{
-					//delete *it;
+					delete *it;
 					it = objects.erase(it);
 				}
 				else
