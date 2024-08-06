@@ -56,7 +56,6 @@ Model::Model(std::string path, GLuint textureLocation, GLuint colorLocation, std
 		for (unsigned int j = 0;j < aiMeshes[i]->mNumFaces;j++)
 		{
 			aiFace face = aiMeshes[i]->mFaces[j];
-			//get the normal vector for the face by taking the cross product of the first two edges
 			auto a = aiMeshes[i]->mVertices[face.mIndices[0]];
 			auto b = aiMeshes[i]->mVertices[face.mIndices[1]];
 			auto c = aiMeshes[i]->mVertices[face.mIndices[2]];
@@ -64,10 +63,11 @@ Model::Model(std::string path, GLuint textureLocation, GLuint colorLocation, std
 			auto firstEdge = b - a;
 			auto secondEdge = c - a;
 
-			auto firstVec = glm::vec3(firstEdge.x, firstEdge.y, firstEdge.z);
-			auto secondVec = glm::vec3(secondEdge.x, secondEdge.y, secondEdge.z);
+			auto firstEdgeVec = glm::vec3(firstEdge.x, firstEdge.y, firstEdge.z);
+			auto secondEdgeVec = glm::vec3(secondEdge.x, secondEdge.y, secondEdge.z);
 
-			faces.push_back(glm::mat2x3(firstVec, secondVec));
+			auto normal = glm::normalize(glm::cross(firstEdgeVec, secondEdgeVec));
+			faces.push_back(glm::mat2x3(normal, glm::vec3(a.x,a.y,a.z)));
 		}
 	}
 }

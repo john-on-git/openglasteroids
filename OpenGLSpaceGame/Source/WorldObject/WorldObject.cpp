@@ -170,12 +170,13 @@ std::vector<glm::vec4>* WorldObject::calcFaces(glm::vec3 position)
 	for (unsigned int i = 0;i < this->model->faces.size();i++)
 	{
 		glm::mat2x3 face = this->model->faces.at(i); //get the face representation
-		auto vec1 = glm::vec3(this->modelMatrix * glm::vec4(face[0] + position, 0));
-		auto vec2 = glm::vec3(this->modelMatrix * glm::vec4(face[1] + position, 0));
+		auto normal = glm::vec3(this->modelMatrix * glm::vec4(face[0] + position, 0));
+		auto point = glm::vec3(this->modelMatrix * glm::vec4(face[1] + position, 0));
 
-		//calculate the equation of the plane intersecting this face 
-		auto normal = glm::normalize(glm::cross(vec1, vec2));
-		auto d = glm::dot(normal, vec1);
+		//calculate the equation of the plane intersecting this face
+		//this all seems to be correct (verified w/ Desmos), I think the issue is with the face rep above^. Prob got the format wrong.
+		//Yes! It should also include a point on the plane. The normal vector can be pre-computed.
+		auto d = glm::dot(normal, point);
 		faces->push_back(glm::vec4(normal, d));
 	}
 	return faces;
