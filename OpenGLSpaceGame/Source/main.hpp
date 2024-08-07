@@ -7,7 +7,7 @@ constexpr auto WINDOW_HEIGHT = 1000;
 constexpr auto FRAMERATE   = 144;
 constexpr auto FRAME_DELAY = 1000 / FRAMERATE;
 
-constexpr auto SHIP_MOVERATE_MULT		= 0.00009f;
+constexpr auto SHIP_MOVERATE_MULT		= 0.00004f;
 constexpr auto SHIP_TURNRATE_MULT		= 0.666f;
 constexpr auto SHIP_MIN_VELOCITY		= 0.0f;
 constexpr auto SHIP_MAX_VELOCITY		= 0.0333f;

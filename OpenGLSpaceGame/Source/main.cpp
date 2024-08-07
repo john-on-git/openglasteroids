@@ -36,7 +36,7 @@
 using namespace std;
 
 //Debug logic for visualizing the quadtree. Not very efficient but idc.
-void drawQuadTree(bool drawAllRegions, bool drawShipRegion, WorldObject* ship, QuadTreeCollisionHandler* collisionHandler, Program* texturedColoredShader, Program* blockColorShader, GLuint colorLocation) {
+void drawQuadTree(bool drawAllRegions, bool drawShipRegion, bool drawShipOABB, WorldObject* ship, QuadTreeCollisionHandler* collisionHandler, Program* texturedColoredShader, Program* blockColorShader, GLuint colorLocation) {
 	blockColorShader->Use();
 	int STRIDE = 2;
 	size_t COORDS_LEN = 8;
@@ -159,60 +159,64 @@ void drawQuadTree(bool drawAllRegions, bool drawShipRegion, WorldObject* ship, Q
 		glad_glDeleteBuffers(2, buffers);
 		glad_glDeleteVertexArrays(1, &quadtreeVAO);
 	}
-	glad_glUniform4fv(colorLocation, 1, glm::value_ptr(glm::vec4(0.0f, 0.0f, 1.0f, 1.0f)));
-	glad_glLineWidth(5);
-	//set up line quadtree debugger
-	glm::vec3* bounds = ship->getObjectAlignedBoundingBox();
-	float verts[] = {
-		bounds[0].x, bounds[0].y, //topleft
-		bounds[1].x, bounds[1].y, //topright
-		bounds[7].x, bounds[7].y, //bottomright
-		bounds[6].x, bounds[6].y, //bottomleft
-	};
-	//generate vertex array object
-	GLuint quadtreeVAO;
-	glad_glGenVertexArrays(1, &quadtreeVAO);
-	glad_glBindVertexArray(quadtreeVAO);
-	//generate buffers and copy over data
-	GLuint buffers[2]; //vertex buffer, and vertex index buffer
-	glad_glGenBuffers(2, buffers); //19.5.21, first argument is the number of buffers, not the size of the buffer. corrupted the heap?
+	
+	if (drawShipOABB)
+	{
+		glad_glUniform4fv(colorLocation, 1, glm::value_ptr(glm::vec4(0.0f, 0.0f, 1.0f, 1.0f)));
+		glad_glLineWidth(5);
+		//set up line quadtree debugger
+		glm::vec3* bounds = ship->getObjectAlignedBoundingBox();
+		float verts[] = {
+			bounds[0].x, bounds[0].y, //topleft
+			bounds[1].x, bounds[1].y, //topright
+			bounds[7].x, bounds[7].y, //bottomright
+			bounds[6].x, bounds[6].y, //bottomleft
+		};
+		//generate vertex array object
+		GLuint quadtreeVAO;
+		glad_glGenVertexArrays(1, &quadtreeVAO);
+		glad_glBindVertexArray(quadtreeVAO);
+		//generate buffers and copy over data
+		GLuint buffers[2]; //vertex buffer, and vertex index buffer
+		glad_glGenBuffers(2, buffers); //19.5.21, first argument is the number of buffers, not the size of the buffer. corrupted the heap?
 
-	glad_glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
-	glad_glBufferData( //add verts to buffer
-		GL_ARRAY_BUFFER,
-		COORDS_LEN * sizeof(float),
-		verts,
-		GL_STATIC_DRAW
-	);
+		glad_glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
+		glad_glBufferData( //add verts to buffer
+			GL_ARRAY_BUFFER,
+			COORDS_LEN * sizeof(float),
+			verts,
+			GL_STATIC_DRAW
+		);
 
-	glad_glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers[1]);
-	glad_glBufferData( //add verts to buffer
-		GL_ELEMENT_ARRAY_BUFFER,
-		INDICES_LEN * sizeof(unsigned int),
-		vertIndices,
-		GL_STATIC_DRAW
-	);
+		glad_glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers[1]);
+		glad_glBufferData( //add verts to buffer
+			GL_ELEMENT_ARRAY_BUFFER,
+			INDICES_LEN * sizeof(unsigned int),
+			vertIndices,
+			GL_STATIC_DRAW
+		);
 
-	//set vertex attrib pointers OK
-	glad_glEnableVertexAttribArray(0);
-	glad_glVertexAttribPointer( //position
-		0,
-		2,
-		GL_FLOAT,
-		GL_FALSE,
-		STRIDE * sizeof(float),
-		nullptr
-	);
+		//set vertex attrib pointers OK
+		glad_glEnableVertexAttribArray(0);
+		glad_glVertexAttribPointer( //position
+			0,
+			2,
+			GL_FLOAT,
+			GL_FALSE,
+			STRIDE * sizeof(float),
+			nullptr
+		);
 
-	glad_glBindVertexArray(quadtreeVAO);
-	glad_glDrawElements(
-		GL_LINES,
-		INDICES_LEN,
-		GL_UNSIGNED_INT,
-		nullptr
-	);
-	glad_glDeleteBuffers(2, buffers);
-	glad_glDeleteVertexArrays(1, &quadtreeVAO);
+		glad_glBindVertexArray(quadtreeVAO);
+		glad_glDrawElements(
+			GL_LINES,
+			INDICES_LEN,
+			GL_UNSIGNED_INT,
+			nullptr
+		);
+		glad_glDeleteBuffers(2, buffers);
+		glad_glDeleteVertexArrays(1, &quadtreeVAO);
+	}
 	texturedColoredShader->Use();
 }
 
@@ -283,7 +287,7 @@ int main()
 		auto projectileTex = Texture("textures/projectile.png");
 	//model
 		auto shipModel = Model(
-			"Models/uvmapped_cube.obj",
+			"Models/sphere.obj",
 			textureLocation,
 			colorMaskLocation,
 			std::vector<GLuint>{ shipTex.handle },
@@ -291,17 +295,25 @@ int main()
 			1
 		);
 		auto projectileModel = Model(
-			"Models/uvmapped_cube.obj",
+			"Models/sphere.obj",
 			textureLocation,
 			colorMaskLocation,
 			std::vector<GLuint>{ projectileTex.handle },
 			std::vector<glm::vec4>{ glm::vec4(2, 2, 2, 1) },
 			1
 		);
+		auto dummy2Model = Model(
+			"Models/ship.obj",
+			textureLocation,
+			colorMaskLocation,
+			std::vector<GLuint>{ shipTex.handle },
+			std::vector<glm::vec4>{ glm::vec4(1, 1, 1, 1) },
+			1
+		);
 	//set up world stuff
 		auto ship = WorldObject(
 			&shipModel,
-			glm::vec3(0.37f, 0.37f, -5.0f),	//pos
+			glm::vec3(0.4f, 0.4f, -5.0f),	//pos
 			glm::vec3(270.0f, 50.0f, 0.0f),	//rot
 			glm::vec3(0.05f, 0.05f, 0.05f), //scale
 			projectionLocation,
@@ -309,7 +321,7 @@ int main()
 			modelLocation,
 			vector<tag>{ SHIP }
 		);
-		auto dummy = WorldObject(
+		auto dummy1 = WorldObject(
 			&projectileModel,
 			glm::vec3(0.4f, 0.4f, -5.0f),	//pos
 			glm::vec3(270.0f, 0.0f, 0.0f),	//rot
@@ -321,7 +333,7 @@ int main()
 		);
 		auto objects = vector<WorldObject*>{
 				&ship,
-				&dummy
+				&dummy1
 		};
 	//game stuff
 		vector<WorldObject*> projectiles;
@@ -420,16 +432,16 @@ int main()
 			objects.push_back(projectile);
 			projectiles.push_back(projectile);
 
-			auto projectileVelocity = glm::vec3(
+			auto projectileVelocity = new glm::vec3(
 				shipVelocity.x + (sin(rad) * BULLET_VELOCITY_MULT),
 				shipVelocity.y + (cos(rad) * BULLET_VELOCITY_MULT),
 				shipVelocity.z + 0.0f
 			);
 
 			//set up the delta
-			auto projectilePositionTarget = WorldObjectPositionTarget(projectile);
-			auto projectileVelocityDelta = new Delta<glm::vec3>(new Vec3Provider(&projectileVelocity));
-			projectileVelocityDelta->AddTarget(&projectilePositionTarget);
+			auto projectilePositionTarget = new WorldObjectPositionTarget(projectile);
+			auto projectileVelocityDelta = new Delta<glm::vec3>(new Vec3Provider(projectileVelocity));
+			projectileVelocityDelta->AddTarget(projectilePositionTarget);
 			deltas.push_back(projectileVelocityDelta);
 			
 			fireDelay = FIRE_DELAY; //reset fire delay
@@ -479,7 +491,7 @@ int main()
 		
 		delete broadCollisions;
 		//draw the bounds of the quadtree, highlighting the node that the ship is in
-		drawQuadTree(true, true, &ship, &collisionHandler, &texturedColoredShader, &blockColorShader, colorLocation);
+		//drawQuadTree(true, true, false, &ship, &collisionHandler, &texturedColoredShader, &blockColorShader, colorLocation);
 		//draw all objects, deleting any that have been marked for delete
 			for (auto it = objects.begin(); it != objects.end();)
 			{

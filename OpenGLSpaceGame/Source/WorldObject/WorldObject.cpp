@@ -82,15 +82,15 @@ void WorldObject::Draw()
 		//THESE ARE IN REVERSE ORDER FOR A REASON. BECAUSE OPENGL USES COLUMN-MAJOR MATRICES.
 		//projection
 			//init with identity
-			glm::mat4 projectionMatrix = glm::ortho(
-				-1.0f, 1.0f,	//left-right
-				-1.0f, 1.0f,	//bottom-top
-				1.0f, 100.0f	//near-far
-			);
-			//glm::mat4 projectionMatrix = glm::perspective(75.0f, 1.0f, 1.0f, 100.0f);
+			//glm::mat4 projectionMatrix = glm::ortho(
+			//	1.0f, -1.0f,	//left-right
+			//	1.0f, -1.0f,	//bottom-top
+			//	1.0f, 100.0f	//near-far
+			//);
+			glm::mat4 projectionMatrix = glm::perspective(75.0f, 1.0f, 1.0f, 100.0f);
 		//view
 			//init with identity
-			glm::mat4 viewMatrix(1.0f);
+			glm::mat4 viewMatrix(glm::lookAt(glm::vec3(0,0,0),glm::vec3(0,0,-1),glm::vec3(0,-1,0)));
 		//model
 	//pass matrices to shader
 		glad_glUniformMatrix4fv(

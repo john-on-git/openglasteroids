@@ -88,7 +88,7 @@ vector<glm::vec2*>* QuadTreeCollisionHandler::GetAllBounds(vector<glm::vec2*>* s
 * @param qPosition the position of q relative to the start of e
 * @return true if the line intersects the model, else false
 */
-static bool LineIntersectsPolygon(glm::vec3 rayOrigin, glm::vec3 rayDirection, vector<glm::vec4>* faces)
+static bool LineIntersectsPolygon(glm::mat2x4 edge, vector<glm::vec4>* faces)
 {
 	//TODO, there's actually no class containing the vector positions as this info is stored on the GPU
 	//so this data needs to be added to q/its components
@@ -96,13 +96,17 @@ static bool LineIntersectsPolygon(glm::vec3 rayOrigin, glm::vec3 rayDirection, v
 
 	//based on Eric Haines - Fast Ray-Convex Polyhedron Intersection
 	
-	double tNear = -numeric_limits<double>::max();
+	double tNear = 0;
 	double tFar = 1; //which is glm::length(rayDirection);
+
+	auto rayOrigin = glm::vec3(edge[0]);
+	auto rayDirection = glm::vec3(edge[1] - edge[0]);
+
 	for (unsigned int i = 0;i < faces->size();i++) //for each face of q 
 	{
 		glm::vec4 pn = faces->at(i);
+		auto vd = glm::dot(glm::vec3(pn), rayDirection);
 		auto vn = glm::dot(glm::vec3(pn), rayOrigin) + pn.w;
-		auto vd = glm::dot(glm::vec3(pn), rayDirection); //calculate Vd
 		if (vd == 0)
 		{
 			//"if vd is 0 then the ray is parallel and no intersection takes place"
@@ -170,46 +174,37 @@ bool QuadTreeCollisionHandler::GetFineCollision(WorldObject* p, WorldObject* q)
 	//one issue is that the edges aren't scaled
 
 	//README! Currently trying to go case-by case on the first call. edge 18 of p intersects (but not really). rayDirection is NaN for it.
+	std::vector<glm::mat2x4>* edges;
+	std::vector<glm::vec4>* faces;
 
 	//the objects are intersecting if any of the edges of p intersect q
-	std::vector<glm::mat2x4>* edges = p->calcEdges();
+	edges = p->calcEdges();
+	faces = q->calcFaces();
 	for (unsigned int i = 0;i < edges->size();i++)
 	{
-		glm::mat2x4 edge = edges->at(i);
 		//return true if this edge intersects the polygon, transforming everything so the start of the edge is the origin
-		std::vector<glm::vec4>* faces = q->calcFaces();
-		auto rayDirection = glm::normalize(edge[1] - edge[0]);
-		if (LineIntersectsPolygon(edge[0], rayDirection, faces)) //TODO
+		if (LineIntersectsPolygon(edges->at(i), faces)) //TODO
 		{
-			delete faces;
 			return true;
 		}
-		else
-		{
-			delete faces;
-		}
 	}
+	delete faces;
 	delete edges;
 
 	//or if any of the edges of q intersect p
 	edges = q->calcEdges();
+	faces = p->calcFaces();
 	for (unsigned int i = 0;i < edges->size();i++)
 	{
-		glm::mat2x4 edge = edges->at(i);
 		//return true if this edge intersects the polygon, transforming everything so the start of the edge is the origin
-		std::vector<glm::vec4>* faces = p->calcFaces();
-		auto rayDirection = glm::normalize(edge[1] - edge[0]);
-		if (LineIntersectsPolygon(edge[0], rayDirection, faces)) //TODO
+		if (LineIntersectsPolygon(edges->at(i), faces)) //TODO
 		{
-			delete faces;
 			return true;
 		}
-		else
-		{
-			delete faces;
-		}
 	}
+	delete faces;
 	delete edges;
+
 	//TODO special case for identical & aligned shapes
 
 	return false; //no intersection found
