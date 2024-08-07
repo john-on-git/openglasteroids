@@ -301,8 +301,8 @@ int main()
 	//set up world stuff
 		auto ship = WorldObject(
 			&shipModel,
-			glm::vec3(0.0f, 0.0f, -5.0f),	//pos
-			glm::vec3(270.0f, 0.0f, 0.0f),	//rot
+			glm::vec3(0.37f, 0.37f, -5.0f),	//pos
+			glm::vec3(270.0f, 50.0f, 0.0f),	//rot
 			glm::vec3(0.05f, 0.05f, 0.05f), //scale
 			projectionLocation,
 			viewLocation,

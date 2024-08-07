@@ -45,11 +45,15 @@ Model::Model(std::string path, GLuint textureLocation, GLuint colorLocation, std
 			boundingMin.z = std::min(boundingMin.z, secondVert.z);
 			boundingMax.z = std::max(boundingMax.z, secondVert.z);
 
-			//add the edge
-			edges.push_back(glm::mat2x4(
-				glm::vec4(firstVert.x,   firstVert.y,  firstVert.z, 0),
-				glm::vec4(secondVert.x, secondVert.y, secondVert.z, 0)
-			));
+			//add the edge (discarding any zero-length edges)
+			auto edge = glm::mat2x3(
+				glm::vec3(firstVert.x, firstVert.y, firstVert.z),
+				glm::vec3(secondVert.x, secondVert.y, secondVert.z)
+			);
+			if (glm::length(edge[1] - edge[0]) > 0)
+			{
+				edges.push_back(edge);
+			}
 			firstVert = secondVert;
 		}
 		//add each face
@@ -60,14 +64,7 @@ Model::Model(std::string path, GLuint textureLocation, GLuint colorLocation, std
 			auto b = aiMeshes[i]->mVertices[face.mIndices[1]];
 			auto c = aiMeshes[i]->mVertices[face.mIndices[2]];
 
-			auto firstEdge = b - a;
-			auto secondEdge = c - a;
-
-			auto firstEdgeVec = glm::vec3(firstEdge.x, firstEdge.y, firstEdge.z);
-			auto secondEdgeVec = glm::vec3(secondEdge.x, secondEdge.y, secondEdge.z);
-
-			auto normal = glm::normalize(glm::cross(firstEdgeVec, secondEdgeVec));
-			faces.push_back(glm::mat2x3(normal, glm::vec3(a.x,a.y,a.z)));
+			faces.push_back(glm::mat3x3(glm::vec3(a.x,a.y,a.z), glm::vec3(b.x,b.y,b.z), glm::vec3(c.x,c.y,c.z)));
 		}
 	}
 }

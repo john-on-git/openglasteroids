@@ -88,7 +88,7 @@ vector<glm::vec2*>* QuadTreeCollisionHandler::GetAllBounds(vector<glm::vec2*>* s
 * @param qPosition the position of q relative to the start of e
 * @return true if the line intersects the model, else false
 */
-bool LineIntersectsPolygon(glm::vec3 e, vector<glm::vec4>* faces)
+static bool LineIntersectsPolygon(glm::vec3 rayOrigin, glm::vec3 rayDirection, vector<glm::vec4>* faces)
 {
 	//TODO, there's actually no class containing the vector positions as this info is stored on the GPU
 	//so this data needs to be added to q/its components
@@ -96,52 +96,51 @@ bool LineIntersectsPolygon(glm::vec3 e, vector<glm::vec4>* faces)
 
 	//based on Eric Haines - Fast Ray-Convex Polyhedron Intersection
 	
-	double tNear = 0;
-	double tFar = glm::length(e);
-	//TODO the worldobject q should contain a representation of the faces
-	for (unsigned int i = 0;i < faces->size();i++) //for each face of q
+	double tNear = -numeric_limits<double>::max();
+	double tFar = 1; //which is glm::length(rayDirection);
+	for (unsigned int i = 0;i < faces->size();i++) //for each face of q 
 	{
 		glm::vec4 pn = faces->at(i);
-		auto vd = glm::dot(glm::vec3(pn), e); //calculate Vd
-		auto vn = pn.w; //ray origin is always *the* origin, so vn = d;
-		auto t = -vn / vd;
+		auto vn = glm::dot(glm::vec3(pn), rayOrigin) + pn.w;
+		auto vd = glm::dot(glm::vec3(pn), rayDirection); //calculate Vd
 		if (vd == 0)
 		{
 			//"if vd is 0 then the ray is parallel and no intersection takes place"
 			//"in such a case, we check if the ray origin is inside the plane's half space"
 
-			if (vn > 0) //"if vn is positive... the ray must miss the polygon, so testing is done."
+			if (vn > 0) //"if vn is positive... the ray must miss the polyhedron, so testing is done."
 			{
 				return false;
 			}
 		}
-		else if (vd > 0)//"if vd is positive the plane is back-facing"
+		else
 		{
-			//t can affect tfar, if t<0, then the polygon is missed. if t<tfar, tfar is set to t
-			if (t < 0)
+			auto t = vn / vd; //the algorithm calls for -vn/vd, but it only works if inverted? I think the plane is being inverted at some point
+			if (vd > 0)//"if vd is positive the plane is back-facing"
+			{
+				//"t can affect tfar, if t<0, then the polygon is missed."
+				if (t < 0)
+				{
+					return false;
+				}
+				else if (t < tFar) //"if t is less than tfar, tfar is set to t"
+				{
+					tFar = t;
+				}
+			}
+			else //"if vd is negative, it is front-facing."
+			{
+				if (t > tNear)
+				{
+					tNear = t;
+				}
+			}
+
+			//"if tNear ever is greater than tFar, the ray must miss the polyhedron"
+			if (tNear > tFar)
 			{
 				return false;
 			}
-			else if (t<tFar)
-			{
-				tFar = t;
-			}
-		}
-		else //"if vd is negative, it is front-facing."
-		{
-			if (t < 0)
-			{
-				return false;
-			}
-			else if (t > tNear)
-			{
-				tNear = t;
-			}
-		}
-		//branch? updating the tnear/tfar
-		if (tNear > tFar)
-		{
-			return false;
 		}
 	}
 	return true;
@@ -149,33 +148,69 @@ bool LineIntersectsPolygon(glm::vec3 e, vector<glm::vec4>* faces)
 bool QuadTreeCollisionHandler::GetFineCollision(WorldObject* p, WorldObject* q)
 {
 	//based on the polygon intersection algorithm detailed by The Morgan Kaufmann Series in Interactive 3D Technology
-	
+
+	//TODO for debugging, remove me!
+	/*std::cout << "Didn't Collide w/ Faces:" << endl;
+	std::cout << "p:" << endl;
+	auto pFaces = p->calcFaces();
+	for (unsigned int i = 0; i < pFaces->size(); i++)
+	{
+		auto face = pFaces->at(i);
+		std::cout << "\t" << "(" << face.x << "x + " << face.y << "y + " << face.z << "z) =" << face.w << endl;
+	}
+	std::cout << "q:" << endl;
+
+	auto qFaces = q->calcFaces();
+	for (unsigned int i = 0; i < qFaces->size(); i++)
+	{
+		auto face = qFaces->at(i);
+		std::cout << "\t" << "(" << face.x << "x + " << face.y << "y + " << face.z << "z) =" << face.w << endl;
+	}*/
+
+	//one issue is that the edges aren't scaled
+
+	//README! Currently trying to go case-by case on the first call. edge 18 of p intersects (but not really). rayDirection is NaN for it.
+
 	//the objects are intersecting if any of the edges of p intersect q
-	for (unsigned int i = 0;i < p->model->edges.size();i++)
+	std::vector<glm::mat2x4>* edges = p->calcEdges();
+	for (unsigned int i = 0;i < edges->size();i++)
 	{
-		glm::mat2x4 edge = p->model->edges.at(i);
+		glm::mat2x4 edge = edges->at(i);
 		//return true if this edge intersects the polygon, transforming everything so the start of the edge is the origin
-		std::vector<glm::vec4>* faces = q->calcFaces(edge[0]);
-		if (LineIntersectsPolygon(glm::vec3(edge[1] - edge[0]), faces)) //TODO
+		std::vector<glm::vec4>* faces = q->calcFaces();
+		auto rayDirection = glm::normalize(edge[1] - edge[0]);
+		if (LineIntersectsPolygon(edge[0], rayDirection, faces)) //TODO
 		{
 			delete faces;
 			return true;
 		}
-		delete faces;
+		else
+		{
+			delete faces;
+		}
 	}
+	delete edges;
+
 	//or if any of the edges of q intersect p
-	for (unsigned int i = 0;i < q->model->edges.size();i++)
+	edges = q->calcEdges();
+	for (unsigned int i = 0;i < edges->size();i++)
 	{
-		glm::mat2x4 edge = q->model->edges.at(i);
+		glm::mat2x4 edge = edges->at(i);
 		//return true if this edge intersects the polygon, transforming everything so the start of the edge is the origin
-		std::vector<glm::vec4>* faces = p->calcFaces(edge[0]);
-		if (LineIntersectsPolygon(glm::vec3(edge[1] - edge[0]), faces)) //TODO
+		std::vector<glm::vec4>* faces = p->calcFaces();
+		auto rayDirection = glm::normalize(edge[1] - edge[0]);
+		if (LineIntersectsPolygon(edge[0], rayDirection, faces)) //TODO
 		{
 			delete faces;
 			return true;
 		}
-		delete faces;
+		else
+		{
+			delete faces;
+		}
 	}
+	delete edges;
 	//TODO special case for identical & aligned shapes
+
 	return false; //no intersection found
 }

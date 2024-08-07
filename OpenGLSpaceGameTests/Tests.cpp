@@ -56,9 +56,9 @@ TEST(CubeAtOrigin, FaceCalculations) {
 	);
 	auto shipObject = WorldObject(
 		&shipModel,
-		glm::vec3(0.0f,  0.0f, -5.0f), //pos
-		glm::vec3(0.0f,  0.0f,  0.0f), //rot
-		glm::vec3(1.0f,  1.0f,  1.0f), //scale (1.0f = 2 units wide cube)
+		glm::vec3(0.0f,  0.0f, 0.0f), //pos
+		glm::vec3(0.0f,  0.0f, 0.0f), //rot
+		glm::vec3(1.0f,  1.0f, 1.0f), //scale (1.0f = 2 units wide cube)
 		projectionLocation,
 		viewLocation,
 		modelLocation,
@@ -66,29 +66,29 @@ TEST(CubeAtOrigin, FaceCalculations) {
 	);
 	//there are twelve faces because each square "face" of the cube is split into two tris
 	vector<glm::vec4> expectedFaces = {
-		glm::vec4(0.0f,1.0f,0.0f,  1.0f), //+y (1)
-		glm::vec4(0.0f,0.0f,1.0f,  1.0f), //+z (1)
+		glm::vec4(0.0f,-1.0f,0.0f,  1.0f), //-y (1)
+		glm::vec4(0.0f,0.0f,-1.0f,  1.0f), //-z (1)
 		
-		glm::vec4(-1.0f,0.0f,0.0f, 1.0f), //-x (2)
-		glm::vec4(0.0f,-1.0f,0.0f, 1.0f), //-y (1)
+		glm::vec4(1.0f,0.0f,0.0f,   1.0f), //+x (1)
+		glm::vec4(0.0f,1.0f,0.0f,   1.0f), //+y (1)
 
-		glm::vec4(1.0f,0.0f,0.0f,  1.0f), //+x (2)
-		glm::vec4(0.0f,0.0f,-1.0f, 1.0f), //-z (1)
+		glm::vec4(-1.0f,0.0f,0.0f,  1.0f), //-x (1)
+		glm::vec4( 0.0f,0.0f,1.0f,  1.0f), //+z (1)
 
-		glm::vec4(0.0f,1.0f,0.0f,  1.0f), //+y (2)
-		glm::vec4(0.0f,0.0f,1.0f,  1.0f), //+z (2)
+		glm::vec4(0.0f,-1.0f, 0.0f, 1.0f), //-y (2)
+		glm::vec4(0.0f, 0.0f,-1.0f, 1.0f), //-z (2)
 
-		glm::vec4(-1.0f,0.0f,0.0f, 1.0f), //-x (1)
-		glm::vec4(0.0f,-1.0f,0.0f, 1.0f), //-y (2)
+		glm::vec4(1.0f,0.0f,0.0f,   1.0f), //+x (2)
+		glm::vec4(0.0f,1.0f,0.0f,   1.0f), //+y (2)
 
-		glm::vec4(1.0f,0.0f,0.0f,  1.0f), //+x (1)
-		glm::vec4(0.0f,0.0f,-1.0f, 1.0f), //-z (2)
+		glm::vec4(-1.0f,0.0f,0.0f,  1.0f), //-x (2)
+		glm::vec4( 0.0f,0.0f,1.0f,  1.0f), //+z (2)
 	};
-	auto actualFaces = shipObject.calcFaces(glm::vec3(0.0f, 0.0f, 0.0f));
-	//string s = "";
+	auto actualFaces = shipObject.calcFaces();
+	string s = "";
 	for (unsigned char i = 0; i < 12; i++)
 	{
-		/*s.append(std::to_string(i));
+		s.append(std::to_string(i));
 		s.append("\n\tExpected: ");
 		s.append(std::to_string(expectedFaces.at(i)[0]));
 		s.append(" ");
@@ -106,10 +106,10 @@ TEST(CubeAtOrigin, FaceCalculations) {
 		s.append(std::to_string(actualFaces->at(i)[2]));
 		s.append(" ");
 		s.append(std::to_string(actualFaces->at(i)[3]));
-		s.append("\n");*/
+		s.append("\n");
 
 		EXPECT_EQ(expectedFaces.at(i), actualFaces->at(i));
-		/*if (expectedFaces.at(i) == actualFaces->at(i))
+		if (expectedFaces.at(i) == actualFaces->at(i))
 		{
 			s.append("TRUE");
 		}
@@ -117,6 +117,6 @@ TEST(CubeAtOrigin, FaceCalculations) {
 		{
 			s.append("FALSE");
 		}
-		s.append("\n");*/
+		s.append("\n");
 	}
 }

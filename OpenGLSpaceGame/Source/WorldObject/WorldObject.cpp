@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "WorldObject.hpp"
 #include "windows.h"
@@ -164,20 +164,36 @@ glm::vec3* WorldObject::getObjectAlignedBoundingBox()
 	return boundingBox;
 }
 
-std::vector<glm::vec4>* WorldObject::calcFaces(glm::vec3 position)
+std::vector<glm::vec4>* WorldObject::calcFaces()
 {
 	auto faces = new std::vector<glm::vec4>();
 	for (unsigned int i = 0;i < this->model->faces.size();i++)
 	{
-		glm::mat2x3 face = this->model->faces.at(i); //get the face representation
-		auto normal = glm::vec3(this->modelMatrix * glm::vec4(face[0] + position, 0));
-		auto point = glm::vec3(this->modelMatrix * glm::vec4(face[1] + position, 0));
+		//the shift in position is probably what's breaking this.
+		glm::mat3x3 face = this->model->faces.at(i); //get the face representation
+		//convert to vec4, applying transform (this breaks it)
+		auto a = this->modelMatrix * glm::vec4(face[0], 1.0f);
+		auto b = this->modelMatrix * glm::vec4(face[1], 1.0f);
+		auto c = this->modelMatrix * glm::vec4(face[2], 1.0f);
 
-		//calculate the equation of the plane intersecting this face
-		//this all seems to be correct (verified w/ Desmos), I think the issue is with the face rep above^. Prob got the format wrong.
-		//Yes! It should also include a point on the plane. The normal vector can be pre-computed.
-		auto d = glm::dot(normal, point);
+		auto normal = glm::normalize(glm::cross(glm::vec3(a - b), glm::vec3(c - a)));
+		auto d = -glm::dot(normal, glm::vec3(a));
+
 		faces->push_back(glm::vec4(normal, d));
 	}
 	return faces;
+}
+
+std::vector<glm::mat2x4>* WorldObject::calcEdges()
+{
+	auto edges = new std::vector<glm::mat2x4>();
+	for (unsigned int i = 0; i < this->model->edges.size(); i++)
+	{
+		glm::mat2x3 edge = this->model->edges.at(i); //get the edge representation
+		//TODO WHY ISN'T THE MATRIX WORKING 😭 (it was because the w component was 0)
+		auto a = this->modelMatrix * glm::vec4(edge[0], 1.0f);
+		auto b = this->modelMatrix * glm::vec4(edge[1], 1.0f);
+		edges->push_back(glm::mat2x4(a,b));
+	}
+	return edges;
 }

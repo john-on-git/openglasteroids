@@ -28,7 +28,8 @@ class WorldObject {
 		glm::vec3 getScale();
 		void setScale(glm::vec3 scale);
 		glm::vec3* getObjectAlignedBoundingBox();
-		std::vector<glm::vec4>* calcFaces(glm::vec3 position);
+		std::vector<glm::vec4>* calcFaces();
+		std::vector<glm::mat2x4>* calcEdges();
 	protected:
 		glm::vec3 position;
 		glm::vec3 angle;
