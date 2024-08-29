@@ -12,14 +12,38 @@ QuadTreeCollisionHandler::QuadTreeCollisionHandler(unsigned char maxDepth, glm::
 	root = NULL;
 }
 
-void QuadTreeCollisionHandler::Update(vector<WorldObject*> v)
+void QuadTreeCollisionHandler::Register(WorldObject* o)
 {
-	if(root!=NULL) //if there's an existing quadtree
+	this->objects.insert(o);
+}
+
+unordered_set<UnorderedPair<WorldObject*>>* QuadTreeCollisionHandler::Check()
+{
+	unordered_set<UnorderedPair<WorldObject*>>* collisions = new unordered_set<UnorderedPair<WorldObject*>>();
+	
+	//clear any existing quadtree
+	if (root != NULL)
+	{
 		delete root; //clear it
-	//construct the quadtree
+	}
+
+	//and construct the new one
 	root = new qnode(NULL, initialBounds[0], initialBounds[1]);
-	for (auto obj : v)
+	for (auto obj : this->objects)
+	{
 		root->TryInsert(maxDepth, 1, obj);
+	}
+
+	//check collision
+	auto broadCollisions = this->GetBroadCollisions();
+	for (auto it = broadCollisions->begin(); it != broadCollisions->end(); it++) //for each collision
+	{
+		if (this->GetFineCollision(it->first, it->second))
+		{
+			collisions->insert(*it);
+		}
+	}
+	return collisions;
 }
 
 unordered_set<UnorderedPair<WorldObject*>>* QuadTreeCollisionHandler::GetBroadCollisions()
@@ -97,16 +121,16 @@ static bool LineIntersectsPolygon(glm::mat2x4 edge, vector<glm::vec4>* faces)
 	//based on Eric Haines - Fast Ray-Convex Polyhedron Intersection
 	
 	double tNear = 0;
-	double tFar = 1; //which is glm::length(rayDirection);
+	double tFar = glm::length(glm::vec3(edge[1] - edge[0])); //which is glm::length(rayDirection);
 
 	auto rayOrigin = glm::vec3(edge[0]);
-	auto rayDirection = glm::vec3(edge[1] - edge[0]);
+	auto rayDirection = glm::normalize(glm::vec3(edge[1] - edge[0]));
 
 	for (unsigned int i = 0;i < faces->size();i++) //for each face of q 
 	{
-		glm::vec4 pn = faces->at(i);
+		glm::vec4 pn = faces->at(i);	
 		auto vd = glm::dot(glm::vec3(pn), rayDirection);
-		auto vn = glm::dot(glm::vec3(pn), rayOrigin) + pn.w;
+		auto vn = glm::dot(glm::vec3(pn), rayOrigin) - pn.w;
 		if (vd == 0)
 		{
 			//"if vd is 0 then the ray is parallel and no intersection takes place"
@@ -119,8 +143,8 @@ static bool LineIntersectsPolygon(glm::mat2x4 edge, vector<glm::vec4>* faces)
 		}
 		else
 		{
-			auto t = vn / vd; //the algorithm calls for -vn/vd, but it only works if inverted? I think the plane is being inverted at some point
-			if (vd > 0)//"if vd is positive the plane is back-facing"
+			auto t = -vn / vd;
+			if (vd > 0) //"if vd is positive the plane is back-facing"
 			{
 				//"t can affect tfar, if t<0, then the polygon is missed."
 				if (t < 0)
@@ -171,7 +195,7 @@ bool QuadTreeCollisionHandler::GetFineCollision(WorldObject* p, WorldObject* q)
 		std::cout << "\t" << "(" << face.x << "x + " << face.y << "y + " << face.z << "z) =" << face.w << endl;
 	}*/
 
-	//one issue is that the edges aren't scaled
+	//one issue is that the edges aren't scaled. Fixed!
 
 	//README! Currently trying to go case-by case on the first call. edge 18 of p intersects (but not really). rayDirection is NaN for it.
 	std::vector<glm::mat2x4>* edges;

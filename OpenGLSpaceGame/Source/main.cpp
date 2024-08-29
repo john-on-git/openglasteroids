@@ -287,7 +287,7 @@ int main()
 		auto projectileTex = Texture("textures/projectile.png");
 	//model
 		auto shipModel = Model(
-			"Models/sphere.obj",
+			"Models/ship.obj",
 			textureLocation,
 			colorMaskLocation,
 			std::vector<GLuint>{ shipTex.handle },
@@ -302,8 +302,8 @@ int main()
 			std::vector<glm::vec4>{ glm::vec4(2, 2, 2, 1) },
 			1
 		);
-		auto dummy2Model = Model(
-			"Models/ship.obj",
+		auto cubeModel = Model(
+			"Models/cube.obj",
 			textureLocation,
 			colorMaskLocation,
 			std::vector<GLuint>{ shipTex.handle },
@@ -313,19 +313,19 @@ int main()
 	//set up world stuff
 		auto ship = WorldObject(
 			&shipModel,
-			glm::vec3(0.4f, 0.4f, -5.0f),	//pos
+			glm::vec3(0.4f, 0.4f, -15.0f),	//pos
 			glm::vec3(270.0f, 50.0f, 0.0f),	//rot
-			glm::vec3(0.05f, 0.05f, 0.05f), //scale
+			glm::vec3(1.0f, 1.0f, 1.0f), //scale
 			projectionLocation,
 			viewLocation,
 			modelLocation,
 			vector<tag>{ SHIP }
 		);
 		auto dummy1 = WorldObject(
-			&projectileModel,
-			glm::vec3(0.4f, 0.4f, -5.0f),	//pos
+			&cubeModel,
+			glm::vec3(0.4f, 0.4f, -15.0f),	//pos
 			glm::vec3(270.0f, 0.0f, 0.0f),	//rot
-			glm::vec3(0.05f, 0.05f, 0.05f),	//scale
+			glm::vec3(1.0f, 1.0f, 1.0f),	//scale
 			projectionLocation,
 			viewLocation,
 			modelLocation,
@@ -341,9 +341,13 @@ int main()
 
 		QuadTreeCollisionHandler collisionHandler(
 			5,
-			glm::vec2(-1.1f, -1.1f),
-			glm::vec2( 1.1f,  1.1f)
+			glm::vec2(-10.1f, -10.1f),
+			glm::vec2( 10.1f,  10.1f)
 		);
+		for (auto it = objects.begin(); it != objects.end(); it++) //for each collision
+		{
+			collisionHandler.Register(*it);
+		}
 		//set up deltas stuff
 		vector<Delta<glm::vec3>*> deltas;
 		auto shipAngleTarget = WorldObjectAngleTarget(&ship);
@@ -431,6 +435,7 @@ int main()
 			);
 			objects.push_back(projectile);
 			projectiles.push_back(projectile);
+			collisionHandler.Register(projectile);
 
 			auto projectileVelocity = new glm::vec3(
 				shipVelocity.x + (sin(rad) * BULLET_VELOCITY_MULT),
@@ -450,46 +455,41 @@ int main()
 		for (auto object : objects)
 		{
 			//toroidal space
-				auto objectPosition = object->getPosition();
-				if (objectPosition.x > ARENA_W) //off right
-				{
-					objectPosition.x = -ARENA_W;
-				}
-				else if (objectPosition.x < -ARENA_W) //off left
-				{
-					objectPosition.x = ARENA_W;
-				}
+				//auto objectPosition = object->getPosition();
+				//if (objectPosition.x > ARENA_W) //off right
+				//{
+				//	objectPosition.x = -ARENA_W;
+				//}
+				//else if (objectPosition.x < -ARENA_W) //off left
+				//{
+				//	objectPosition.x = ARENA_W;
+				//}
 
-				if (objectPosition.y < -ARENA_H) //off top
-				{
-					objectPosition.y = ARENA_W;
-				}
-				else if (objectPosition.y > ARENA_H) //off bottom
-				{
-					objectPosition.y = -ARENA_W;
-				}
-				object->setPosition(objectPosition);
+				//if (objectPosition.y < -ARENA_H) //off top
+				//{
+				//	objectPosition.y = ARENA_W;
+				//}
+				//else if (objectPosition.y > ARENA_H) //off bottom
+				//{
+				//	objectPosition.y = -ARENA_W;
+				//}
+				//object->setPosition(objectPosition);
 
 			object->model->meshes[0].colorMask = glm::vec4(1, 1, 1, 1); //reset color
 		}
 
 		//check for collisions
-			collisionHandler.Update(objects); //spatially partition all objects
-			//check collision
-			auto broadCollisions = collisionHandler.GetBroadCollisions();
-			for (auto it = broadCollisions->begin(); it != broadCollisions->end();it++) //for each collision
+			auto collisions = collisionHandler.Check();
+			for (auto it = collisions->begin(); it != collisions->end(); it++) //for each collision
 			{
-				if (collisionHandler.GetFineCollision(it->first, it->second))
-				{
-					//color change for collision debugging
-					it->first->model->meshes[0].colorMask = glm::vec4(2, 1, 1, 1);
-					it->second->model->meshes[0].colorMask = glm::vec4(2, 1, 1, 1);
-				}
+				//color change for collision debugging
+				it->first->model->meshes[0].colorMask = glm::vec4(2, 1, 1, 1);
+				it->second->model->meshes[0].colorMask = glm::vec4(2, 1, 1, 1);
 			}
+			delete collisions;
 		//clear framebuffers
 			glad_glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
-		delete broadCollisions;
 		//draw the bounds of the quadtree, highlighting the node that the ship is in
 		//drawQuadTree(true, true, false, &ship, &collisionHandler, &texturedColoredShader, &blockColorShader, colorLocation);
 		//draw all objects, deleting any that have been marked for delete

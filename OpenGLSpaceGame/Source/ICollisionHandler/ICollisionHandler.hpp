@@ -8,7 +8,6 @@ using namespace std;
 class ICollisionHandler
 {
 	public:
-		virtual void Update(vector<WorldObject*> v) = 0;
-		virtual unordered_set<UnorderedPair<WorldObject*>>* GetBroadCollisions() = 0;
-		virtual bool GetFineCollision(WorldObject* a, WorldObject* b) = 0;
+		virtual void Register(WorldObject* o) = 0;
+		virtual unordered_set<UnorderedPair<WorldObject*>>* Check() = 0;
 };

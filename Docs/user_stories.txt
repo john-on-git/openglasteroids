@@ -1,0 +1,36 @@
+- Gina.
+	- Young Gamer.
+	- Competitive.
+	- Power user.
+- George.
+	- Middle Aged.
+	- Nervous.
+	- Unfamiliar with computers.
+
+1. Duelling Players.
+	1. Tutorial.
+		1. George observes the menu options.
+		2. He isn't a confident gamer so he clicks the Tutorial button.
+		3. He plays through a short interactive sequence explaining each of the controls in sequence.
+	2. George Plays.
+		1. George returns to the 
+		2. He clicks the New Game button.
+		3. He...
+	3. Gina Plays.
+		1. Gina sits down and launches the game too.
+		2. She...
+	4. View High Scores.
+		1. After finishing, Gina sees her score displayed.
+		2. Knowing that high score menus are a thing, she looks for the option in the menu. 
+		3. She finds the High Scores button, clicks it.
+		4. She compares scores with George (making fun of him in the process).
+		
+		
+With Patterson's big picture layout it would look like:
+		
+	George			Gina	
+	1. 		2.		3.		4. 
+	1.1		2.1		3.1		4.1
+	1.2		2.2		3.2		4.2
+	1.3		2.3				4.3
+							4.4

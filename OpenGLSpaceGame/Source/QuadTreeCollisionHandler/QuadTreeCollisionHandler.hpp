@@ -8,12 +8,15 @@
 class QuadTreeCollisionHandler : public ICollisionHandler {
 	public:
 		QuadTreeCollisionHandler(unsigned char maxDepth, glm::vec2 bottomLeft, glm::vec2 topRight);
-		virtual void Update(vector<WorldObject*> v);
-		virtual unordered_set<UnorderedPair<WorldObject*>>* GetBroadCollisions();
-		bool GetFineCollision(WorldObject* a, WorldObject* b);
+		virtual void Register(WorldObject* o);
+		virtual unordered_set<UnorderedPair<WorldObject*>>* Check();
 		virtual glm::vec2* GetNodeBoundsForObject(WorldObject* object);
 		vector<glm::vec2*>* GetAllBounds(vector<glm::vec2*>* store);
 	private:
+		virtual unordered_set<UnorderedPair<WorldObject*>>* GetBroadCollisions();
+		bool GetFineCollision(WorldObject* a, WorldObject* b);
+		
+		unordered_set<WorldObject*> objects;
 		glm::vec2 initialBounds[2];
 		unsigned char maxDepth;
 		//15.5.2024, why is this defined in a header file?
