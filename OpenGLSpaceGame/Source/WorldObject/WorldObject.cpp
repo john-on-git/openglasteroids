@@ -22,7 +22,7 @@ WorldObject::WorldObject(Model* model, glm::vec3 position, glm::vec3 angle, glm:
 	this->modelLocation = modelLocation;
 	this->tags = tags;
 	this->markedForDelete = false;
-	boundingBox = NULL;
+	boundingBox = nullptr;
 	boundingBoxAngle = glm::vec3(-1, -1, -1);
 	UpdateModelMatrix();
 }
@@ -66,6 +66,8 @@ void WorldObject::setScale(glm::vec3 scale)
 	this->scale = scale;
 	UpdateModelMatrix();
 }
+
+void WorldObject::Tick() {}
 
 void WorldObject::Draw()
 {
@@ -119,10 +121,10 @@ void WorldObject::Draw()
 glm::vec3* WorldObject::getObjectAlignedBoundingBox()
 {
 	if (angle!=boundingBoxAngle) { //recalculate the bounding box
-		if (boundingBox != NULL) //delete any existing bounding box
+		if (boundingBox != nullptr) //delete any existing bounding box
 		{
 			delete[] boundingBox;
-			boundingBox = NULL;
+			boundingBox = nullptr;
 		}
 		//construct the rotation matrix
 

@@ -9,6 +9,7 @@ class QuadTreeCollisionHandler : public ICollisionHandler {
 	public:
 		QuadTreeCollisionHandler(unsigned char maxDepth, glm::vec2 bottomLeft, glm::vec2 topRight);
 		virtual void Register(WorldObject* o);
+		virtual void Remove(WorldObject* o);
 		virtual unordered_set<UnorderedPair<WorldObject*>>* Check();
 		virtual glm::vec2* GetNodeBoundsForObject(WorldObject* object);
 		vector<glm::vec2*>* GetAllBounds(vector<glm::vec2*>* store);
@@ -30,10 +31,10 @@ class QuadTreeCollisionHandler : public ICollisionHandler {
 				{
 					this->parent = parent;
 
-					children[0] = NULL;
-					children[1] = NULL;
-					children[2] = NULL;
-					children[3] = NULL;
+					children[0] = nullptr;
+					children[1] = nullptr;
+					children[2] = nullptr;
+					children[3] = nullptr;
 
 					bounds[0] = bottomLeft;
 					bounds[1] = topRight;
@@ -61,7 +62,7 @@ class QuadTreeCollisionHandler : public ICollisionHandler {
 						{
 							//try to insert in the subtree first
 							bool inSubTree = false; //true if the object has been inserted somewhere in the subtree
-							if (children[0] == NULL) //if this is a leaf node, create the children
+							if (children[0] == nullptr) //if this is a leaf node, create the children
 							{
 								children[0] = new qnode( //top left
 									this,
@@ -130,22 +131,22 @@ class QuadTreeCollisionHandler : public ICollisionHandler {
 					for (auto item : contents) //check this
 						if (item == obj)
 							return this;
-					if(children[0]!=NULL) //if not a leaf, check children
+					if(children[0]!=nullptr) //if not a leaf, check children
 						for (auto child : children)
 						{
 							auto res = child->Find(obj);
-							if (res != NULL)
+							if (res != nullptr)
 								return res;
 						}
-					return NULL; //not in tree
+					return nullptr; //not in tree
 				}
 				void DepthFirstFlatten(vector<glm::vec2*>* collector)
 				{
-					auto heapCopy = new glm::vec2[]{ bounds[0], bounds[1] };
+					auto heapCopy = new glm::vec2[2]{ bounds[0], bounds[1] };
 					collector->push_back(heapCopy);
 					for (auto child : children)
 					{
-						if (child != NULL) {
+						if (child != nullptr) {
 							child->DepthFirstFlatten(collector);
 						}
 					}

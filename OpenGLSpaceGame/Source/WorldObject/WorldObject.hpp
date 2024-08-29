@@ -20,6 +20,7 @@ class WorldObject {
 		glm::mat4 rotationMatrix;
 
 		WorldObject(Model *model, glm::vec3 position, glm::vec3 angle, glm::vec3 scale, GLuint projectionLocation, GLuint viewLocation, GLuint modelLocation, vector<tag> tags);
+		virtual void Tick();
 		void Draw();
 		glm::vec3 getPosition();
 		void setPosition(glm::vec3 position);

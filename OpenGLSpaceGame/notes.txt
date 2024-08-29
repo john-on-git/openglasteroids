@@ -1,0 +1,7 @@
+What's the best way to implement projectile decay?
+	- Property of WorldObject? Nah, should inherit/compose: not really a property of all worldobjects.
+	- Child class of WorldObject?
+	- Decay object.
+		- Composition w/ WorldObject?
+		- Just used in main
+	- imperative in main.cpp

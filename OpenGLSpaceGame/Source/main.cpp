@@ -20,6 +20,7 @@
 #include "Program/program.hpp"
 #include "BufferedAiMesh/BufferedAiMesh.hpp"
 #include "WorldObject/WorldObject.hpp"
+#include "TemporaryWorldObject/TemporaryWorldObject.hpp"
 #include "Texture/Texture.hpp"
 #include "main.hpp"
 #include "Delta/Delta.hpp"
@@ -336,11 +337,10 @@ int main()
 				&dummy1
 		};
 	//game stuff
-		vector<WorldObject*> projectiles;
 		glm::vec3 shipVelocity(0.0f, 0.0f, 0.0f);
 
 		QuadTreeCollisionHandler collisionHandler(
-			5,
+			10,
 			glm::vec2(-10.1f, -10.1f),
 			glm::vec2( 10.1f,  10.1f)
 		);
@@ -364,14 +364,19 @@ int main()
 		deltas.push_back(&shipDragDelta);
 
 		unsigned char fireDelay = 0;
+
+		boolean showDebugInfo = false;
+		unsigned char showDebugInfoToggleDelay = 0;
 	//render loop
 	while (!glfwWindowShouldClose(window))
 	{
 		if (fireDelay > 0)
 			fireDelay--;
+		if (showDebugInfoToggleDelay > 0)
+			showDebugInfoToggleDelay--;
 		//get player input
 		auto rad = glm::radians(ship.getAngle().y);
-		if (keyPressed[GLFW_KEY_W])
+		if (keyPressed[GLFW_KEY_W] || keyPressed[GLFW_KEY_UP])
 		{
 			auto move = glm::vec3(
 				SHIP_MOVERATE_MULT * sin(rad),
@@ -382,7 +387,7 @@ int main()
 			moveDelta->AddTarget(&shipVelocityTarget);
 			deltas.push_back(moveDelta);
 		}
-		else if (keyPressed[GLFW_KEY_S])
+		else if (keyPressed[GLFW_KEY_S] || keyPressed[GLFW_KEY_DOWN])
 		{
 			auto move = glm::vec3(
 				-SHIP_MOVERATE_MULT * sin(rad),
@@ -394,7 +399,7 @@ int main()
 			deltas.push_back(moveDelta);
 		}
 
-		if (keyPressed[GLFW_KEY_A])
+		if (keyPressed[GLFW_KEY_A] || keyPressed[GLFW_KEY_LEFT])
 		{
 			auto move = glm::vec3(
 				0.0f,
@@ -405,7 +410,7 @@ int main()
 			moveDelta->AddTarget(&shipAngleTarget);
 			deltas.push_back(moveDelta);
 		}
-		else if (keyPressed[GLFW_KEY_D])
+		else if (keyPressed[GLFW_KEY_D] || keyPressed[GLFW_KEY_RIGHT])
 		{
 			auto move = glm::vec3(
 				0.0f,
@@ -417,13 +422,13 @@ int main()
 			deltas.push_back(moveDelta);
 		}
 
-		if (keyPressed[GLFW_KEY_SPACE] && fireDelay==0)
+		if ((keyPressed[GLFW_KEY_Z] || keyPressed[GLFW_KEY_SPACE]) && fireDelay == 0)
 		{
-			auto projectile = new WorldObject(
+			auto projectile = new TemporaryWorldObject(
 				&projectileModel,
 				glm::vec3(
-					ship.getPosition().x + (sin(rad) * 0.05), //second half moves the spawn point away from the center of the ship
-					ship.getPosition().y + (cos(rad) * 0.05), //0.05 is the distance between the center and tip
+					ship.getPosition().x + (sin(rad) * 0.10), //second half moves the spawn point away from the center of the ship
+					ship.getPosition().y + (cos(rad) * 0.10), //0.05 is the distance between the center and tip
 					ship.getPosition().z
 				),
 				glm::vec3(270.0f, 0.0f, 0.0f),
@@ -431,16 +436,16 @@ int main()
 				projectionLocation,
 				viewLocation,
 				modelLocation,
-				vector<tag>{ PROJECTILE }
+				vector<tag>{ PROJECTILE },
+				PROJECTILE_DURATION
 			);
 			objects.push_back(projectile);
-			projectiles.push_back(projectile);
+
 			collisionHandler.Register(projectile);
 
-
 			auto projectileVelocity = new glm::vec3(
-				shipVelocity.x + (sin(rad) * BULLET_VELOCITY_MULT),
-				shipVelocity.y + (cos(rad) * BULLET_VELOCITY_MULT),
+				shipVelocity.x + (sin(rad) * PROJECTILE_VELOCITY_MULT),
+				shipVelocity.y + (cos(rad) * PROJECTILE_VELOCITY_MULT),
 				shipVelocity.z + 0.0f
 			);
 
@@ -452,29 +457,36 @@ int main()
 			
 			fireDelay = FIRE_DELAY; //reset fire delay
 		}
+
+		//toggle debug info
+		if (keyPressed[GLFW_KEY_F5] && showDebugInfoToggleDelay==0)
+		{
+			showDebugInfo = !showDebugInfo; //no Intellisense, bitwise ~ was not intended
+			showDebugInfoToggleDelay = SHOW_DEBUG_INFO_TOGGLE_DELAY;
+		}
 		
 		for (auto object : objects)
 		{
 			//toroidal space
-				//auto objectPosition = object->getPosition();
-				//if (objectPosition.x > ARENA_W) //off right
-				//{
-				//	objectPosition.x = -ARENA_W;
-				//}
-				//else if (objectPosition.x < -ARENA_W) //off left
-				//{
-				//	objectPosition.x = ARENA_W;
-				//}
+			auto objectPosition = object->getPosition();
+			if (objectPosition.x > ARENA_W) //off right
+			{
+				objectPosition.x = -ARENA_W;
+			}
+			else if (objectPosition.x < -ARENA_W) //off left
+			{
+				objectPosition.x = ARENA_W;
+			}
 
-				//if (objectPosition.y < -ARENA_H) //off top
-				//{
-				//	objectPosition.y = ARENA_W;
-				//}
-				//else if (objectPosition.y > ARENA_H) //off bottom
-				//{
-				//	objectPosition.y = -ARENA_W;
-				//}
-				//object->setPosition(objectPosition);
+			if (objectPosition.y < -ARENA_H) //off top
+			{
+				objectPosition.y = ARENA_W;
+			}
+			else if (objectPosition.y > ARENA_H) //off bottom
+			{
+				objectPosition.y = -ARENA_W;
+			}
+			object->setPosition(objectPosition);
 
 			object->model->meshes[0].colorMask = glm::vec4(1, 1, 1, 1); //reset color
 		}
@@ -491,14 +503,21 @@ int main()
 		//clear framebuffers
 			glad_glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
-		//draw the bounds of the quadtree, highlighting the node that the ship is in
-		//drawQuadTree(true, true, false, &ship, &collisionHandler, &texturedColoredShader, &blockColorShader, colorLocation);
-		//draw all objects, deleting any that have been marked for delete
+		//draw debug info
+		if (showDebugInfo)
+		{
+			//draw the bounds of the quadtree, highlighting the node that the ship is in
+			drawQuadTree(true, true, false, &ship, &collisionHandler, &texturedColoredShader, &blockColorShader, colorLocation);
+		}
 			for (auto it = objects.begin(); it != objects.end();)
 			{
+				//Tick() everything
+				(*it)->Tick();
+				//draw all objects, deleting any that have been marked for delete
 				(*it)->Draw();
 				if ((*it)->markedForDelete)
 				{
+					collisionHandler.Remove(*it);
 					delete *it;
 					it = objects.erase(it);
 				}

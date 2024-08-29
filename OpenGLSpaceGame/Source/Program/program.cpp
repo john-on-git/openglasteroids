@@ -24,7 +24,7 @@ Program::Program(std::string fragShaderPath, std::string vertShaderPath)
 			//compile frag
 			success = GL_FALSE;
 			fragShaderHandle = glad_glCreateShader(GL_FRAGMENT_SHADER);
-			glad_glShaderSource(fragShaderHandle, 1, &fragShaderSource, NULL);
+			glad_glShaderSource(fragShaderHandle, 1, &fragShaderSource, nullptr);
 			glad_glCompileShader(fragShaderHandle);
 			glad_glGetShaderiv(fragShaderHandle, GL_COMPILE_STATUS, &success);
 			if (success == GL_FALSE)
@@ -33,7 +33,7 @@ Program::Program(std::string fragShaderPath, std::string vertShaderPath)
 			//compile vert
 			success = GL_FALSE;
 			vertShaderHandle = glad_glCreateShader(GL_VERTEX_SHADER);
-			glad_glShaderSource(vertShaderHandle, 1, &vertShaderSource, NULL);
+			glad_glShaderSource(vertShaderHandle, 1, &vertShaderSource, nullptr);
 			glad_glCompileShader(vertShaderHandle);
 			glad_glGetShaderiv(vertShaderHandle, GL_COMPILE_STATUS, &success);
 			if (success == GL_FALSE)

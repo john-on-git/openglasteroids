@@ -6,8 +6,8 @@ template <class T> class UnorderedPair
 	public:
 		UnorderedPair()
 		{
-			this->first = NULL;
-			this->second = NULL;
+			this->first = nullptr;
+			this->second = nullptr;
 		}
 		UnorderedPair(T a, T b)
 		{

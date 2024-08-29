@@ -9,5 +9,6 @@ class ICollisionHandler
 {
 	public:
 		virtual void Register(WorldObject* o) = 0;
+		virtual void Remove(WorldObject* o) = 0;
 		virtual unordered_set<UnorderedPair<WorldObject*>>* Check() = 0;
 };

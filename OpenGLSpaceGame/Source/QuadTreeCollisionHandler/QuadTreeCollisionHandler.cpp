@@ -9,7 +9,7 @@ QuadTreeCollisionHandler::QuadTreeCollisionHandler(unsigned char maxDepth, glm::
 	this->maxDepth = maxDepth;
 	initialBounds[0] = bottomLeft;
 	initialBounds[1] = topRight;
-	root = NULL;
+	root = nullptr;
 }
 
 void QuadTreeCollisionHandler::Register(WorldObject* o)
@@ -17,18 +17,23 @@ void QuadTreeCollisionHandler::Register(WorldObject* o)
 	this->objects.insert(o);
 }
 
+void QuadTreeCollisionHandler::Remove(WorldObject* o)
+{
+	this->objects.erase(o);
+}
+
 unordered_set<UnorderedPair<WorldObject*>>* QuadTreeCollisionHandler::Check()
 {
 	unordered_set<UnorderedPair<WorldObject*>>* collisions = new unordered_set<UnorderedPair<WorldObject*>>();
 	
 	//clear any existing quadtree
-	if (root != NULL)
+	if (root != nullptr)
 	{
 		delete root; //clear it
 	}
 
 	//and construct the new one
-	root = new qnode(NULL, initialBounds[0], initialBounds[1]);
+	root = new qnode(nullptr, initialBounds[0], initialBounds[1]);
 	for (auto obj : this->objects)
 	{
 		root->TryInsert(maxDepth, 1, obj);
@@ -49,8 +54,8 @@ unordered_set<UnorderedPair<WorldObject*>>* QuadTreeCollisionHandler::Check()
 unordered_set<UnorderedPair<WorldObject*>>* QuadTreeCollisionHandler::GetBroadCollisions()
 {
 	auto o = new unordered_set<UnorderedPair<WorldObject*>>;
-	if (root == NULL) //this has never been updated
-		return NULL;
+	if (root == nullptr) //this has never been updated
+		return nullptr;
 	else
 	{
 		auto pair = GetBroadCollisionsHelper(o, root);
@@ -67,7 +72,7 @@ pair<unordered_set<UnorderedPair<WorldObject*>>*, vector<WorldObject*>*> QuadTre
 		//returning cache from function & taking union (doing this one)
 	auto cache = new vector<WorldObject*>;
 
-	if (node->children[0] != NULL) //if this is not a leaf node, check subtree first
+	if (node->children[0] != nullptr) //if this is not a leaf node, check subtree first
 		for (char i = 0;i < 4;i++)
 		{
 			//get all content from subtree & move to this node's cache
@@ -96,7 +101,7 @@ glm::vec2* QuadTreeCollisionHandler::GetNodeBoundsForObject(WorldObject* target)
 {
 	//bfs the tree for object
 	qnode* result = root->Find(target);
-	return result==NULL ? NULL : result->bounds;
+	return result==nullptr ? nullptr : result->bounds;
 }
 
 vector<glm::vec2*>* QuadTreeCollisionHandler::GetAllBounds(vector<glm::vec2*>* store)

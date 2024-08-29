@@ -7,7 +7,7 @@
 Texture::Texture(const char *path)
 {
 	int x, y;
-	unsigned char* data = stbi_load(path, &x, &y, NULL, STBI_rgb_alpha);
+	unsigned char* data = stbi_load(path, &x, &y, nullptr, STBI_rgb_alpha);
 	
 	unsigned int handle;
 	glad_glGenTextures(1, &handle);

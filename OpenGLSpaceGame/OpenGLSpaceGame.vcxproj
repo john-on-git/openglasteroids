@@ -143,6 +143,7 @@
     <ClCompile Include="Source\QuadTreeCollisionHandler\QuadTreeCollisionHandler.cpp" />
     <ClCompile Include="Source\Texture\Texture.cpp" />
     <ClCompile Include="Source\WorldObject\WorldObject.cpp" />
+    <ClCompile Include="Source\TemporaryWorldObject\TemporaryWorldObject.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\bmp_loader.hpp" />
@@ -164,6 +165,7 @@
     <ClInclude Include="Source\Texture\Texture.hpp" />
     <ClInclude Include="Source\UnorderedPair\UnorderedPair.hpp" />
     <ClInclude Include="Source\WorldObject\WorldObject.hpp" />
+    <ClInclude Include="Source\TemporaryWorldObject\TemporaryWorldObject.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
