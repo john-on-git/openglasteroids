@@ -313,9 +313,9 @@ int main()
 	//set up world stuff
 		auto ship = WorldObject(
 			&shipModel,
-			glm::vec3(0.4f, 0.4f, -15.0f),	//pos
+			glm::vec3(0.0f, 0.0f, -5.0f),	//pos
 			glm::vec3(270.0f, 50.0f, 0.0f),	//rot
-			glm::vec3(1.0f, 1.0f, 1.0f), //scale
+			glm::vec3(0.05f, 0.05f, 0.05f), //scale
 			projectionLocation,
 			viewLocation,
 			modelLocation,
@@ -323,9 +323,9 @@ int main()
 		);
 		auto dummy1 = WorldObject(
 			&cubeModel,
-			glm::vec3(0.4f, 0.4f, -15.0f),	//pos
+			glm::vec3(0.4f, 0.4f, -5.0f),	//pos
 			glm::vec3(270.0f, 0.0f, 0.0f),	//rot
-			glm::vec3(1.0f, 1.0f, 1.0f),	//scale
+			glm::vec3(0.05f, 0.05f, 0.05f),	//scale
 			projectionLocation,
 			viewLocation,
 			modelLocation,
@@ -436,6 +436,7 @@ int main()
 			objects.push_back(projectile);
 			projectiles.push_back(projectile);
 			collisionHandler.Register(projectile);
+
 
 			auto projectileVelocity = new glm::vec3(
 				shipVelocity.x + (sin(rad) * BULLET_VELOCITY_MULT),

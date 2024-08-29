@@ -17,6 +17,14 @@
 #include <QuadTreeCollisionHandler/QuadTreeCollisionHandler.cpp>
 #include <GLFW/glfw3.h>
 
+
+//TODO the collision output depends on the spin of the object (spotted using ship and cube)
+//write some tests to determine what's going on
+//it's not scale related
+//it's some combination of angle and distance
+//it's related to distance from the origin! 
+//It's actually an issue with broad collisions :skull: no wait it's actually an issue with both??? No. It's just with fine, broad broke because it was outside the quadtree (it should prob auto-expand or smth)
+
 namespace Tests {
 
 class CollisionDetectionTests : public testing::Test {
@@ -88,29 +96,43 @@ TEST_F(CollisionDetectionTests, CorrectFacesForCubeAtOrigin) {
 	);
 	//there are twelve faces because each square "face" of the cube is split into two tris
 	vector<glm::vec4> expectedFaces = {
-		glm::vec4(0.0f,-1.0f,0.0f,  1.0f), //-y (1)
-		glm::vec4(0.0f,0.0f,-1.0f,  1.0f), //-z (1)
+		glm::vec4(0.0f,-1.0f,0.0f,  -1.0f), //-y (1)
+		glm::vec4(0.0f,0.0f,-1.0f,  -1.0f), //-z (1)
 
-		glm::vec4(1.0f,0.0f,0.0f,   1.0f), //+x (1)
-		glm::vec4(0.0f,1.0f,0.0f,   1.0f), //+y (1)
+		glm::vec4(1.0f,0.0f,0.0f,   -1.0f), //+x (1)
+		glm::vec4(0.0f,1.0f,0.0f,   -1.0f), //+y (1)
 
-		glm::vec4(-1.0f,0.0f,0.0f,  1.0f), //-x (1)
-		glm::vec4(0.0f,0.0f,1.0f,  1.0f), //+z (1)
+		glm::vec4(-1.0f,0.0f,0.0f,  -1.0f), //-x (1)
+		glm::vec4(0.0f,0.0f,1.0f,  -1.0f), //+z (1)
 
-		glm::vec4(0.0f,-1.0f, 0.0f, 1.0f), //-y (2)
-		glm::vec4(0.0f, 0.0f,-1.0f, 1.0f), //-z (2)
+		glm::vec4(0.0f,-1.0f, 0.0f, -1.0f), //-y (2)
+		glm::vec4(0.0f, 0.0f,-1.0f, -1.0f), //-z (2)
 
-		glm::vec4(1.0f,0.0f,0.0f,   1.0f), //+x (2)
-		glm::vec4(0.0f,1.0f,0.0f,   1.0f), //+y (2)
+		glm::vec4(1.0f,0.0f,0.0f,   -1.0f), //+x (2)
+		glm::vec4(0.0f,1.0f,0.0f,   -1.0f), //+y (2)
 
-		glm::vec4(-1.0f,0.0f,0.0f,  1.0f), //-x (2)
-		glm::vec4(0.0f,0.0f,1.0f,  1.0f), //+z (2)
+		glm::vec4(-1.0f,0.0f,0.0f,  -1.0f), //-x (2)
+		glm::vec4(0.0f,0.0f,1.0f,  -1.0f), //+z (2)
 	};
 	auto actualFaces = cube.calcFaces();
-	for (unsigned char i = 0; i < 12; i++)
+	ASSERT_EQ(actualFaces->size(), expectedFaces.size());
+	for (auto itActual = actualFaces->begin(); itActual != actualFaces->end(); itActual++)
 	{
-		EXPECT_EQ(expectedFaces.at(i), actualFaces->at(i));
+		//remove this face if it was expected
+		int match = -1; //no match
+		for (unsigned char i = 0; i < expectedFaces.size(); i++)
+		{
+			if (*itActual == expectedFaces.at(i)) {
+				match = i;
+				break;
+			}
+		}
+		if (match != -1) {
+			expectedFaces.erase(expectedFaces.begin() + match);
+		}
 	}
+	//expect all expected faces to have been removed (because they were all in the actual faces)
+	EXPECT_EQ(expectedFaces.size(),0);
 }
 
 //that the collision is correctly detected for simple objects in a few different positions
@@ -158,7 +180,7 @@ TEST_F(CollisionDetectionTests, CubesIntersectingNearOrigin) {
 TEST_F(CollisionDetectionTests, CubesIntersectingFarFromOrigin) {
 	auto firstCube = WorldObject(
 		cubeModel,
-		glm::vec3(0.0f + 100.1f, 0.0f + 100.1f, 0.0f + 100.1f), //pos
+		glm::vec3(0.0f + 20.0f, 0.0f + 20.0f, 0.0f + 20.0f), //pos
 		glm::vec3(0.0f, 0.0f, 0.0f), //rot
 		glm::vec3(1.0f, 1.0f, 1.0f), //scale (1.0f = 2 units wide cube)
 		projectionLocation,
@@ -168,7 +190,7 @@ TEST_F(CollisionDetectionTests, CubesIntersectingFarFromOrigin) {
 	);
 	auto secondCube = WorldObject(
 		cubeModel,
-		glm::vec3(1.9f + 100.1f, 0.1f + 100.1f, 0.1f + 100.1f), //pos
+		glm::vec3(1.9f + 20.0f, 0.1f + 20.0f, 0.1f + 20.0f), //pos
 		glm::vec3(0.0f, 0.0f, 0.0f), //rot
 		glm::vec3(1.0f, 1.0f, 1.0f), //scale (1.0f = 2 units wide cube)
 		projectionLocation,
@@ -193,27 +215,82 @@ TEST_F(CollisionDetectionTests, CubesIntersectingFarFromOrigin) {
 		);
 	}
 	delete collisions;
+
+	//e1f1 parallel outside
+	//e1f2 back-facing
+
+	//there's something wrong with the plane normal. it's inverted.
+	//this was my first guess :skull:
+	//this answers my question, and that's why the w had to be inverted?
+	//error in face calculations line 179 (a-b) instead of (b-a), so it was backwards, remember your right hand rule
 }
 
 //expected not colliding
 
-TEST_F(CollisionDetectionTests, CubesNonintersectingButCloseNearOrigin) {
-	SUCCEED() << "Not Implemented";
-}
-
 TEST_F(CollisionDetectionTests, CubesNonintersectingNearOrigin) {
-	SUCCEED() << "Not Implemented";
+	auto firstCube = WorldObject(
+		cubeModel,
+		glm::vec3(0.0f, 0.0f, 0.0f), //pos
+		glm::vec3(0.0f, 0.0f, 0.0f), //rot
+		glm::vec3(1.0f, 1.0f, 1.0f), //scale (1.0f = 2 units wide cube)
+		projectionLocation,
+		viewLocation,
+		modelLocation,
+		vector<tag>{ }
+	);
+	auto secondCube = WorldObject(
+		cubeModel,
+		glm::vec3(2.001f, 0.1f, 0.1f), //pos
+		glm::vec3(0.0f, 0.0f, 0.0f), //rot
+		glm::vec3(1.0f, 1.0f, 1.0f), //scale (1.0f = 2 units wide cube)
+		projectionLocation,
+		viewLocation,
+		modelLocation,
+		vector<tag>{ }
+	);
+	QuadTreeCollisionHandler collisionHandler(
+		10,
+		glm::vec2(-100.0f, -100.0f),
+		glm::vec2(100.0f, 100.0f)
+	);
+	collisionHandler.Register(&firstCube);
+	collisionHandler.Register(&secondCube);
+	auto collisions = collisionHandler.Check();
+	EXPECT_EQ(collisions->size(), 0);
+	delete collisions;
 }
-
 TEST_F(CollisionDetectionTests, CubesNonintersectingFarFromOrigin) {
-	SUCCEED() << "Not Implemented";
+	auto firstCube = WorldObject(
+		cubeModel,
+		glm::vec3(0.0f + 20.0f, 0.0f + 20.0f, 0.0f + 20.0f), //pos
+		glm::vec3(0.0f, 0.0f, 0.0f), //rot
+		glm::vec3(1.0f, 1.0f, 1.0f), //scale (1.0f = 2 units wide cube)
+		projectionLocation,
+		viewLocation,
+		modelLocation,
+		vector<tag>{ }
+	);
+	auto secondCube = WorldObject(
+		cubeModel,
+		glm::vec3(2.001f + 20.0f, 0.1f + 20.0f, 0.1f + 20.0f), //pos
+		glm::vec3(0.0f, 0.0f, 0.0f), //rot
+		glm::vec3(1.0f, 1.0f, 1.0f), //scale (1.0f = 2 units wide cube)
+		projectionLocation,
+		viewLocation,
+		modelLocation,
+		vector<tag>{ }
+	);
+	QuadTreeCollisionHandler collisionHandler(
+		10,
+		glm::vec2(-100.0f, -100.0f),
+		glm::vec2(100.0f, 100.0f)
+	);
+	collisionHandler.Register(&firstCube);
+	collisionHandler.Register(&secondCube);
+	auto collisions = collisionHandler.Check();
+	EXPECT_EQ(collisions->size(), 0);
+	delete collisions;
 }
-
-//TODO the collision output depends on the spin of the object (spotted using ship and cube)
-//write some tests to determine what's going on
-//it's not scale related
-//it's some combination of angle and distance
-//it's related to distance from the origin!
 
 /*
 False Positive

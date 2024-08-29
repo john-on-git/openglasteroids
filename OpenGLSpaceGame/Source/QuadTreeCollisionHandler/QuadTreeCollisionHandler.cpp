@@ -130,7 +130,7 @@ static bool LineIntersectsPolygon(glm::mat2x4 edge, vector<glm::vec4>* faces)
 	{
 		glm::vec4 pn = faces->at(i);	
 		auto vd = glm::dot(glm::vec3(pn), rayDirection);
-		auto vn = glm::dot(glm::vec3(pn), rayOrigin) - pn.w;
+		auto vn = glm::dot(glm::vec3(pn), rayOrigin) + pn.w;
 		if (vd == 0)
 		{
 			//"if vd is 0 then the ray is parallel and no intersection takes place"

@@ -176,7 +176,7 @@ std::vector<glm::vec4>* WorldObject::calcFaces()
 		auto b = this->modelMatrix * glm::vec4(face[1], 1.0f);
 		auto c = this->modelMatrix * glm::vec4(face[2], 1.0f);
 
-		auto normal = glm::normalize(glm::cross(glm::vec3(a - b), glm::vec3(c - a)));
+		auto normal = glm::normalize(glm::cross(glm::vec3(b - a), glm::vec3(c - a)));
 		auto d = -glm::dot(normal, glm::vec3(a));
 
 		faces->push_back(glm::vec4(normal, d));
