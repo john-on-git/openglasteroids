@@ -54,7 +54,10 @@
     <ClCompile Include="Source\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\TemporaryWorldObject\TemporaryWorldObject.cpp">
+    <ClCompile Include="Source\WorldObject\TemporarySpaceGameObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\WorldObject\SpaceGameObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -116,7 +119,10 @@
     <ClInclude Include="Source\Tag.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\TemporaryWorldObject\TemporaryWorldObject.hpp">
+    <ClInclude Include="Source\WorldObject\TemporarySpaceGameObject.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\WorldObject\SpaceGameObject.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

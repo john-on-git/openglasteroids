@@ -9,3 +9,8 @@ glm::vec3 Vec3Provider::Tick()
 {
 	return *this->source;
 }
+
+bool Vec3Provider::References(void* reference)
+{
+	return source == reference;
+}

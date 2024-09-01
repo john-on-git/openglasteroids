@@ -3,6 +3,7 @@
 #include <windows.h>
 #include <cmath>
 #include <vector>
+#include <map>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/vec3.hpp>
@@ -19,12 +20,12 @@
 
 #include "Program/program.hpp"
 #include "BufferedAiMesh/BufferedAiMesh.hpp"
-#include "WorldObject/WorldObject.hpp"
-#include "TemporaryWorldObject/TemporaryWorldObject.hpp"
+#include "WorldObject/SpaceGameObject.hpp"
+#include "WorldObject/TemporarySpaceGameObject.hpp"
 #include "Texture/Texture.hpp"
 #include "main.hpp"
-#include "Delta/Delta.hpp"
 #include "QuadTreeCollisionHandler/QuadTreeCollisionHandler.hpp"
+#include "Delta/Delta.hpp"
 #include "Delta/DeltaProvider.hpp"
 #include "Delta/DeltaTarget.hpp"
 #include "Delta/DeltaProviders/Vec3Provider.hpp"
@@ -37,7 +38,7 @@
 using namespace std;
 
 //Debug logic for visualizing the quadtree. Not very efficient but idc.
-void drawQuadTree(bool drawAllRegions, bool drawShipRegion, bool drawShipOABB, WorldObject* ship, QuadTreeCollisionHandler* collisionHandler, Program* texturedColoredShader, Program* blockColorShader, GLuint colorLocation) {
+static void DrawQuadTree(bool drawAllRegions, bool drawShipRegion, bool drawShipOABB, WorldObject* ship, QuadTreeCollisionHandler* collisionHandler, Program* texturedColoredShader, Program* blockColorShader, GLuint colorLocation) {
 	blockColorShader->Use();
 	int STRIDE = 2;
 	size_t COORDS_LEN = 8;
@@ -166,7 +167,7 @@ void drawQuadTree(bool drawAllRegions, bool drawShipRegion, bool drawShipOABB, W
 		glad_glUniform4fv(colorLocation, 1, glm::value_ptr(glm::vec4(0.0f, 0.0f, 1.0f, 1.0f)));
 		glad_glLineWidth(5);
 		//set up line quadtree debugger
-		glm::vec3* bounds = ship->getObjectAlignedBoundingBox();
+		glm::vec3* bounds = ship->getOrientedBoundingBox();
 		float verts[] = {
 			bounds[0].x, bounds[0].y, //topleft
 			bounds[1].x, bounds[1].y, //topright
@@ -226,147 +227,200 @@ bool keyPressed[360];
 int main()
 {
 	//initialize glfw
-		if (!glfwInit())
-		{
-			OutputDebugStringW(L"FATAL: failed to initialize glfw\n");
-			exit(1);
-		}
+	if (!glfwInit())
+	{
+		OutputDebugStringW(L"FATAL: failed to initialize glfw\n");
+		exit(1);
+	}
 	//initialize window
-		GLFWwindow* window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE, nullptr, nullptr);
-		if (window == nullptr)
-		{
-			OutputDebugStringW(L"FATAL: failed to initialize glfw window\n");
-			exit(1);
-		}
-		glfwMakeContextCurrent(window);
-		glfwSetKeyCallback(window, key_callback);
-		glfwSwapInterval(1);
+	GLFWwindow* window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE, nullptr, nullptr);
+	if (window == nullptr)
+	{
+		OutputDebugStringW(L"FATAL: failed to initialize glfw window\n");
+		exit(1);
+	}
+	glfwMakeContextCurrent(window);
+	glfwSetKeyCallback(window, key_callback);
+	glfwSwapInterval(1);
 	//initialize glad
-		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-		{
-			OutputDebugStringW(L"FATAL: failed to initialize glad\n");
-			exit(1);
-		}
+	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+	{
+		OutputDebugStringW(L"FATAL: failed to initialize glad\n");
+		exit(1);
+	}
 	//glEnables
-		glad_glEnable(GL_DEPTH_TEST);
-		glad_glEnable(GL_TEXTURE_2D);
-		glad_glEnable(GL_BLEND);
-		glad_glBlendEquation(GL_FUNC_ADD); // this is default
-		glad_glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glad_glEnable(GL_DEPTH_TEST);
+	glad_glEnable(GL_TEXTURE_2D);
+	glad_glEnable(GL_BLEND);
+	glad_glBlendEquation(GL_FUNC_ADD); // this is default
+	glad_glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	//gl drawing config
-		glad_glClearColor(0.0f, 0.0f, 0.0f, 1);
-		glad_glPointSize(5.0f);
+	glad_glClearColor(0.0f, 0.0f, 0.0f, 1);
+	glad_glPointSize(5.0f);
+
 	//shader setup
-		//compile
-			Program texturedColoredShader(
-				"Shaders/TexturedColoredTransform/texturedColoredTransform.frag",
-				"Shaders/TexturedColoredTransform/texturedColoredTransform.vert"
-			);
-			Program blockColorShader(
-				"Shaders/BlockColor/blockColor.frag",
-				"Shaders/BlockColor/blockColor.vert"
-			);
-		//get uniform locations
-			blockColorShader.Use();
-			GLuint colorLocation = glad_glGetUniformLocation(blockColorShader.handle, "color");
+	//compile
+	Program texturedColoredShader(
+		"Shaders/TexturedColoredTransform/texturedColoredTransform.frag",
+		"Shaders/TexturedColoredTransform/texturedColoredTransform.vert"
+	);
+	Program blockColorShader(
+		"Shaders/BlockColor/blockColor.frag",
+		"Shaders/BlockColor/blockColor.vert"
+	);
+	//get uniform locations
+	blockColorShader.Use();
+	GLuint colorLocation = glad_glGetUniformLocation(blockColorShader.handle, "color");
 
-			texturedColoredShader.Use();
-			GLuint
-				textureLocation		= glad_glGetUniformLocation(texturedColoredShader.handle, "tex"),
-				colorMaskLocation	= glad_glGetUniformLocation(texturedColoredShader.handle, "colorMask"),
-				projectionLocation	= glad_glGetUniformLocation(texturedColoredShader.handle, "projection"),
-				viewLocation		= glad_glGetUniformLocation(texturedColoredShader.handle, "view"),
-				modelLocation		= glad_glGetUniformLocation(texturedColoredShader.handle, "model");
-			//check for failure
-			if (projectionLocation == -1 || viewLocation == -1 || modelLocation == -1)
-			{
-				OutputDebugStringW(L"FATAL: couldn't get uniform location\n");
-				exit(1);
-			}
+	texturedColoredShader.Use();
+	GLuint
+		textureLocation		= glad_glGetUniformLocation(texturedColoredShader.handle, "tex"),
+		colorMaskLocation	= glad_glGetUniformLocation(texturedColoredShader.handle, "colorMask"),
+		projectionLocation	= glad_glGetUniformLocation(texturedColoredShader.handle, "projection"),
+		viewLocation		= glad_glGetUniformLocation(texturedColoredShader.handle, "view"),
+		modelLocation		= glad_glGetUniformLocation(texturedColoredShader.handle, "model");
+	//check for failure
+	if (projectionLocation == -1 || viewLocation == -1 || modelLocation == -1)
+	{
+		OutputDebugStringW(L"FATAL: couldn't get uniform location\n");
+		exit(1);
+	}
+
 	//textures
-		auto shipTex = Texture("textures/ship.png");
-		auto projectileTex = Texture("textures/projectile.png");
+	auto shipTex = Texture("textures/ship.png");
+	auto projectileTex = Texture("textures/projectile.png");
+
 	//model
-		auto shipModel = Model(
-			"Models/ship.obj",
-			textureLocation,
-			colorMaskLocation,
-			std::vector<GLuint>{ shipTex.handle },
-			std::vector<glm::vec4>{ glm::vec4(1, 1, 1, 1) },
-			1
-		);
-		auto projectileModel = Model(
-			"Models/sphere.obj",
-			textureLocation,
-			colorMaskLocation,
-			std::vector<GLuint>{ projectileTex.handle },
-			std::vector<glm::vec4>{ glm::vec4(2, 2, 2, 1) },
-			1
-		);
-		auto cubeModel = Model(
-			"Models/cube.obj",
-			textureLocation,
-			colorMaskLocation,
-			std::vector<GLuint>{ shipTex.handle },
-			std::vector<glm::vec4>{ glm::vec4(1, 1, 1, 1) },
-			1
-		);
+	auto shipModel = Model(
+		"Models/ship.obj",
+		textureLocation,
+		colorMaskLocation,
+		std::vector<GLuint>{ shipTex.handle },
+		std::vector<glm::vec4>{ glm::vec4(1, 1, 1, 1) },
+		1
+	);
+	auto projectileModel = Model(
+		"Models/sphere.obj",
+		textureLocation,
+		colorMaskLocation,
+		std::vector<GLuint>{ projectileTex.handle },
+		std::vector<glm::vec4>{ glm::vec4(2, 2, 2, 1) },
+		1
+	);
+	auto cubeModel = Model(
+		"Models/cube.obj",
+		textureLocation,
+		colorMaskLocation,
+		std::vector<GLuint>{ shipTex.handle },
+		std::vector<glm::vec4>{ glm::vec4(1, 1, 1, 1) },
+		1
+	);
+
 	//set up world stuff
-		auto ship = WorldObject(
-			&shipModel,
-			glm::vec3(0.0f, 0.0f, -5.0f),	//pos
-			glm::vec3(270.0f, 50.0f, 0.0f),	//rot
-			glm::vec3(0.05f, 0.05f, 0.05f), //scale
-			projectionLocation,
-			viewLocation,
-			modelLocation,
-			vector<tag>{ SHIP }
-		);
-		auto dummy1 = WorldObject(
-			&cubeModel,
-			glm::vec3(0.4f, 0.4f, -5.0f),	//pos
-			glm::vec3(270.0f, 0.0f, 0.0f),	//rot
-			glm::vec3(0.05f, 0.05f, 0.05f),	//scale
-			projectionLocation,
-			viewLocation,
-			modelLocation,
-			vector<tag>{}
-		);
-		auto objects = vector<WorldObject*>{
-				&ship,
-				&dummy1
-		};
+	auto ship = new SpaceGameObject(
+		&shipModel,
+		glm::vec3(0.0f, 0.0f, -5.0f),	//pos
+		glm::vec3(0.0f, 0.0f, 0.0f),	//vel
+		glm::vec3(0.0f, 0.0f, 0.0f),	//rot vel
+		glm::vec3(270.0f, 50.0f, 0.0f),	//rot
+		glm::vec3(0.05f, 0.05f, 0.05f), //scale
+		projectionLocation,
+		viewLocation,
+		modelLocation,
+		unordered_set<tag>{ SHIP }
+	);
+	ship->velocityDelta->addDependent(new Delta<glm::vec3>(new DragProvider(&ship->velocity), { new Vec3Target(&ship->velocity) }, {}));
+	ship->rotationalVelocityDelta->addDependent(new Delta<glm::vec3>(new DragProvider(&ship->rotationalVelocity, 10), { new Vec3Target(&ship->rotationalVelocity) }, {}));
+
+
+	auto dummy1 = new SpaceGameObject(
+		&cubeModel,
+		glm::vec3(0.4f, 0.4f, -5.0f),	//pos
+		glm::vec3(0.0f, 0.0f, 0.0f),	//vel
+		glm::vec3(0.2f, 0.1f, 0.3f),	//rot vel
+		glm::vec3(270.0f, 0.0f, 0.0f),	//rot
+		glm::vec3(0.05f, 0.05f, 0.05f),	//scale
+		projectionLocation,
+		viewLocation,
+		modelLocation,
+		unordered_set<tag>{}
+	);
+	auto dummy2 = new SpaceGameObject(
+		&cubeModel,
+		glm::vec3(-0.4f, -0.4f, -5.0f),	//pos
+		glm::vec3(0.0f, 0.0f, 0.0f),	//vel
+		glm::vec3(0.2f, 0.1f, 0.3f),	//rot vel
+		glm::vec3(270.0f, 0.0f, 0.0f),	//rot
+		glm::vec3(0.05f, 0.05f, 0.05f),	//scale
+		projectionLocation,
+		viewLocation,
+		modelLocation,
+		unordered_set<tag>{}
+	);
+	auto dummy3 = new SpaceGameObject(
+		&cubeModel,
+		glm::vec3(-0.4f, -0.4f, -5.0f),	//pos
+		glm::vec3(0.0f, 0.0f, 0.0f),	//vel
+		glm::vec3(0.2f, 0.1f, 0.3f),	//rot vel
+		glm::vec3(270.0f, 0.0f, 0.0f),	//rot
+		glm::vec3(0.05f, 0.05f, 0.05f),	//scale
+		projectionLocation,
+		viewLocation,
+		modelLocation,
+		unordered_set<tag>{}
+	);
+	auto dummy4 = new SpaceGameObject(
+		&cubeModel,
+		glm::vec3(-0.4f, -0.4f, -5.0f),	//pos
+		glm::vec3(0.0f, 0.0f, 0.0f),	//vel
+		glm::vec3(0.2f, 0.1f, 0.3f),	//rot vel
+		glm::vec3(270.0f, 0.0f, 0.0f),	//rot
+		glm::vec3(0.05f, 0.05f, 0.05f),	//scale
+		projectionLocation,
+		viewLocation,
+		modelLocation,
+		unordered_set<tag>{}
+	);
+	auto dummy5 = new SpaceGameObject(
+		&cubeModel,
+		glm::vec3(-0.4f, -0.4f, -5.0f),	//pos
+		glm::vec3(0.0f, 0.0f, 0.0f),	//vel
+		glm::vec3(0.2f, 0.1f, 0.3f),	//rot vel
+		glm::vec3(270.0f, 0.0f, 0.0f),	//rot
+		glm::vec3(0.05f, 0.05f, 0.05f),	//scale
+		projectionLocation,
+		viewLocation,
+		modelLocation,
+		unordered_set<tag>{}
+	);
+
+	vector<SpaceGameObject*> objects = {
+		ship,
+		dummy1,
+		dummy2,
+		dummy3,
+		dummy4,
+		dummy5
+	};
+
 	//game stuff
-		glm::vec3 shipVelocity(0.0f, 0.0f, 0.0f);
+	QuadTreeCollisionHandler collisionHandler(
+		10,
+		glm::vec2(-10.1f, -10.1f),
+		glm::vec2( 10.1f,  10.1f)
+	);
+	for (auto it = objects.begin(); it != objects.end(); it++) //register all objects
+	{
+		collisionHandler.Register(*it);
+	}
+	//set up deltas stuff
+	auto shipAngleTarget = WorldObjectAngleTarget(ship);
 
-		QuadTreeCollisionHandler collisionHandler(
-			10,
-			glm::vec2(-10.1f, -10.1f),
-			glm::vec2( 10.1f,  10.1f)
-		);
-		for (auto it = objects.begin(); it != objects.end(); it++) //for each collision
-		{
-			collisionHandler.Register(*it);
-		}
-		//set up deltas stuff
-		vector<Delta<glm::vec3>*> deltas;
-		auto shipAngleTarget = WorldObjectAngleTarget(&ship);
-		auto shipVelocityTarget = Vec3Target(&shipVelocity);
+	unsigned char fireDelay = 0;
 
-		//add velocity delta
-		auto shipVelocityDelta = Delta<glm::vec3>(new Vec3Provider(&shipVelocity));
-		shipVelocityDelta.AddTarget(new WorldObjectPositionTarget(&ship));
-		deltas.push_back(&shipVelocityDelta);
+	bool showDebugInfo = false;
+	unsigned char showDebugInfoToggleDelay = 0;
 
-		//add drag delta
-		auto shipDragDelta = Delta<glm::vec3>(new DragProvider(&shipVelocity));
-		shipDragDelta.AddTarget(&shipVelocityTarget);
-		deltas.push_back(&shipDragDelta);
-
-		unsigned char fireDelay = 0;
-
-		boolean showDebugInfo = false;
-		unsigned char showDebugInfoToggleDelay = 0;
 	//render loop
 	while (!glfwWindowShouldClose(window))
 	{
@@ -375,86 +429,71 @@ int main()
 		if (showDebugInfoToggleDelay > 0)
 			showDebugInfoToggleDelay--;
 		//get player input
-		auto rad = glm::radians(ship.getAngle().y);
-		if (keyPressed[GLFW_KEY_W] || keyPressed[GLFW_KEY_UP])
+		auto rad = glm::radians(ship->getAngle().y);
+		if (ship != nullptr && keyPressed[GLFW_KEY_W] || keyPressed[GLFW_KEY_UP])
 		{
 			auto move = glm::vec3(
 				SHIP_MOVERATE_MULT * sin(rad),
 				SHIP_MOVERATE_MULT * cos(rad),
 				0.0f
 			);
-			auto moveDelta = new Delta<glm::vec3>(new Vec3Provider(&move), 10, SHIP_MAX_VELOCITY);
-			moveDelta->AddTarget(&shipVelocityTarget);
-			deltas.push_back(moveDelta);
+			ship->velocityDelta->addDependent(new Delta<glm::vec3>(new Vec3Provider(&move), { new Vec3Target(&ship->velocity) }, {}, 10, SHIP_MAX_VELOCITY));
 		}
-		else if (keyPressed[GLFW_KEY_S] || keyPressed[GLFW_KEY_DOWN])
+		else if (ship != nullptr && keyPressed[GLFW_KEY_S] || keyPressed[GLFW_KEY_DOWN])
 		{
 			auto move = glm::vec3(
 				-SHIP_MOVERATE_MULT * sin(rad),
 				-SHIP_MOVERATE_MULT * cos(rad),
 				0.0f
 			);
-			auto moveDelta = new Delta<glm::vec3>(new Vec3Provider(&move), 10, SHIP_MAX_VELOCITY);
-			moveDelta->AddTarget(&shipVelocityTarget);
-			deltas.push_back(moveDelta);
+			ship->velocityDelta->addDependent(new Delta<glm::vec3>(new Vec3Provider(&move), { new Vec3Target(&ship->velocity) }, {}, 10, SHIP_MAX_VELOCITY));
 		}
 
-		if (keyPressed[GLFW_KEY_A] || keyPressed[GLFW_KEY_LEFT])
+		if (ship != nullptr && keyPressed[GLFW_KEY_A] || keyPressed[GLFW_KEY_LEFT])
 		{
-			auto move = glm::vec3(
-				0.0f,
-				-SHIP_TURNRATE_MULT,
-				0.0f
-			);	
-			auto moveDelta = new Delta<glm::vec3>(new Vec3Provider(&move), 10);
-			moveDelta->AddTarget(&shipAngleTarget);
-			deltas.push_back(moveDelta);
+			ship->rotationalVelocityDelta->addDependent(new Delta<glm::vec3>(
+				new Vec3Provider(new glm::vec3(0.0f, -SHIP_TURNRATE_MULT, 0.0f)),
+				{ new Vec3Target(&ship->rotationalVelocity) },
+				{},
+				1
+			));
 		}
-		else if (keyPressed[GLFW_KEY_D] || keyPressed[GLFW_KEY_RIGHT])
+		else if (ship != nullptr && keyPressed[GLFW_KEY_D] || keyPressed[GLFW_KEY_RIGHT])
 		{
-			auto move = glm::vec3(
-				0.0f,
-				SHIP_TURNRATE_MULT,
-				0.0f
-			);
-			auto moveDelta = new Delta<glm::vec3>(new Vec3Provider(&move), 10);
-			moveDelta->AddTarget(&shipAngleTarget);
-			deltas.push_back(moveDelta);
+			ship->rotationalVelocityDelta->addDependent(new Delta<glm::vec3>(
+				new Vec3Provider(new glm::vec3(0.0f, SHIP_TURNRATE_MULT, 0.0f)), 
+				{ new Vec3Target(&ship->rotationalVelocity) },
+				{},
+				1
+			));
 		}
 
-		if ((keyPressed[GLFW_KEY_Z] || keyPressed[GLFW_KEY_SPACE]) && fireDelay == 0)
+		if (ship!=nullptr && (keyPressed[GLFW_KEY_Z] || keyPressed[GLFW_KEY_SPACE]) && fireDelay == 0)
 		{
-			auto projectile = new TemporaryWorldObject(
+			auto projectile = new TemporarySpaceGameObject(
 				&projectileModel,
 				glm::vec3(
-					ship.getPosition().x + (sin(rad) * 0.10), //second half moves the spawn point away from the center of the ship
-					ship.getPosition().y + (cos(rad) * 0.10), //0.05 is the distance between the center and tip
-					ship.getPosition().z
+					ship->getPosition().x + (sin(rad) * 0.10), //second half moves the spawn point away from the center of the ship
+					ship->getPosition().y + (cos(rad) * 0.10), //0.05 is the distance between the center and tip
+					ship->getPosition().z
 				),
+				glm::vec3(
+					ship->velocity.x + (sin(rad) * PROJECTILE_VELOCITY_MULT),
+					ship->velocity.y + (cos(rad) * PROJECTILE_VELOCITY_MULT),
+					ship->velocity.z + 0.0f
+				),
+				glm::vec3(0,0,0),
 				glm::vec3(270.0f, 0.0f, 0.0f),
 				glm::vec3(0.005f, 0.005f, 0.005f),
 				projectionLocation,
 				viewLocation,
 				modelLocation,
-				vector<tag>{ PROJECTILE },
+				unordered_set<tag>{ PROJECTILE },
 				PROJECTILE_DURATION
 			);
 			objects.push_back(projectile);
-
 			collisionHandler.Register(projectile);
 
-			auto projectileVelocity = new glm::vec3(
-				shipVelocity.x + (sin(rad) * PROJECTILE_VELOCITY_MULT),
-				shipVelocity.y + (cos(rad) * PROJECTILE_VELOCITY_MULT),
-				shipVelocity.z + 0.0f
-			);
-
-			//set up the delta
-			auto projectilePositionTarget = new WorldObjectPositionTarget(projectile);
-			auto projectileVelocityDelta = new Delta<glm::vec3>(new Vec3Provider(projectileVelocity));
-			projectileVelocityDelta->AddTarget(projectilePositionTarget);
-			deltas.push_back(projectileVelocityDelta);
-			
 			fireDelay = FIRE_DELAY; //reset fire delay
 		}
 
@@ -495,9 +534,24 @@ int main()
 			auto collisions = collisionHandler.Check();
 			for (auto it = collisions->begin(); it != collisions->end(); it++) //for each collision
 			{
-				//color change for collision debugging
-				it->first->model->meshes[0].colorMask = glm::vec4(2, 1, 1, 1);
-				it->second->model->meshes[0].colorMask = glm::vec4(2, 1, 1, 1);
+				//destroy both if it's a projectile
+				if (it->first->tags.count(PROJECTILE)==1 || it->second->tags.count(PROJECTILE)==1)
+				{
+					it->first->markedForDelete = true;
+					it->second->markedForDelete = true;
+				}
+				else { //generic collision, knocks both things away and trades spin
+					
+					SpaceGameObject* first = (SpaceGameObject*)(it->first);
+					SpaceGameObject* second = (SpaceGameObject*)(it->second);
+
+					first->velocity = glm::vec3(COLLIDE_BOUNCE_STRENGTH * (it->first->getPosition() - it->second->getPosition()));
+					second->velocity = glm::vec3(COLLIDE_BOUNCE_STRENGTH * (it->second->getPosition() - it->first->getPosition()));
+
+					auto averageRotation = (first->rotationalVelocity + second->rotationalVelocity) * 0.5f;
+					first->rotationalVelocity = averageRotation;
+					second->rotationalVelocity = averageRotation;
+				}
 			}
 			delete collisions;
 		//clear framebuffers
@@ -507,35 +561,26 @@ int main()
 		if (showDebugInfo)
 		{
 			//draw the bounds of the quadtree, highlighting the node that the ship is in
-			drawQuadTree(true, true, false, &ship, &collisionHandler, &texturedColoredShader, &blockColorShader, colorLocation);
+			DrawQuadTree(true, true, false, ship, &collisionHandler, &texturedColoredShader, &blockColorShader, colorLocation);
 		}
-			for (auto it = objects.begin(); it != objects.end();)
+
+		for (size_t i = 0; i < objects.size(); i++)
+		{
+			//Tick() everything
+			objects.at(i)->Tick();
+			//draw all objects, deleting any that have been marked for delete
+			objects.at(i)->Draw();
+			if (objects.at(i)->markedForDelete)
 			{
-				//Tick() everything
-				(*it)->Tick();
-				//draw all objects, deleting any that have been marked for delete
-				(*it)->Draw();
-				if ((*it)->markedForDelete)
-				{
-					collisionHandler.Remove(*it);
-					delete *it;
-					it = objects.erase(it);
+				collisionHandler.Remove(objects.at(i));
+
+				if (objects.at(i) == ship) { //ship destroyed, game over
+					exit(0); //TODO display a game over message & kick back to main menu
 				}
-				else
-					it++;
+				objects.erase(objects.begin() + i);
+				i--;
 			}
-		//apply all deltas, deleting any that have expired
-			for (auto it = deltas.begin(); it != deltas.end();)
-			{
-				if ((*it)->Tick())
-				{
-					it = deltas.erase(it);
-				}
-				else
-				{
-					it++;
-				}
-			}
+		}
 		//check for GL errors
 			GLenum err = glad_glGetError();
 			while(err!=GL_NO_ERROR)

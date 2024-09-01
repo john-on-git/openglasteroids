@@ -3,6 +3,117 @@
 #include <iostream>
 #include <queue>
 #include <glm/geometric.hpp>
+/**
+*
+* @param e vector representing the line segment, starting at the origin
+* @param q the model to check for intersection with
+* @param qPosition the position of q relative to the start of e
+* @return true if the line intersects the model, else false
+*/
+static bool LineIntersectsPolygon(glm::mat2x4 edge, vector<glm::vec4>* faces)
+{
+	//TODO, there's actually no class containing the vector positions as this info is stored on the GPU
+	//so this data needs to be added to q/its components
+	//Done!
+
+	//based on Eric Haines - Fast Ray-Convex Polyhedron Intersection
+
+	double tNear = 0;
+	double tFar = glm::length(glm::vec3(edge[1] - edge[0])); //which is glm::length(rayDirection);
+
+	auto rayOrigin = glm::vec3(edge[0]);
+	auto rayDirection = glm::normalize(glm::vec3(edge[1] - edge[0]));
+
+	for (size_t i = 0; i < faces->size(); i++) //for each face of q 
+	{
+		glm::vec4 pn = faces->at(i);
+		auto vd = glm::dot(glm::vec3(pn), rayDirection);
+		auto vn = glm::dot(glm::vec3(pn), rayOrigin) + pn.w;
+		if (vd == 0)
+		{
+			//"if vd is 0 then the ray is parallel and no intersection takes place"
+			//"in such a case, we check if the ray origin is inside the plane's half space"
+
+			if (vn > 0) //"if vn is positive... the ray must miss the polyhedron, so testing is done."
+			{
+				return false;
+			}
+		}
+		else
+		{
+			auto t = -vn / vd;
+			if (vd > 0) //"if vd is positive the plane is back-facing"
+			{
+				//"t can affect tfar, if t<0, then the polygon is missed."
+				if (t < 0)
+				{
+					return false;
+				}
+				else if (t < tFar) //"if t is less than tfar, tfar is set to t"
+				{
+					tFar = t;
+				}
+			}
+			else //"if vd is negative, it is front-facing."
+			{
+				if (t > tNear)
+				{
+					tNear = t;
+				}
+			}
+
+			//"if tNear ever is greater than tFar, the ray must miss the polyhedron"
+			if (tNear > tFar)
+			{
+				return false;
+			}
+		}
+	}
+	return true;
+}
+
+static bool GetFineCollision(WorldObject* p, WorldObject* q)
+{
+	//based on the polygon intersection algorithm detailed by The Morgan Kaufmann Series in Interactive 3D Technology
+
+	//one issue is that the edges aren't scaled. Fixed!
+
+	//README! Currently trying to go case-by case on the first call. edge 18 of p intersects (but not really). rayDirection is NaN for it.
+	std::vector<glm::mat2x4>* edges;
+	std::vector<glm::vec4>* faces;
+
+	//the objects are intersecting if any of the edges of p intersect q
+	edges = p->calcEdges();
+	faces = q->calcFaces();
+	for (size_t i = 0; i < edges->size(); i++)
+	{
+		//return true if this edge intersects the polygon, transforming everything so the start of the edge is the origin
+		if (LineIntersectsPolygon(edges->at(i), faces)) //TODO
+		{
+			return true;
+		}
+	}
+	delete faces;
+	delete edges;
+
+	//or if any of the edges of q intersect p
+	edges = q->calcEdges();
+	faces = p->calcFaces();
+	for (size_t i = 0; i < edges->size(); i++)
+	{
+		//return true if this edge intersects the polygon, transforming everything so the start of the edge is the origin
+		if (LineIntersectsPolygon(edges->at(i), faces)) //TODO
+		{
+			return true;
+		}
+	}
+	delete faces;
+	delete edges;
+
+	//TODO special case for identical & aligned shapes
+
+	return false; //no intersection found
+}
 
 QuadTreeCollisionHandler::QuadTreeCollisionHandler(unsigned char maxDepth, glm::vec2 bottomLeft, glm::vec2 topRight)
 {
@@ -43,7 +154,11 @@ unordered_set<UnorderedPair<WorldObject*>>* QuadTreeCollisionHandler::Check()
 	auto broadCollisions = this->GetBroadCollisions();
 	for (auto it = broadCollisions->begin(); it != broadCollisions->end(); it++) //for each collision
 	{
-		if (this->GetFineCollision(it->first, it->second))
+		auto firstBoundingSphereRadius = glm::length(glm::vec3(it->first->model->boundingMax) * it->first->getScale());
+		auto secondBoundingSphereRadius = glm::length(glm::vec3(it->second->model->boundingMax) * it->second->getScale());
+		auto spheresColliding = glm::length(it->first->getPosition() - it->second->getPosition()) <= firstBoundingSphereRadius + secondBoundingSphereRadius;
+
+		if (spheresColliding && GetFineCollision(it->first, it->second))
 		{
 			collisions->insert(*it);
 		}
@@ -108,133 +223,4 @@ vector<glm::vec2*>* QuadTreeCollisionHandler::GetAllBounds(vector<glm::vec2*>* s
 {
 	root->DepthFirstFlatten(store);
 	return store;
-}
-
-/**
-* 
-* @param e vector representing the line segment, starting at the origin
-* @param q the model to check for intersection with
-* @param qPosition the position of q relative to the start of e
-* @return true if the line intersects the model, else false
-*/
-static bool LineIntersectsPolygon(glm::mat2x4 edge, vector<glm::vec4>* faces)
-{
-	//TODO, there's actually no class containing the vector positions as this info is stored on the GPU
-	//so this data needs to be added to q/its components
-	//Done!
-
-	//based on Eric Haines - Fast Ray-Convex Polyhedron Intersection
-	
-	double tNear = 0;
-	double tFar = glm::length(glm::vec3(edge[1] - edge[0])); //which is glm::length(rayDirection);
-
-	auto rayOrigin = glm::vec3(edge[0]);
-	auto rayDirection = glm::normalize(glm::vec3(edge[1] - edge[0]));
-
-	for (unsigned int i = 0;i < faces->size();i++) //for each face of q 
-	{
-		glm::vec4 pn = faces->at(i);	
-		auto vd = glm::dot(glm::vec3(pn), rayDirection);
-		auto vn = glm::dot(glm::vec3(pn), rayOrigin) + pn.w;
-		if (vd == 0)
-		{
-			//"if vd is 0 then the ray is parallel and no intersection takes place"
-			//"in such a case, we check if the ray origin is inside the plane's half space"
-
-			if (vn > 0) //"if vn is positive... the ray must miss the polyhedron, so testing is done."
-			{
-				return false;
-			}
-		}
-		else
-		{
-			auto t = -vn / vd;
-			if (vd > 0) //"if vd is positive the plane is back-facing"
-			{
-				//"t can affect tfar, if t<0, then the polygon is missed."
-				if (t < 0)
-				{
-					return false;
-				}
-				else if (t < tFar) //"if t is less than tfar, tfar is set to t"
-				{
-					tFar = t;
-				}
-			}
-			else //"if vd is negative, it is front-facing."
-			{
-				if (t > tNear)
-				{
-					tNear = t;
-				}
-			}
-
-			//"if tNear ever is greater than tFar, the ray must miss the polyhedron"
-			if (tNear > tFar)
-			{
-				return false;
-			}
-		}
-	}
-	return true;
-}
-bool QuadTreeCollisionHandler::GetFineCollision(WorldObject* p, WorldObject* q)
-{
-	//based on the polygon intersection algorithm detailed by The Morgan Kaufmann Series in Interactive 3D Technology
-
-	//TODO for debugging, remove me!
-	/*std::cout << "Didn't Collide w/ Faces:" << endl;
-	std::cout << "p:" << endl;
-	auto pFaces = p->calcFaces();
-	for (unsigned int i = 0; i < pFaces->size(); i++)
-	{
-		auto face = pFaces->at(i);
-		std::cout << "\t" << "(" << face.x << "x + " << face.y << "y + " << face.z << "z) =" << face.w << endl;
-	}
-	std::cout << "q:" << endl;
-
-	auto qFaces = q->calcFaces();
-	for (unsigned int i = 0; i < qFaces->size(); i++)
-	{
-		auto face = qFaces->at(i);
-		std::cout << "\t" << "(" << face.x << "x + " << face.y << "y + " << face.z << "z) =" << face.w << endl;
-	}*/
-
-	//one issue is that the edges aren't scaled. Fixed!
-
-	//README! Currently trying to go case-by case on the first call. edge 18 of p intersects (but not really). rayDirection is NaN for it.
-	std::vector<glm::mat2x4>* edges;
-	std::vector<glm::vec4>* faces;
-
-	//the objects are intersecting if any of the edges of p intersect q
-	edges = p->calcEdges();
-	faces = q->calcFaces();
-	for (unsigned int i = 0;i < edges->size();i++)
-	{
-		//return true if this edge intersects the polygon, transforming everything so the start of the edge is the origin
-		if (LineIntersectsPolygon(edges->at(i), faces)) //TODO
-		{
-			return true;
-		}
-	}
-	delete faces;
-	delete edges;
-
-	//or if any of the edges of q intersect p
-	edges = q->calcEdges();
-	faces = p->calcFaces();
-	for (unsigned int i = 0;i < edges->size();i++)
-	{
-		//return true if this edge intersects the polygon, transforming everything so the start of the edge is the origin
-		if (LineIntersectsPolygon(edges->at(i), faces)) //TODO
-		{
-			return true;
-		}
-	}
-	delete faces;
-	delete edges;
-
-	//TODO special case for identical & aligned shapes
-
-	return false; //no intersection found
 }

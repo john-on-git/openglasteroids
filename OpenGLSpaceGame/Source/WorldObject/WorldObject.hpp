@@ -15,11 +15,11 @@ class WorldObject {
 	public:
 		Model *model;
 		bool markedForDelete;
-		vector<tag> tags;
+		unordered_set<tag> tags;
 		glm::mat4 modelMatrix;
 		glm::mat4 rotationMatrix;
 
-		WorldObject(Model *model, glm::vec3 position, glm::vec3 angle, glm::vec3 scale, GLuint projectionLocation, GLuint viewLocation, GLuint modelLocation, vector<tag> tags);
+		WorldObject(Model *model, glm::vec3 position, glm::vec3 angle, glm::vec3 scale, GLuint projectionLocation, GLuint viewLocation, GLuint modelLocation, unordered_set<tag> tags);
 		virtual void Tick();
 		void Draw();
 		glm::vec3 getPosition();
@@ -28,7 +28,7 @@ class WorldObject {
 		void setAngle(glm::vec3 angle);
 		glm::vec3 getScale();
 		void setScale(glm::vec3 scale);
-		glm::vec3* getObjectAlignedBoundingBox();
+		glm::vec3* getOrientedBoundingBox();
 		std::vector<glm::vec4>* calcFaces();
 		std::vector<glm::mat2x4>* calcEdges();
 	protected:

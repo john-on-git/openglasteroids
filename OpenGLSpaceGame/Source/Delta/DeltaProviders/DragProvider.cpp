@@ -1,15 +1,23 @@
 #include "DragProvider.hpp"
 
-DragProvider::DragProvider(glm::vec3* shipVelocity)
+
+
+DragProvider::DragProvider(glm::vec3* target)
 {
-	this->shipVelocity = shipVelocity;
+	this->target = target;
+	mult = 1.0f;
+}
+DragProvider::DragProvider(glm::vec3* target, float mult)
+{
+	this->target = target;
+	this->mult = mult;
 }
 
 glm::vec3 DragProvider::Tick()
 {
 	return glm::vec3(
-		-SHIP_DRAG_COEFFICIENT * shipVelocity->x,
-		-SHIP_DRAG_COEFFICIENT * shipVelocity->y,
-		-SHIP_DRAG_COEFFICIENT * shipVelocity->z
+		-SHIP_DRAG_COEFFICIENT * mult * target->x,
+		-SHIP_DRAG_COEFFICIENT * mult * target->y,
+		-SHIP_DRAG_COEFFICIENT * mult * target->z
 	);
 }

@@ -11,7 +11,8 @@
 #include "../BufferedAiMesh/BufferedAiMesh.hpp"
 #include <iostream>
 
-WorldObject::WorldObject(Model* model, glm::vec3 position, glm::vec3 angle, glm::vec3 scale, GLuint projectionLocation, GLuint viewLocation, GLuint modelLocation, vector<tag> tags)
+
+WorldObject::WorldObject(Model* model, glm::vec3 position, glm::vec3 angle, glm::vec3 scale, GLuint projectionLocation, GLuint viewLocation, GLuint modelLocation, unordered_set<tag> tags)
 {
 	this->model = model;
 	this->position = position;
@@ -118,7 +119,7 @@ void WorldObject::Draw()
 	model->Draw();
 }
 
-glm::vec3* WorldObject::getObjectAlignedBoundingBox()
+glm::vec3* WorldObject::getOrientedBoundingBox()
 {
 	if (angle!=boundingBoxAngle) { //recalculate the bounding box
 		if (boundingBox != nullptr) //delete any existing bounding box
@@ -130,38 +131,15 @@ glm::vec3* WorldObject::getObjectAlignedBoundingBox()
 
 		//calculate the rotated bounding box
 		boundingBox = new glm::vec3[8];
-		for (unsigned char i = 0;i < 8;i++)
-		{
-			glm::vec4 vert;
-			switch (i)
-			{
-				case 0:
-					vert = glm::vec4(model->boundingMin.x, model->boundingMax.y, model->boundingMin.z, 1.0f);
-					break;
-				case 1:
-					vert = glm::vec4(model->boundingMax.x, model->boundingMax.y, model->boundingMin.z, 1.0f);
-					break;
-				case 2:
-					vert = glm::vec4(model->boundingMin.x, model->boundingMax.y, model->boundingMax.z, 1.0f);
-					break;
-				case 3:
-					vert = glm::vec4(model->boundingMax.x, model->boundingMax.y, model->boundingMax.z, 1.0f);
-					break;
-				case 4:
-					vert = glm::vec4(model->boundingMin.x, model->boundingMin.y, model->boundingMin.z, 1.0f);
-					break;
-				case 5:
-					vert = glm::vec4(model->boundingMax.x, model->boundingMin.y, model->boundingMin.z, 1.0f);
-					break;
-				case 6:
-					vert = glm::vec4(model->boundingMin.x, model->boundingMin.y, model->boundingMax.z, 1.0f);
-					break;
-				case 7:
-					vert = glm::vec4(model->boundingMax.x, model->boundingMin.y, model->boundingMax.z, 1.0f);
-					break;
-			}
-			boundingBox[i] = glm::vec3(this->modelMatrix * vert);
-		}
+
+		boundingBox[0] = glm::vec3(this->modelMatrix * glm::vec4(model->boundingMin.x, model->boundingMax.y, model->boundingMin.z, 1.0f));
+		boundingBox[1] = glm::vec3(this->modelMatrix * glm::vec4(model->boundingMax.x, model->boundingMax.y, model->boundingMin.z, 1.0f));
+		boundingBox[2] = glm::vec3(this->modelMatrix * glm::vec4(model->boundingMin.x, model->boundingMax.y, model->boundingMax.z, 1.0f));
+		boundingBox[3] = glm::vec3(this->modelMatrix * glm::vec4(model->boundingMax.x, model->boundingMax.y, model->boundingMax.z, 1.0f));
+		boundingBox[4] = glm::vec3(this->modelMatrix * glm::vec4(model->boundingMin.x, model->boundingMin.y, model->boundingMin.z, 1.0f));
+		boundingBox[5] = glm::vec3(this->modelMatrix * glm::vec4(model->boundingMax.x, model->boundingMin.y, model->boundingMin.z, 1.0f));
+		boundingBox[6] = glm::vec3(this->modelMatrix * glm::vec4(model->boundingMin.x, model->boundingMin.y, model->boundingMax.z, 1.0f));
+		boundingBox[7] = glm::vec3(this->modelMatrix * glm::vec4(model->boundingMax.x, model->boundingMin.y, model->boundingMax.z, 1.0f));
 	}
 	return boundingBox;
 }

@@ -15,7 +15,6 @@ class QuadTreeCollisionHandler : public ICollisionHandler {
 		vector<glm::vec2*>* GetAllBounds(vector<glm::vec2*>* store);
 	private:
 		virtual unordered_set<UnorderedPair<WorldObject*>>* GetBroadCollisions();
-		bool GetFineCollision(WorldObject* a, WorldObject* b);
 		
 		unordered_set<WorldObject*> objects;
 		glm::vec2 initialBounds[2];
@@ -109,10 +108,8 @@ class QuadTreeCollisionHandler : public ICollisionHandler {
 									)
 								);
 							}
-							int i = 0;
-							while (i<4 && !inSubTree) {
+							for (char i = 0; i < 4 && !inSubTree;i++) {
 								inSubTree = inSubTree || children[i]->TryInsert(maxDepth, currentDepth + 1, obj);
-								i++;
 							}
 							//if it did not fit anywhere in the subtree, put it in this node
 							if (!inSubTree)
@@ -155,7 +152,7 @@ class QuadTreeCollisionHandler : public ICollisionHandler {
 				bool WillFit(WorldObject* obj)
 				{
 					//calculate world coordinates of object's object-aligned bounding box
-					auto objBBox = obj->getObjectAlignedBoundingBox();
+					auto objBBox = obj->getOrientedBoundingBox();
 					//determine whether the OABB is located fully inside this region
 					for (char i=0;i<8;i++)
 					{
