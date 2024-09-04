@@ -1,4 +1,5 @@
-﻿#include <iostream>
+﻿#define _USE_MATH_DEFINES
+#include <iostream>
 #include <fstream>
 #include <windows.h>
 #include <cmath>
@@ -226,6 +227,7 @@ bool keyPressed[360];
 
 int main()
 {
+	srand(time(NULL));
 	//initialize glfw
 	if (!glfwInit())
 	{
@@ -289,6 +291,7 @@ int main()
 	//textures
 	auto shipTex = Texture("textures/ship.png");
 	auto projectileTex = Texture("textures/projectile.png");
+	auto graniteTex = Texture("textures/wikimedia_Pink_granite_tileable_1024x1024.png");
 
 	//model
 	auto shipModel = Model(
@@ -307,16 +310,16 @@ int main()
 		std::vector<glm::vec4>{ glm::vec4(2, 2, 2, 1) },
 		1
 	);
-	auto cubeModel = Model(
+	auto asteroidModel = Model(
 		"Models/cube.obj",
 		textureLocation,
 		colorMaskLocation,
-		std::vector<GLuint>{ shipTex.handle },
+		std::vector<GLuint>{ graniteTex.handle },
 		std::vector<glm::vec4>{ glm::vec4(1, 1, 1, 1) },
 		1
 	);
 
-	//set up world stuff
+	//set up game & world stuff
 	auto ship = new SpaceGameObject(
 		&shipModel,
 		glm::vec3(0.0f, 0.0f, -5.0f),	//pos
@@ -329,94 +332,30 @@ int main()
 		modelLocation,
 		unordered_set<tag>{ SHIP }
 	);
+	//the ship has drag
 	ship->velocityDelta->addDependent(new Delta<glm::vec3>(new DragProvider(&ship->velocity), { new Vec3Target(&ship->velocity) }, {}));
 	ship->rotationalVelocityDelta->addDependent(new Delta<glm::vec3>(new DragProvider(&ship->rotationalVelocity, 10), { new Vec3Target(&ship->rotationalVelocity) }, {}));
 
-
-	auto dummy1 = new SpaceGameObject(
-		&cubeModel,
-		glm::vec3(0.4f, 0.4f, -5.0f),	//pos
-		glm::vec3(0.0f, 0.0f, 0.0f),	//vel
-		glm::vec3(0.2f, 0.1f, 0.3f),	//rot vel
-		glm::vec3(270.0f, 0.0f, 0.0f),	//rot
-		glm::vec3(0.05f, 0.05f, 0.05f),	//scale
-		projectionLocation,
-		viewLocation,
-		modelLocation,
-		unordered_set<tag>{}
-	);
-	auto dummy2 = new SpaceGameObject(
-		&cubeModel,
-		glm::vec3(-0.4f, -0.4f, -5.0f),	//pos
-		glm::vec3(0.0f, 0.0f, 0.0f),	//vel
-		glm::vec3(0.2f, 0.1f, 0.3f),	//rot vel
-		glm::vec3(270.0f, 0.0f, 0.0f),	//rot
-		glm::vec3(0.05f, 0.05f, 0.05f),	//scale
-		projectionLocation,
-		viewLocation,
-		modelLocation,
-		unordered_set<tag>{}
-	);
-	auto dummy3 = new SpaceGameObject(
-		&cubeModel,
-		glm::vec3(-0.4f, -0.4f, -5.0f),	//pos
-		glm::vec3(0.0f, 0.0f, 0.0f),	//vel
-		glm::vec3(0.2f, 0.1f, 0.3f),	//rot vel
-		glm::vec3(270.0f, 0.0f, 0.0f),	//rot
-		glm::vec3(0.05f, 0.05f, 0.05f),	//scale
-		projectionLocation,
-		viewLocation,
-		modelLocation,
-		unordered_set<tag>{}
-	);
-	auto dummy4 = new SpaceGameObject(
-		&cubeModel,
-		glm::vec3(-0.4f, -0.4f, -5.0f),	//pos
-		glm::vec3(0.0f, 0.0f, 0.0f),	//vel
-		glm::vec3(0.2f, 0.1f, 0.3f),	//rot vel
-		glm::vec3(270.0f, 0.0f, 0.0f),	//rot
-		glm::vec3(0.05f, 0.05f, 0.05f),	//scale
-		projectionLocation,
-		viewLocation,
-		modelLocation,
-		unordered_set<tag>{}
-	);
-	auto dummy5 = new SpaceGameObject(
-		&cubeModel,
-		glm::vec3(-0.4f, -0.4f, -5.0f),	//pos
-		glm::vec3(0.0f, 0.0f, 0.0f),	//vel
-		glm::vec3(0.2f, 0.1f, 0.3f),	//rot vel
-		glm::vec3(270.0f, 0.0f, 0.0f),	//rot
-		glm::vec3(0.05f, 0.05f, 0.05f),	//scale
-		projectionLocation,
-		viewLocation,
-		modelLocation,
-		unordered_set<tag>{}
-	);
-
 	vector<SpaceGameObject*> objects = {
 		ship,
-		dummy1,
-		dummy2,
-		dummy3,
-		dummy4,
-		dummy5
 	};
+	unsigned char numAsteroids = 0;
+	unsigned char asteroidSide = 0;
 
-	//game stuff
 	QuadTreeCollisionHandler collisionHandler(
 		10,
 		glm::vec2(-10.1f, -10.1f),
 		glm::vec2( 10.1f,  10.1f)
 	);
-	for (auto it = objects.begin(); it != objects.end(); it++) //register all objects
+	for (auto object : objects) //register all objects
 	{
-		collisionHandler.Register(*it);
+		collisionHandler.Register(object);
 	}
-	//set up deltas stuff
+
 	auto shipAngleTarget = WorldObjectAngleTarget(ship);
 
 	unsigned char fireDelay = 0;
+	unsigned char controlsDisabled = 0;
 
 	bool showDebugInfo = false;
 	unsigned char showDebugInfoToggleDelay = 0;
@@ -424,13 +363,77 @@ int main()
 	//render loop
 	while (!glfwWindowShouldClose(window))
 	{
-		if (fireDelay > 0)
-			fireDelay--;
-		if (showDebugInfoToggleDelay > 0)
-			showDebugInfoToggleDelay--;
+
+		while (numAsteroids < NUM_TARGET_ASTEROIDS)
+		{
+			//asteroids launch from a different side each time rotating counterclockwise, from a random point on the side, towards the center, +-45°
+			float rel = ((float)rand()) / RAND_MAX;
+			float angle = 0;
+			float scale = 0.03 + ((float)rand()) / RAND_MAX * 0.1;
+			glm::vec3 pos;
+			switch (asteroidSide)
+			{
+				case 0:
+					pos = glm::vec3(-.95f, rel, -5.0f); //left
+					angle = 0 - (M_PI / 4) + ((float)rand()) / RAND_MAX * (M_PI / 2); //right
+					break;
+				case 1:
+					pos = glm::vec3(rel, -.95f, -5.0f); //bottom
+					angle = (M_PI / 2) - (M_PI / 4) + ((float)rand()) / RAND_MAX * (M_PI / 2); //up
+					break;
+				case 2:
+					pos = glm::vec3(.95f, rel, -5.0f); //right
+					angle = (M_PI)-(M_PI / 4) + ((float)rand()) / RAND_MAX * (M_PI / 2); //left
+					break;
+				case 3:
+					pos = glm::vec3(rel, .95f, -5.0f); //top
+					angle = (M_PI * 3 / 2) - (M_PI / 4) + ((float)rand()) / RAND_MAX * (M_PI / 2); //down
+					break;
+			}
+			SpaceGameObject* asteroid = new SpaceGameObject(
+				&asteroidModel,
+				pos,	//pos
+				glm::vec3(ASTEROID_INIT_VEL * cos(angle), ASTEROID_INIT_VEL * sin(angle), 0.0f),	//vel
+				glm::vec3(0.2f, 0.1f, 0.3f),	//rot vel
+				glm::vec3(0.0f, 0.0f, 0.0f),	//rot
+				glm::vec3(scale, scale, scale),	//scale
+				projectionLocation,
+				viewLocation,
+				modelLocation,
+				unordered_set<tag>{ ASTEROID }
+			);
+			objects.push_back(asteroid);
+			collisionHandler.Register(asteroid);
+			numAsteroids++;
+			++asteroidSide %= 4;
+		}
+
+		constexpr auto flash = glm::vec4(2.0f, 2.0f, 0.75f, 1.0f);
+		constexpr auto none = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+		if (fireDelay > 0) { fireDelay--; }
+		if (controlsDisabled > 0)
+		{
+			controlsDisabled--;
+			if (controlsDisabled % (FPS/4) == 0)
+			{
+				if (shipModel.meshes[0].colorMask == none) 
+				{ 
+					shipModel.meshes[0].colorMask = flash;
+				}
+				else 
+				{ 
+					shipModel.meshes[0].colorMask = none;
+				}
+			}
+		}
+		else
+		{
+			shipModel.meshes[0].colorMask = none;
+		}
+		if (showDebugInfoToggleDelay > 0) { showDebugInfoToggleDelay--; }
 		//get player input
 		auto rad = glm::radians(ship->getAngle().y);
-		if (ship != nullptr && keyPressed[GLFW_KEY_W] || keyPressed[GLFW_KEY_UP])
+		if (ship != nullptr && controlsDisabled == 0 && keyPressed[GLFW_KEY_W] || keyPressed[GLFW_KEY_UP])
 		{
 			auto move = glm::vec3(
 				SHIP_MOVERATE_MULT * sin(rad),
@@ -439,7 +442,7 @@ int main()
 			);
 			ship->velocityDelta->addDependent(new Delta<glm::vec3>(new Vec3Provider(&move), { new Vec3Target(&ship->velocity) }, {}, 10, SHIP_MAX_VELOCITY));
 		}
-		else if (ship != nullptr && keyPressed[GLFW_KEY_S] || keyPressed[GLFW_KEY_DOWN])
+		else if (ship != nullptr && controlsDisabled==0 && keyPressed[GLFW_KEY_S] || keyPressed[GLFW_KEY_DOWN])
 		{
 			auto move = glm::vec3(
 				-SHIP_MOVERATE_MULT * sin(rad),
@@ -449,7 +452,7 @@ int main()
 			ship->velocityDelta->addDependent(new Delta<glm::vec3>(new Vec3Provider(&move), { new Vec3Target(&ship->velocity) }, {}, 10, SHIP_MAX_VELOCITY));
 		}
 
-		if (ship != nullptr && keyPressed[GLFW_KEY_A] || keyPressed[GLFW_KEY_LEFT])
+		if (ship != nullptr && controlsDisabled==0 && keyPressed[GLFW_KEY_A] || keyPressed[GLFW_KEY_LEFT])
 		{
 			ship->rotationalVelocityDelta->addDependent(new Delta<glm::vec3>(
 				new Vec3Provider(new glm::vec3(0.0f, -SHIP_TURNRATE_MULT, 0.0f)),
@@ -458,7 +461,7 @@ int main()
 				1
 			));
 		}
-		else if (ship != nullptr && keyPressed[GLFW_KEY_D] || keyPressed[GLFW_KEY_RIGHT])
+		else if (ship != nullptr && controlsDisabled==0 && keyPressed[GLFW_KEY_D] || keyPressed[GLFW_KEY_RIGHT])
 		{
 			ship->rotationalVelocityDelta->addDependent(new Delta<glm::vec3>(
 				new Vec3Provider(new glm::vec3(0.0f, SHIP_TURNRATE_MULT, 0.0f)), 
@@ -468,9 +471,9 @@ int main()
 			));
 		}
 
-		if (ship!=nullptr && (keyPressed[GLFW_KEY_Z] || keyPressed[GLFW_KEY_SPACE]) && fireDelay == 0)
+		if (ship!=nullptr && controlsDisabled==0 && (keyPressed[GLFW_KEY_Z] || keyPressed[GLFW_KEY_SPACE]) && fireDelay == 0)
 		{
-			auto projectile = new TemporarySpaceGameObject(
+			TemporarySpaceGameObject* projectile = new TemporarySpaceGameObject(
 				&projectileModel,
 				glm::vec3(
 					ship->getPosition().x + (sin(rad) * 0.10), //second half moves the spawn point away from the center of the ship
@@ -484,7 +487,7 @@ int main()
 				),
 				glm::vec3(0,0,0),
 				glm::vec3(270.0f, 0.0f, 0.0f),
-				glm::vec3(0.005f, 0.005f, 0.005f),
+				glm::vec3(0.005f, 0.005f, 0.005f), //glm::vec3(0.005f, 0.005f, 0.005f),
 				projectionLocation,
 				viewLocation,
 				modelLocation,
@@ -526,8 +529,6 @@ int main()
 				objectPosition.y = -ARENA_W;
 			}
 			object->setPosition(objectPosition);
-
-			object->model->meshes[0].colorMask = glm::vec4(1, 1, 1, 1); //reset color
 		}
 
 		//check for collisions
@@ -539,18 +540,50 @@ int main()
 				{
 					it->first->markedForDelete = true;
 					it->second->markedForDelete = true;
+					if (it->first->tags.count(ASTEROID) == 1)
+					{
+						numAsteroids--;
+					}
+					if (it->second->tags.count(ASTEROID) == 1)
+					{
+						numAsteroids--;
+					}
 				}
-				else { //generic collision, knocks both things away and trades spin
+				else { //generic elastic collision, trades spin
 					
+					//alright, so my lack of understanding of classical physics is coming back to bite me in the ass
+					//this current implemention conserves the magnitude of velocity... I THINK?
+					//when I tried to write a version that conserved momentum it didn't work (didn't behave realistically).
+
 					SpaceGameObject* first = (SpaceGameObject*)(it->first);
 					SpaceGameObject* second = (SpaceGameObject*)(it->second);
 
-					first->velocity = glm::vec3(COLLIDE_BOUNCE_STRENGTH * (it->first->getPosition() - it->second->getPosition()));
-					second->velocity = glm::vec3(COLLIDE_BOUNCE_STRENGTH * (it->second->getPosition() - it->first->getPosition()));
+					glm::vec3 dir = glm::normalize(first->getPosition() - second->getPosition());
+					auto m1 = first->getScale()[0];
+					auto m2 = second->getScale()[0]; //might add real mass later idk
+					auto a = (m1 / (m1 + m2));
+					auto b = (m2 / (m1 + m2));
+					auto e = glm::length(a * first->velocity) + glm::length(b * second->velocity);
 
+					auto mBefore = m1 * first->velocity + m2 * second->velocity;
+					auto eBefore = pow(glm::dot(first->velocity, first->velocity), 2) * m1 / 2 + pow(glm::dot(second->velocity, second->velocity), 2) * m2 / 2;
+
+					first->velocity = e * dir;
+					second->velocity = e * -dir;
+
+					auto mAfter = m1 * first->velocity + m2 * second->velocity;
+					auto eAfter = pow(glm::dot(first->velocity, first->velocity), 2) * m1 / 2 + pow(glm::dot(second->velocity, second->velocity), 2) * m2 / 2;
+
+					cout << "total momentum:\n\tbefore:" << mBefore.x << " " << mBefore.y << " " << mBefore.z << "\n\tafter: " << mAfter.x << " " << mAfter.y << " " << mAfter.z << endl << endl;
+					cout << "total energy:\n\tbefore:" << glm::length(eBefore) << "\n\tafter: " << glm::length(eAfter) << endl << endl;
 					auto averageRotation = (first->rotationalVelocity + second->rotationalVelocity) * 0.5f;
 					first->rotationalVelocity = averageRotation;
 					second->rotationalVelocity = averageRotation;
+
+					if (first->tags.count(SHIP) == 1 || second->tags.count(SHIP) == 1)
+					{
+						controlsDisabled = SHIP_STUN_DURATION;
+					}
 				}
 			}
 			delete collisions;
