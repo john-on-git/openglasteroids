@@ -2,12 +2,12 @@
 
 
 
-DragProvider::DragProvider(glm::vec3* target)
+DragProvider::DragProvider(SpaceGameObject* target)
 {
 	this->target = target;
 	mult = 1.0f;
 }
-DragProvider::DragProvider(glm::vec3* target, float mult)
+DragProvider::DragProvider(SpaceGameObject* target, float mult)
 {
 	this->target = target;
 	this->mult = mult;
@@ -15,9 +15,10 @@ DragProvider::DragProvider(glm::vec3* target, float mult)
 
 glm::vec3 DragProvider::Tick()
 {
+	glm::vec3 targetVel = target->getVelocity();
 	return glm::vec3(
-		-SHIP_DRAG_COEFFICIENT * mult * target->x,
-		-SHIP_DRAG_COEFFICIENT * mult * target->y,
-		-SHIP_DRAG_COEFFICIENT * mult * target->z
+		-SHIP_DRAG_COEFFICIENT * mult * targetVel.x,
+		-SHIP_DRAG_COEFFICIENT * mult * targetVel.y,
+		-SHIP_DRAG_COEFFICIENT * mult * targetVel.z
 	);
 }

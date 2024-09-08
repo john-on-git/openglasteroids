@@ -130,13 +130,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Source\AppState\MainMenu.cpp" />
+    <ClCompile Include="Source\AppState\GameInProgress.cpp" />
     <ClCompile Include="Source\bmp_loader.cpp" />
     <ClCompile Include="Source\BufferedAiMesh\BufferedAiMesh.cpp" />
     <ClCompile Include="Source\Delta\DeltaProviders\DragProvider.cpp" />
+    <ClCompile Include="Source\Delta\DeltaProviders\SpaceGameObjectRotationalVelocityProvider.cpp" />
+    <ClCompile Include="Source\Delta\DeltaProviders\SpaceGameObjectVelocityProvider.cpp" />
     <ClCompile Include="Source\Delta\DeltaProviders\Vec3Provider.cpp" />
+    <ClCompile Include="Source\Delta\DeltaProviders\RotDragProvider.cpp" />
     <ClCompile Include="Source\Delta\DeltaTargets\Vec3Target.cpp" />
     <ClCompile Include="Source\Delta\DeltaTargets\WorldObjectAngleTarget.cpp" />
     <ClCompile Include="Source\Delta\DeltaTargets\WorldObjectPositionTarget.cpp" />
+    <ClCompile Include="Source\Delta\DeltaTargets\SpaceGameObjectVelocityTarget.cpp" />
+    <ClCompile Include="Source\Delta\DeltaTargets\SpaceGameObjectRotationalVelocityTarget.cpp" />
     <ClCompile Include="Source\main.cpp" />
     <ClCompile Include="Source\Model\Model.cpp" />
     <ClCompile Include="Source\Program\program.cpp" />
@@ -147,16 +154,24 @@
     <ClCompile Include="Source\WorldObject\SpaceGameObject.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\AppState\MainMenu.hpp" />
+    <ClInclude Include="Source\AppState\GameInProgress.hpp" />
+    <ClInclude Include="Source\AppState\AppState.hpp" />
     <ClInclude Include="Source\bmp_loader.hpp" />
     <ClInclude Include="Source\BufferedAiMesh\BufferedAiMesh.hpp" />
     <ClInclude Include="Source\Delta\Delta.hpp" />
     <ClInclude Include="Source\Delta\DeltaProvider.hpp" />
     <ClInclude Include="Source\Delta\DeltaProviders\DragProvider.hpp" />
+    <ClInclude Include="Source\Delta\DeltaProviders\SpaceGameObjectRotationalVelocityProvider.hpp" />
+    <ClInclude Include="Source\Delta\DeltaProviders\SpaceGameObjectVelocityProvider.hpp" />
     <ClInclude Include="Source\Delta\DeltaProviders\Vec3Provider.hpp" />
     <ClInclude Include="Source\Delta\DeltaTarget.hpp" />
     <ClInclude Include="Source\Delta\DeltaTargets\Vec3Target.hpp" />
     <ClInclude Include="Source\Delta\DeltaTargets\WorldObjectAngleTarget.hpp" />
     <ClInclude Include="Source\Delta\DeltaTargets\WorldObjectPositionTarget.hpp" />
+    <ClInclude Include="Source\Delta\DeltaTargets\SpaceGameObjectVelocityTarget.hpp" />
+    <ClInclude Include="Source\Delta\DeltaTargets\SpaceGameObjectRotationalVelocityTarget.hpp" />
+    <ClInclude Include="Source\Delta\DeltaProviders\RotDragProvider.hpp" />
     <ClInclude Include="Source\ICollisionHandler\ICollisionHandler.hpp" />
     <ClInclude Include="Source\main.hpp" />
     <ClInclude Include="Source\Model\Model.hpp" />

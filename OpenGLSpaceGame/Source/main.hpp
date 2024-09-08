@@ -20,9 +20,8 @@ constexpr auto PROJECTILE_DURATION		= FIRE_DELAY * 10;
 constexpr auto NUM_TARGET_ASTEROIDS = 6;
 constexpr auto ASTEROID_INIT_VEL	= .005;
 
-constexpr auto ARENA_H					= 1.0f;
-constexpr auto ARENA_W					= 1.0f;
-constexpr auto COLLIDE_BOUNCE_STRENGTH	= 0.05f;
+constexpr auto ARENA_H					= 1.1f;
+constexpr auto ARENA_W					= 1.1f;
 
 constexpr auto SHOW_DEBUG_INFO_TOGGLE_DELAY = FPS/10;
 

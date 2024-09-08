@@ -26,204 +26,22 @@
 #include "Texture/Texture.hpp"
 #include "main.hpp"
 #include "QuadTreeCollisionHandler/QuadTreeCollisionHandler.hpp"
-#include "Delta/Delta.hpp"
-#include "Delta/DeltaProvider.hpp"
-#include "Delta/DeltaTarget.hpp"
-#include "Delta/DeltaProviders/Vec3Provider.hpp"
-#include "Delta/DeltaTargets/Vec3Target.hpp"
-#include "Delta/DeltaProviders/DragProvider.hpp"
-#include "Delta/DeltaTargets/WorldObjectAngleTarget.hpp"
-#include "Delta/DeltaTargets/WorldObjectPositionTarget.hpp"
 
+#include "AppState/AppState.hpp"
+#include "AppState/MainMenu.hpp"
+#include "AppState/GameInProgress.hpp"
 
 using namespace std;
 
-//Debug logic for visualizing the quadtree. Not very efficient but idc.
-static void DrawQuadTree(bool drawAllRegions, bool drawShipRegion, bool drawShipOABB, WorldObject* ship, QuadTreeCollisionHandler* collisionHandler, Program* texturedColoredShader, Program* blockColorShader, GLuint colorLocation) {
-	blockColorShader->Use();
-	int STRIDE = 2;
-	size_t COORDS_LEN = 8;
-	size_t INDICES_LEN = 8;
-	glad_glUniform4fv(colorLocation, 1, glm::value_ptr(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)));
-	unsigned int vertIndices[] {0, 1, 1, 2, 2, 3, 3, 0};
-	if (drawAllRegions) {
-		glad_glLineWidth(1);
-		vector<glm::vec2*> flattened;
-		collisionHandler->GetAllBounds(&flattened);
-		while (!flattened.empty()) {
-			glm::vec2* bounds =flattened.back();
-			//set up line quadtree debugger
-			float verts[] = {
-				bounds[0].x, bounds[1].y, //topleft
-				bounds[1].x, bounds[1].y, //topright
-				bounds[1].x, bounds[0].y, //bottomright
-				bounds[0].x, bounds[0].y, //bottomleft
-			};
-			//generate vertex array object
-			GLuint quadtreeVAO;
-			glad_glGenVertexArrays(1, &quadtreeVAO);
-			glad_glBindVertexArray(quadtreeVAO);
-			//generate buffers and copy over data
-			GLuint buffers[2]; //vertex buffer, and vertex index buffer
-			glad_glGenBuffers(2, buffers); //19.5.21, first argument is the number of buffers, not the size of the buffer. corrupted the heap?
+AppState* appState;
+bool keyPressed[360];
 
-			glad_glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
-			glad_glBufferData( //add verts to buffer
-				GL_ARRAY_BUFFER,
-				COORDS_LEN * sizeof(float),
-				verts,
-				GL_STATIC_DRAW
-			);
-
-			glad_glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers[1]);
-			glad_glBufferData( //add verts to buffer
-				GL_ELEMENT_ARRAY_BUFFER,
-				INDICES_LEN * sizeof(unsigned int),
-				vertIndices,
-				GL_STATIC_DRAW
-			);
-
-			//set vertex attrib pointers OK
-			glad_glEnableVertexAttribArray(0);
-			glad_glVertexAttribPointer( //position
-				0,
-				2,
-				GL_FLOAT,
-				GL_FALSE,
-				STRIDE * sizeof(float),
-				nullptr
-			);
-
-			glad_glBindVertexArray(quadtreeVAO);
-			glad_glDrawElements(
-				GL_LINES,
-				INDICES_LEN,
-				GL_UNSIGNED_INT,
-				nullptr
-			);
-			glad_glDeleteBuffers(2, buffers);
-			glad_glDeleteVertexArrays(1, &quadtreeVAO);
-			flattened.pop_back();
-		}
-	}
-	if (drawShipRegion) {
-		glad_glLineWidth(10);
-		//set up line quadtree debugger
-		auto bounds = collisionHandler->GetNodeBoundsForObject(ship);
-		float verts[] = {
-			bounds[0].x, bounds[1].y, //topleft
-			bounds[1].x, bounds[1].y, //topright
-			bounds[1].x, bounds[0].y, //bottomright
-			bounds[0].x, bounds[0].y, //bottomleft
-		};
-		//generate vertex array object
-		GLuint quadtreeVAO;
-		glad_glGenVertexArrays(1, &quadtreeVAO);
-		glad_glBindVertexArray(quadtreeVAO);
-		//generate buffers and copy over data
-		GLuint buffers[2]; //vertex buffer, and vertex index buffer
-		glad_glGenBuffers(2, buffers); //19.5.21, first argument is the number of buffers, not the size of the buffer. corrupted the heap?
-
-		glad_glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
-		glad_glBufferData( //add verts to buffer
-			GL_ARRAY_BUFFER,
-			COORDS_LEN * sizeof(float),
-			verts,
-			GL_STATIC_DRAW
-		);
-
-		glad_glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers[1]);
-		glad_glBufferData( //add verts to buffer
-			GL_ELEMENT_ARRAY_BUFFER,
-			INDICES_LEN * sizeof(unsigned int),
-			vertIndices,
-			GL_STATIC_DRAW
-		);
-
-
-		//set vertex attrib pointers OK
-		glad_glEnableVertexAttribArray(0);
-		glad_glVertexAttribPointer( //position
-			0,
-			2,
-			GL_FLOAT,
-			GL_FALSE,
-			STRIDE * sizeof(float),
-			nullptr
-		);
-
-		glad_glBindVertexArray(quadtreeVAO);
-		glad_glDrawElements(
-			GL_LINES,
-			INDICES_LEN,
-			GL_UNSIGNED_INT,
-			nullptr
-		);
-		glad_glDeleteBuffers(2, buffers);
-		glad_glDeleteVertexArrays(1, &quadtreeVAO);
-	}
-	
-	if (drawShipOABB)
-	{
-		glad_glUniform4fv(colorLocation, 1, glm::value_ptr(glm::vec4(0.0f, 0.0f, 1.0f, 1.0f)));
-		glad_glLineWidth(5);
-		//set up line quadtree debugger
-		glm::vec3* bounds = ship->getOrientedBoundingBox();
-		float verts[] = {
-			bounds[0].x, bounds[0].y, //topleft
-			bounds[1].x, bounds[1].y, //topright
-			bounds[7].x, bounds[7].y, //bottomright
-			bounds[6].x, bounds[6].y, //bottomleft
-		};
-		//generate vertex array object
-		GLuint quadtreeVAO;
-		glad_glGenVertexArrays(1, &quadtreeVAO);
-		glad_glBindVertexArray(quadtreeVAO);
-		//generate buffers and copy over data
-		GLuint buffers[2]; //vertex buffer, and vertex index buffer
-		glad_glGenBuffers(2, buffers); //19.5.21, first argument is the number of buffers, not the size of the buffer. corrupted the heap?
-
-		glad_glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
-		glad_glBufferData( //add verts to buffer
-			GL_ARRAY_BUFFER,
-			COORDS_LEN * sizeof(float),
-			verts,
-			GL_STATIC_DRAW
-		);
-
-		glad_glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers[1]);
-		glad_glBufferData( //add verts to buffer
-			GL_ELEMENT_ARRAY_BUFFER,
-			INDICES_LEN * sizeof(unsigned int),
-			vertIndices,
-			GL_STATIC_DRAW
-		);
-
-		//set vertex attrib pointers OK
-		glad_glEnableVertexAttribArray(0);
-		glad_glVertexAttribPointer( //position
-			0,
-			2,
-			GL_FLOAT,
-			GL_FALSE,
-			STRIDE * sizeof(float),
-			nullptr
-		);
-
-		glad_glBindVertexArray(quadtreeVAO);
-		glad_glDrawElements(
-			GL_LINES,
-			INDICES_LEN,
-			GL_UNSIGNED_INT,
-			nullptr
-		);
-		glad_glDeleteBuffers(2, buffers);
-		glad_glDeleteVertexArrays(1, &quadtreeVAO);
-	}
-	texturedColoredShader->Use();
+//AppState uses GoF State Pattern, with main.cpp as the Context
+static void SetState(AppState* newState) {
+	delete appState;
+	appState = newState;
 }
 
-bool keyPressed[360];
 
 int main()
 {
@@ -289,8 +107,8 @@ int main()
 	}
 
 	//textures
-	auto shipTex = Texture("textures/ship.png");
-	auto projectileTex = Texture("textures/projectile.png");
+	auto shipTex = Texture("textures/blankwhite.png");
+	auto projectileTex = Texture("textures/blankwhite.png");
 	auto graniteTex = Texture("textures/wikimedia_Pink_granite_tileable_1024x1024.png");
 
 	//model
@@ -319,312 +137,28 @@ int main()
 		1
 	);
 
-	//set up game & world stuff
-	auto ship = new SpaceGameObject(
-		&shipModel,
-		glm::vec3(0.0f, 0.0f, -5.0f),	//pos
-		glm::vec3(0.0f, 0.0f, 0.0f),	//vel
-		glm::vec3(0.0f, 0.0f, 0.0f),	//rot vel
-		glm::vec3(270.0f, 50.0f, 0.0f),	//rot
-		glm::vec3(0.05f, 0.05f, 0.05f), //scale
-		projectionLocation,
-		viewLocation,
-		modelLocation,
-		unordered_set<tag>{ SHIP }
-	);
-	//the ship has drag
-	ship->velocityDelta->addDependent(new Delta<glm::vec3>(new DragProvider(&ship->velocity), { new Vec3Target(&ship->velocity) }, {}));
-	ship->rotationalVelocityDelta->addDependent(new Delta<glm::vec3>(new DragProvider(&ship->rotationalVelocity, 10), { new Vec3Target(&ship->rotationalVelocity) }, {}));
+	appState = new MainMenu(SetState, keyPressed, &asteroidModel, &projectileModel, &shipModel, colorLocation, modelLocation, projectionLocation, viewLocation, &texturedColoredShader, &blockColorShader);
 
-	vector<SpaceGameObject*> objects = {
-		ship,
-	};
-	unsigned char numAsteroids = 0;
-	unsigned char asteroidSide = 0;
-
-	QuadTreeCollisionHandler collisionHandler(
-		10,
-		glm::vec2(-10.1f, -10.1f),
-		glm::vec2( 10.1f,  10.1f)
-	);
-	for (auto object : objects) //register all objects
+	while (!glfwWindowShouldClose(window)) //window
 	{
-		collisionHandler.Register(object);
-	}
+		//check for button clicks
+		appState->Tick();
 
-	auto shipAngleTarget = WorldObjectAngleTarget(ship);
+		//cerr << "High scores not implemented" << endl;
 
-	unsigned char fireDelay = 0;
-	unsigned char controlsDisabled = 0;
-
-	bool showDebugInfo = false;
-	unsigned char showDebugInfoToggleDelay = 0;
-
-	//render loop
-	while (!glfwWindowShouldClose(window))
-	{
-
-		while (numAsteroids < NUM_TARGET_ASTEROIDS)
-		{
-			//asteroids launch from a different side each time rotating counterclockwise, from a random point on the side, towards the center, +-45°
-			float rel = ((float)rand()) / RAND_MAX;
-			float angle = 0;
-			float scale = 0.03 + ((float)rand()) / RAND_MAX * 0.1;
-			glm::vec3 pos;
-			switch (asteroidSide)
-			{
-				case 0:
-					pos = glm::vec3(-.95f, rel, -5.0f); //left
-					angle = 0 - (M_PI / 4) + ((float)rand()) / RAND_MAX * (M_PI / 2); //right
-					break;
-				case 1:
-					pos = glm::vec3(rel, -.95f, -5.0f); //bottom
-					angle = (M_PI / 2) - (M_PI / 4) + ((float)rand()) / RAND_MAX * (M_PI / 2); //up
-					break;
-				case 2:
-					pos = glm::vec3(.95f, rel, -5.0f); //right
-					angle = (M_PI)-(M_PI / 4) + ((float)rand()) / RAND_MAX * (M_PI / 2); //left
-					break;
-				case 3:
-					pos = glm::vec3(rel, .95f, -5.0f); //top
-					angle = (M_PI * 3 / 2) - (M_PI / 4) + ((float)rand()) / RAND_MAX * (M_PI / 2); //down
-					break;
-			}
-			SpaceGameObject* asteroid = new SpaceGameObject(
-				&asteroidModel,
-				pos,	//pos
-				glm::vec3(ASTEROID_INIT_VEL * cos(angle), ASTEROID_INIT_VEL * sin(angle), 0.0f),	//vel
-				glm::vec3(0.2f, 0.1f, 0.3f),	//rot vel
-				glm::vec3(0.0f, 0.0f, 0.0f),	//rot
-				glm::vec3(scale, scale, scale),	//scale
-				projectionLocation,
-				viewLocation,
-				modelLocation,
-				unordered_set<tag>{ ASTEROID }
-			);
-			objects.push_back(asteroid);
-			collisionHandler.Register(asteroid);
-			numAsteroids++;
-			++asteroidSide %= 4;
-		}
-
-		constexpr auto flash = glm::vec4(2.0f, 2.0f, 0.75f, 1.0f);
-		constexpr auto none = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-		if (fireDelay > 0) { fireDelay--; }
-		if (controlsDisabled > 0)
-		{
-			controlsDisabled--;
-			if (controlsDisabled % (FPS/4) == 0)
-			{
-				if (shipModel.meshes[0].colorMask == none) 
-				{ 
-					shipModel.meshes[0].colorMask = flash;
-				}
-				else 
-				{ 
-					shipModel.meshes[0].colorMask = none;
-				}
-			}
-		}
-		else
-		{
-			shipModel.meshes[0].colorMask = none;
-		}
-		if (showDebugInfoToggleDelay > 0) { showDebugInfoToggleDelay--; }
-		//get player input
-		auto rad = glm::radians(ship->getAngle().y);
-		if (ship != nullptr && controlsDisabled == 0 && keyPressed[GLFW_KEY_W] || keyPressed[GLFW_KEY_UP])
-		{
-			auto move = glm::vec3(
-				SHIP_MOVERATE_MULT * sin(rad),
-				SHIP_MOVERATE_MULT * cos(rad),
-				0.0f
-			);
-			ship->velocityDelta->addDependent(new Delta<glm::vec3>(new Vec3Provider(&move), { new Vec3Target(&ship->velocity) }, {}, 10, SHIP_MAX_VELOCITY));
-		}
-		else if (ship != nullptr && controlsDisabled==0 && keyPressed[GLFW_KEY_S] || keyPressed[GLFW_KEY_DOWN])
-		{
-			auto move = glm::vec3(
-				-SHIP_MOVERATE_MULT * sin(rad),
-				-SHIP_MOVERATE_MULT * cos(rad),
-				0.0f
-			);
-			ship->velocityDelta->addDependent(new Delta<glm::vec3>(new Vec3Provider(&move), { new Vec3Target(&ship->velocity) }, {}, 10, SHIP_MAX_VELOCITY));
-		}
-
-		if (ship != nullptr && controlsDisabled==0 && keyPressed[GLFW_KEY_A] || keyPressed[GLFW_KEY_LEFT])
-		{
-			ship->rotationalVelocityDelta->addDependent(new Delta<glm::vec3>(
-				new Vec3Provider(new glm::vec3(0.0f, -SHIP_TURNRATE_MULT, 0.0f)),
-				{ new Vec3Target(&ship->rotationalVelocity) },
-				{},
-				1
-			));
-		}
-		else if (ship != nullptr && controlsDisabled==0 && keyPressed[GLFW_KEY_D] || keyPressed[GLFW_KEY_RIGHT])
-		{
-			ship->rotationalVelocityDelta->addDependent(new Delta<glm::vec3>(
-				new Vec3Provider(new glm::vec3(0.0f, SHIP_TURNRATE_MULT, 0.0f)), 
-				{ new Vec3Target(&ship->rotationalVelocity) },
-				{},
-				1
-			));
-		}
-
-		if (ship!=nullptr && controlsDisabled==0 && (keyPressed[GLFW_KEY_Z] || keyPressed[GLFW_KEY_SPACE]) && fireDelay == 0)
-		{
-			TemporarySpaceGameObject* projectile = new TemporarySpaceGameObject(
-				&projectileModel,
-				glm::vec3(
-					ship->getPosition().x + (sin(rad) * 0.10), //second half moves the spawn point away from the center of the ship
-					ship->getPosition().y + (cos(rad) * 0.10), //0.05 is the distance between the center and tip
-					ship->getPosition().z
-				),
-				glm::vec3(
-					ship->velocity.x + (sin(rad) * PROJECTILE_VELOCITY_MULT),
-					ship->velocity.y + (cos(rad) * PROJECTILE_VELOCITY_MULT),
-					ship->velocity.z + 0.0f
-				),
-				glm::vec3(0,0,0),
-				glm::vec3(270.0f, 0.0f, 0.0f),
-				glm::vec3(0.005f, 0.005f, 0.005f), //glm::vec3(0.005f, 0.005f, 0.005f),
-				projectionLocation,
-				viewLocation,
-				modelLocation,
-				unordered_set<tag>{ PROJECTILE },
-				PROJECTILE_DURATION
-			);
-			objects.push_back(projectile);
-			collisionHandler.Register(projectile);
-
-			fireDelay = FIRE_DELAY; //reset fire delay
-		}
-
-		//toggle debug info
-		if (keyPressed[GLFW_KEY_F5] && showDebugInfoToggleDelay==0)
-		{
-			showDebugInfo = !showDebugInfo; //no Intellisense, bitwise ~ was not intended
-			showDebugInfoToggleDelay = SHOW_DEBUG_INFO_TOGGLE_DELAY;
-		}
-		
-		for (auto object : objects)
-		{
-			//toroidal space
-			auto objectPosition = object->getPosition();
-			if (objectPosition.x > ARENA_W) //off right
-			{
-				objectPosition.x = -ARENA_W;
-			}
-			else if (objectPosition.x < -ARENA_W) //off left
-			{
-				objectPosition.x = ARENA_W;
-			}
-
-			if (objectPosition.y < -ARENA_H) //off top
-			{
-				objectPosition.y = ARENA_W;
-			}
-			else if (objectPosition.y > ARENA_H) //off bottom
-			{
-				objectPosition.y = -ARENA_W;
-			}
-			object->setPosition(objectPosition);
-		}
-
-		//check for collisions
-			auto collisions = collisionHandler.Check();
-			for (auto it = collisions->begin(); it != collisions->end(); it++) //for each collision
-			{
-				//destroy both if it's a projectile
-				if (it->first->tags.count(PROJECTILE)==1 || it->second->tags.count(PROJECTILE)==1)
-				{
-					it->first->markedForDelete = true;
-					it->second->markedForDelete = true;
-					if (it->first->tags.count(ASTEROID) == 1)
-					{
-						numAsteroids--;
-					}
-					if (it->second->tags.count(ASTEROID) == 1)
-					{
-						numAsteroids--;
-					}
-				}
-				else { //generic elastic collision, trades spin
-					
-					//alright, so my lack of understanding of classical physics is coming back to bite me in the ass
-					//this current implemention conserves the magnitude of velocity... I THINK?
-					//when I tried to write a version that conserved momentum it didn't work (didn't behave realistically).
-
-					SpaceGameObject* first = (SpaceGameObject*)(it->first);
-					SpaceGameObject* second = (SpaceGameObject*)(it->second);
-
-					glm::vec3 dir = glm::normalize(first->getPosition() - second->getPosition());
-					auto m1 = first->getScale()[0];
-					auto m2 = second->getScale()[0]; //might add real mass later idk
-					auto a = (m1 / (m1 + m2));
-					auto b = (m2 / (m1 + m2));
-					auto e = glm::length(a * first->velocity) + glm::length(b * second->velocity);
-
-					auto mBefore = m1 * first->velocity + m2 * second->velocity;
-					auto eBefore = pow(glm::dot(first->velocity, first->velocity), 2) * m1 / 2 + pow(glm::dot(second->velocity, second->velocity), 2) * m2 / 2;
-
-					first->velocity = e * dir;
-					second->velocity = e * -dir;
-
-					auto mAfter = m1 * first->velocity + m2 * second->velocity;
-					auto eAfter = pow(glm::dot(first->velocity, first->velocity), 2) * m1 / 2 + pow(glm::dot(second->velocity, second->velocity), 2) * m2 / 2;
-
-					cout << "total momentum:\n\tbefore:" << mBefore.x << " " << mBefore.y << " " << mBefore.z << "\n\tafter: " << mAfter.x << " " << mAfter.y << " " << mAfter.z << endl << endl;
-					cout << "total energy:\n\tbefore:" << glm::length(eBefore) << "\n\tafter: " << glm::length(eAfter) << endl << endl;
-					auto averageRotation = (first->rotationalVelocity + second->rotationalVelocity) * 0.5f;
-					first->rotationalVelocity = averageRotation;
-					second->rotationalVelocity = averageRotation;
-
-					if (first->tags.count(SHIP) == 1 || second->tags.count(SHIP) == 1)
-					{
-						controlsDisabled = SHIP_STUN_DURATION;
-					}
-				}
-			}
-			delete collisions;
-		//clear framebuffers
-			glad_glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		
-		//draw debug info
-		if (showDebugInfo)
-		{
-			//draw the bounds of the quadtree, highlighting the node that the ship is in
-			DrawQuadTree(true, true, false, ship, &collisionHandler, &texturedColoredShader, &blockColorShader, colorLocation);
-		}
-
-		for (size_t i = 0; i < objects.size(); i++)
-		{
-			//Tick() everything
-			objects.at(i)->Tick();
-			//draw all objects, deleting any that have been marked for delete
-			objects.at(i)->Draw();
-			if (objects.at(i)->markedForDelete)
-			{
-				collisionHandler.Remove(objects.at(i));
-
-				if (objects.at(i) == ship) { //ship destroyed, game over
-					exit(0); //TODO display a game over message & kick back to main menu
-				}
-				objects.erase(objects.begin() + i);
-				i--;
-			}
-		}
 		//check for GL errors
-			GLenum err = glad_glGetError();
-			while(err!=GL_NO_ERROR)
-			{
-				cout << "\nGL Error: " << to_string(err);
-				err = glad_glGetError();
-			}
+		GLenum err = glad_glGetError();
+		while (err != GL_NO_ERROR)
+		{
+			cout << "\nGL Error: " << to_string(err);
+			err = glad_glGetError();
+			err = glad_glGetError();
+		}
 		//glfw stuff
-			glfwSwapBuffers(window);
-			glfwPollEvents();
-		Sleep(FRAME_DELAY);
+		glfwSwapBuffers(window);
+		glfwPollEvents();
+
+		Sleep(FRAME_DELAY); //FPS cap
 	}
 
 	//free resources
