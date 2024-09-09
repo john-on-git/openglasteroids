@@ -17,11 +17,10 @@ class WorldObject {
 		bool markedForDelete;
 		unordered_set<tag> tags;
 		glm::mat4 modelMatrix;
-		glm::mat4 rotationMatrix;
 
-		WorldObject(Model *model, glm::vec3 position, glm::vec3 angle, glm::vec3 scale, GLuint projectionLocation, GLuint viewLocation, GLuint modelLocation, unordered_set<tag> tags);
+		WorldObject(Model *model, glm::vec3 position, glm::vec3 angle, glm::vec3 scale, GLuint modelViewLocation, unordered_set<tag> tags);
 		virtual void Tick();
-		void Draw();
+		void Draw(glm::mat4 viewMatrix);
 		glm::vec3 getPosition();
 		void setPosition(glm::vec3 position);
 		glm::vec3 getAngle();
@@ -35,9 +34,7 @@ class WorldObject {
 		glm::vec3 position;
 		glm::vec3 angle;
 		glm::vec3 scale;
-		GLuint projectionLocation;
-		GLuint viewLocation;
-		GLuint modelLocation;
+		GLuint modelViewLocation;
 		glm::vec3* boundingBox;
 		glm::vec3 boundingBoxAngle; //angle at which the current value of boundingBox^ was calculated
 		void UpdateModelMatrix();

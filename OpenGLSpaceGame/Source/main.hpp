@@ -4,8 +4,9 @@
 constexpr auto WINDOW_TITLE  = "Space Game";
 constexpr auto WINDOW_WIDTH  = 1000;
 constexpr auto WINDOW_HEIGHT = 1000;
-constexpr auto FPS	 = 144;
+constexpr auto FPS			 = 144;
 constexpr auto FRAME_DELAY	 = 1000 / FPS;
+constexpr auto FONT_CHAR_SIZE	 = 32; //TODO placeholder
 
 constexpr auto SHIP_MOVERATE_MULT = 0.00004f;
 constexpr auto SHIP_TURNRATE_MULT = 1.f;

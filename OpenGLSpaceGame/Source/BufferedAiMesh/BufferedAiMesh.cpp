@@ -103,7 +103,11 @@ void BufferedAiMesh::Draw()
 	//draw every polygon
 		//set uniform value
 		glad_glActiveTexture(GL_TEXTURE0);
-		glad_glBindTexture(GL_TEXTURE_2D, texture);
+
+		glad_glBindTexture(GL_TEXTURE_2D, texture); 
+		//apparently the correct way to do this is to build a RAM representation of which textures are bound, and first use it to check if the texture is already bound, 
+		//as it's cheaper than redundantly sending it to the GPU (a very expensive operation at this timescale)
+		
 		glad_glUniform1i(textureLocation, 0);
 		glad_glUniform4fv(colorLocation, 1, glm::value_ptr(colorMask));
 		//draw

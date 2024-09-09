@@ -23,6 +23,7 @@
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <map>
 
 //Debug logic for visualizing the quadtree. Not very efficient but doesn't really matter
 static void DrawQuadTree(bool drawAllRegions, bool drawShipRegion, bool drawShipOABB, WorldObject* ship, QuadTreeCollisionHandler* collisionHandler, Program* texturedColoredShader, Program* blockColorShader, GLuint colorLocation) {
@@ -210,22 +211,25 @@ static void DrawQuadTree(bool drawAllRegions, bool drawShipRegion, bool drawShip
 }
 
 
-GameInProgress::GameInProgress(void (*SetState)(AppState*), bool keyPressed[360], Model* asteroidModel, Model* projectileModel, Model* shipModel, GLuint colorLocation, GLuint modelLocation, GLuint projectionLocation, GLuint viewLocation, Program* texturedColoredShader, Program* blockColorShader)
+GameInProgress::GameInProgress(void (*SetState)(AppState*), bool keyPressed[360], std::map<std::string, Model*>* models, std::map<std::string, Renderer2D*>* renderer2Ds, GLuint colorLocation, GLuint modelViewLocation, Program* texturedColoredShader, Program* blockColorShader)
 {
 	this->SetState = SetState;
 	this->keyPressed = keyPressed;
 
-	this->asteroidModel = asteroidModel;
-	this->projectileModel = projectileModel;
-	this->shipModel = shipModel;
+	this->models = models;
+	this->renderer2Ds = renderer2Ds;
+	this->asteroidModel = models->at("asteroid");
+	this->projectileModel = models->at("projectile");
+	this->shipModel = models->at("ship");
 
 	this->colorLocation = colorLocation;
-	this->projectionLocation = projectionLocation;
-	this->viewLocation = viewLocation;
-	this->modelLocation = modelLocation;
+	this->modelViewLocation = modelViewLocation;
 
 	this->texturedColoredShader = texturedColoredShader;
 	this->blockColorShader = blockColorShader;
+
+	this->ftLibrary = ftLibrary;
+	this->ftMainFont = ftMainFont;
 
 	//set up game & world stuff
 	ship = new SpaceGameObject(
@@ -235,9 +239,7 @@ GameInProgress::GameInProgress(void (*SetState)(AppState*), bool keyPressed[360]
 		glm::vec3(0.0f, 0.0f, 0.0f),	//rot vel
 		glm::vec3(270.0f, 50.0f, 0.0f),	//rot
 		glm::vec3(0.05f, 0.05f, 0.05f), //scale
-		projectionLocation,
-		viewLocation,
-		modelLocation,
+		modelViewLocation,
 		unordered_set<tag>{ SHIP }
 	);
 	//the ship has drag
@@ -302,9 +304,7 @@ void GameInProgress::Tick()
 			glm::vec3(0.2f, 0.1f, 0.3f),	//rot vel
 			glm::vec3(0.0f, 0.0f, 0.0f),	//rot
 			glm::vec3(scale, scale, scale),	//scale
-			projectionLocation,
-			viewLocation,
-			modelLocation,
+			modelViewLocation,
 			unordered_set<tag>{ ASTEROID }
 		);
 		objects.push_back(asteroid);
@@ -380,9 +380,7 @@ void GameInProgress::Tick()
 				glm::vec3(0, 0, 0),
 				glm::vec3(270.0f, 0.0f, 0.0f),
 				glm::vec3(0.005f, 0.005f, 0.005f), //glm::vec3(0.005f, 0.005f, 0.005f),
-				projectionLocation,
-				viewLocation,
-				modelLocation,
+				modelViewLocation,
 				unordered_set<tag>{ PROJECTILE },
 				PROJECTILE_DURATION
 			);
@@ -485,18 +483,21 @@ void GameInProgress::Tick()
 		DrawQuadTree(true, true, true, ship, collisionHandler, texturedColoredShader, blockColorShader, colorLocation);
 	}
 
+	glm::mat4 viewMatrix(glm::lookAt(glm::vec3(0, 0, 0), glm::vec3(0, 0, -1), glm::vec3(0, -1, 0)));
 	for (size_t i = 0; i < objects.size(); i++)
 	{
 		//Tick() everything
 		objects.at(i)->Tick();
 		//draw all objects, deleting any that have been marked for delete
-		objects.at(i)->Draw();
+		objects.at(i)->Draw(viewMatrix);
 		if (objects.at(i)->markedForDelete)
 		{
 			collisionHandler->Remove(objects.at(i));
 
 			if (objects.at(i) == ship) { //ship destroyed, game over
-				SetState(new MainMenu(SetState, keyPressed, asteroidModel, projectileModel, shipModel, colorLocation, modelLocation, projectionLocation, viewLocation, texturedColoredShader, blockColorShader)); //TODO display a game over message & kick back to main menu
+				SetState(new MainMenu(SetState, keyPressed, models, renderer2Ds, colorLocation, modelViewLocation, texturedColoredShader, blockColorShader)); //TODO display a game over message & kick back to main menu
+				//TODO display game over menu
+				return;
 			}
 			objects.erase(objects.begin() + i);
 			i--;

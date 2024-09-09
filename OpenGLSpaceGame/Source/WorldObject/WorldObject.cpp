@@ -12,15 +12,13 @@
 #include <iostream>
 
 
-WorldObject::WorldObject(Model* model, glm::vec3 position, glm::vec3 angle, glm::vec3 scale, GLuint projectionLocation, GLuint viewLocation, GLuint modelLocation, unordered_set<tag> tags)
+WorldObject::WorldObject(Model* model, glm::vec3 position, glm::vec3 angle, glm::vec3 scale, GLuint modelViewLocation, unordered_set<tag> tags)
 {
 	this->model = model;
 	this->position = position;
 	this->angle = angle;
 	this->scale = scale;
-	this->projectionLocation = projectionLocation;
-	this->viewLocation = viewLocation;
-	this->modelLocation = modelLocation;
+	this->modelViewLocation = modelViewLocation;
 	this->tags = tags;
 	this->markedForDelete = false;
 	boundingBox = nullptr;
@@ -70,9 +68,10 @@ void WorldObject::setScale(glm::vec3 scale)
 
 void WorldObject::Tick() {}
 
-void WorldObject::Draw()
+void WorldObject::Draw(glm::mat4 viewMatrix)
 {
 	/*
+* 
 		22.5.22
 		rotation works correctly
 		translation does nothing but doesn't cause drawing errors
@@ -83,37 +82,13 @@ void WorldObject::Draw()
 	*/
 	//calculate matrices
 		//THESE ARE IN REVERSE ORDER FOR A REASON. BECAUSE OPENGL USES COLUMN-MAJOR MATRICES.
-		//projection
-			//init with identity
-			//glm::mat4 projectionMatrix = glm::ortho(
-			//	1.0f, -1.0f,	//left-right
-			//	1.0f, -1.0f,	//bottom-top
-			//	1.0f, 100.0f	//near-far
-			//);
-			glm::mat4 projectionMatrix = glm::perspective(75.0f, 1.0f, 1.0f, 100.0f);
-		//view
-			//init with identity
-			glm::mat4 viewMatrix(glm::lookAt(glm::vec3(0,0,0),glm::vec3(0,0,-1),glm::vec3(0,-1,0)));
 		//model
 	//pass matrices to shader
 		glad_glUniformMatrix4fv(
-			projectionLocation,
+			modelViewLocation,
 			1,
 			GL_FALSE,
-			glm::value_ptr(projectionMatrix)
-		);
-		glad_glUniformMatrix4fv(
-			viewLocation,
-			1,
-			GL_FALSE,
-			glm::value_ptr(viewMatrix)
-		);
-
-		glad_glUniformMatrix4fv(
-			modelLocation,
-			1,
-			GL_FALSE,
-			glm::value_ptr(this->modelMatrix)
+			glm::value_ptr(viewMatrix * this->modelMatrix)
 		);
 	//draw
 	model->Draw();

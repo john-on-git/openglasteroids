@@ -7,7 +7,7 @@
 class SpaceGameObject : public WorldObject
 {
 	public:
-		SpaceGameObject(Model* model, glm::vec3 position, glm::vec3 velocity, glm::vec3 rotVelocity, glm::vec3 angle, glm::vec3 scale, GLuint projectionLocation, GLuint viewLocation, GLuint modelLocation, unordered_set<tag> tags);
+		SpaceGameObject(Model* model, glm::vec3 position, glm::vec3 velocity, glm::vec3 rotVelocity, glm::vec3 angle, glm::vec3 scale, GLuint modelViewLocation, unordered_set<tag> tags);
 		glm::vec3 getVelocity();
 		void setVelocity(glm::vec3 velocity);
 		glm::vec3 getRotationalVelocity();

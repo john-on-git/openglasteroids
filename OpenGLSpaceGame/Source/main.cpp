@@ -18,6 +18,8 @@
 #include <conio.h>
 #include <assimp/Importer.hpp>
 #include <assimp\postprocess.h>
+#include <ft2build.h>
+#include FT_FREETYPE_H
 
 #include "Program/program.hpp"
 #include "BufferedAiMesh/BufferedAiMesh.hpp"
@@ -26,26 +28,92 @@
 #include "Texture/Texture.hpp"
 #include "main.hpp"
 #include "QuadTreeCollisionHandler/QuadTreeCollisionHandler.hpp"
-
 #include "AppState/AppState.hpp"
 #include "AppState/MainMenu.hpp"
 #include "AppState/GameInProgress.hpp"
+#include "Renderer2D/Renderer2D.hpp"
 
 using namespace std;
 
 AppState* appState;
+GLFWwindow* window;
 bool keyPressed[360];
 
 //AppState uses GoF State Pattern, with main.cpp as the Context
 static void SetState(AppState* newState) {
-	delete appState;
+	auto oldState = appState;
+	//clear any GL state the old AppState left over
+	glad_glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glfwSwapBuffers(window);
+	glad_glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 	appState = newState;
+	delete oldState; //delete this after switching just in case deleting before causes any wacky behaviour
 }
 
 
 int main()
 {
-	srand(time(NULL));
+	//initialize freetype
+	FT_Library ftLibrary;
+	FT_Face ftMainFont;
+	FT_Error err;
+
+	err = FT_Init_FreeType(&ftLibrary);
+	if (err)
+	{
+		OutputDebugStringW(L"FATAL: failed to initialize freetype\n");
+		exit(1);
+	}
+	err = FT_New_Face(ftLibrary, "C:/Windows/Fonts/times.ttf", 0, &ftMainFont);
+	if (err)
+	{
+		OutputDebugStringW(L"FATAL: failed to load font (system does not support Times New Roman)\n");
+		exit(1);
+	}
+
+	//(!ftMainFont->size)
+	//FT_Set_Char_Size just calculates some values, then hands control to another function FT_Request_Size, which immediately errors if the above condition is false
+	//no idea why, the purpose of the function is to init Face->size, why would you first check if it's already init?
+	//docs: "When the FT_New_Face function is called (or one of its siblings), it automatically creates a new size object for the returned face. This size object is directly accessible as face−>size."
+	//So I guess it's a bug?
+	//it was bc the index in FT_New_Face was set to -1, docs say 0. -1 is for checking the number of faces
+	
+	err = FT_Set_Char_Size(
+		ftMainFont,
+		0, //docs say "Value of 0 for the character width means ‘same as character height’"
+		FONT_CHAR_SIZE*64, //docs say it's measured in 1/64 of pixel, and recommend mult by 64
+		WINDOW_WIDTH,
+		WINDOW_HEIGHT
+	);
+	if (err)
+	{
+		OutputDebugStringW(L"FATAL: failed to init font\n");
+		exit(1);
+	}
+	err = FT_Load_Glyph(
+		ftMainFont,
+		'A', //in ASCII
+		FT_LOAD_DEFAULT
+	);
+	if (err)
+	{
+		OutputDebugStringW(L"FATAL: failed to init font\n");
+		exit(1);
+	}
+	err = FT_Render_Glyph(ftMainFont->glyph, FT_RENDER_MODE_NORMAL);
+	if (err)
+	{
+		OutputDebugStringW(L"FATAL: failed to init font\n");
+		exit(1);
+	}
+	//TODO list of issues
+	//	1. ISSUE: ftMainFont->glyph->bitmap.buffer is nullptr. CAUSE: was not calling FT_Render_Glyph
+	//	2. ISSUE: crashes in Texture constructor. Probably because the bitmap is in the wrong format. CAUSE: old logic free'd the bitmap, causes a stack free bc it's no longer a pointer
+	//	3. ISSUE: doesn't crash but nothing renders. Prob an issue with the vert shader, or rendering something really wacky bc of the bitmap format
+
+	srand(time(NULL)); //initialize random
+
 	//initialize glfw
 	if (!glfwInit())
 	{
@@ -53,7 +121,7 @@ int main()
 		exit(1);
 	}
 	//initialize window
-	GLFWwindow* window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE, nullptr, nullptr);
+	window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE, nullptr, nullptr);
 	if (window == nullptr)
 	{
 		OutputDebugStringW(L"FATAL: failed to initialize glfw window\n");
@@ -62,12 +130,14 @@ int main()
 	glfwMakeContextCurrent(window);
 	glfwSetKeyCallback(window, key_callback);
 	glfwSwapInterval(1);
+	
 	//initialize glad
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
 		OutputDebugStringW(L"FATAL: failed to initialize glad\n");
 		exit(1);
 	}
+	
 	//glEnables
 	glad_glEnable(GL_DEPTH_TEST);
 	glad_glEnable(GL_TEXTURE_2D);
@@ -88,46 +158,55 @@ int main()
 		"Shaders/BlockColor/blockColor.frag",
 		"Shaders/BlockColor/blockColor.vert"
 	);
+	Program textShader2D(
+		"Shaders/TextShader2D/textShader2D.frag",
+		"Shaders/TextShader2D/textShader2D.vert"
+	);
 	//get uniform locations
 	blockColorShader.Use();
 	GLuint colorLocation = glad_glGetUniformLocation(blockColorShader.handle, "color");
 
 	texturedColoredShader.Use();
 	GLuint
-		textureLocation		= glad_glGetUniformLocation(texturedColoredShader.handle, "tex"),
-		colorMaskLocation	= glad_glGetUniformLocation(texturedColoredShader.handle, "colorMask"),
-		projectionLocation	= glad_glGetUniformLocation(texturedColoredShader.handle, "projection"),
-		viewLocation		= glad_glGetUniformLocation(texturedColoredShader.handle, "view"),
-		modelLocation		= glad_glGetUniformLocation(texturedColoredShader.handle, "model");
+		textureLocation	   = glad_glGetUniformLocation(texturedColoredShader.handle, "tex"),
+		colorMaskLocation  = glad_glGetUniformLocation(texturedColoredShader.handle, "colorMask"),
+		projectionLocation = glad_glGetUniformLocation(texturedColoredShader.handle, "projection"),
+		modelViewLocation  = glad_glGetUniformLocation(texturedColoredShader.handle, "modelView");
+
+	//set up projection matrix
+		//init with identity
+		//glm::mat4 projectionMatrix = glm::ortho(
+		//	1.0f, -1.0f,	//left-right
+		//	1.0f, -1.0f,	//bottom-top
+		//	1.0f, 100.0f	//near-far
+		//);
+	glm::mat4 projectionMatrix = glm::perspective(75.0f, 1.0f, 1.0f, 100.0f);
+	//view
+	glad_glUniformMatrix4fv(
+		projectionLocation,
+		1,
+		GL_FALSE,
+		glm::value_ptr(projectionMatrix)
+	);
+
 	//check for failure
-	if (projectionLocation == -1 || viewLocation == -1 || modelLocation == -1)
+	if (projectionLocation == -1 || modelViewLocation == -1)
 	{
 		OutputDebugStringW(L"FATAL: couldn't get uniform location\n");
 		exit(1);
 	}
 
-	//textures
-	auto shipTex = Texture("textures/blankwhite.png");
-	auto projectileTex = Texture("textures/blankwhite.png");
+	//textures (from file)
+	auto blankWhiteTex = Texture("textures/blankwhite.png");
 	auto graniteTex = Texture("textures/wikimedia_Pink_granite_tileable_1024x1024.png");
 
+	//textures (font)
+	auto newGameTextTex = Texture(ftMainFont->glyph->bitmap);
+
+	//2d renderers
+	auto newGameTextRenderer = Renderer2D(&newGameTextTex); //TODO
+
 	//model
-	auto shipModel = Model(
-		"Models/ship.obj",
-		textureLocation,
-		colorMaskLocation,
-		std::vector<GLuint>{ shipTex.handle },
-		std::vector<glm::vec4>{ glm::vec4(1, 1, 1, 1) },
-		1
-	);
-	auto projectileModel = Model(
-		"Models/sphere.obj",
-		textureLocation,
-		colorMaskLocation,
-		std::vector<GLuint>{ projectileTex.handle },
-		std::vector<glm::vec4>{ glm::vec4(2, 2, 2, 1) },
-		1
-	);
 	auto asteroidModel = Model(
 		"Models/cube.obj",
 		textureLocation,
@@ -136,8 +215,43 @@ int main()
 		std::vector<glm::vec4>{ glm::vec4(1, 1, 1, 1) },
 		1
 	);
+	auto projectileModel = Model(
+		"Models/sphere.obj",
+		textureLocation,
+		colorMaskLocation,
+		std::vector<GLuint>{ blankWhiteTex.handle },
+		std::vector<glm::vec4>{ glm::vec4(2, 2, 2, 1) },
+		1
+	);
+	auto planeModel = Model(
+		"Models/plane.obj",
+		textureLocation,
+		colorMaskLocation,
+		std::vector<GLuint>{ blankWhiteTex.handle },
+		std::vector<glm::vec4>{ glm::vec4(1, 1, 1, 1) },
+		1
+	);
+	auto shipModel = Model(
+		"Models/ship.obj",
+		textureLocation,
+		colorMaskLocation,
+		std::vector<GLuint>{ blankWhiteTex.handle },
+		std::vector<glm::vec4>{ glm::vec4(1, 1, 1, 1) },
+		1
+	);
 
-	appState = new MainMenu(SetState, keyPressed, &asteroidModel, &projectileModel, &shipModel, colorLocation, modelLocation, projectionLocation, viewLocation, &texturedColoredShader, &blockColorShader);
+	std::map<std::string, Model*> models = {
+		{"asteroid",&asteroidModel},
+		{"projectile", &projectileModel},
+		{"plane", &planeModel},
+		{"ship", &shipModel}
+	};
+
+	std::map<std::string, Renderer2D*> renderer2ds = {
+		{"newGameText",&newGameTextRenderer}
+	};
+
+	appState = new MainMenu(SetState, keyPressed, &models, &renderer2ds, colorLocation, modelViewLocation, &texturedColoredShader, &blockColorShader);
 
 	while (!glfwWindowShouldClose(window)) //window
 	{

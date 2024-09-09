@@ -2,24 +2,29 @@
 
 #include "AppState.hpp"
 #include "../Model/Model.hpp"
-#include "../Program/program.hpp"
+#include "../Program/Program.hpp"
+#include "../Renderer2D/Renderer2D.hpp"
+#include <ft2build.h>
+#include <map>
+#include FT_FREETYPE_H
 
 class MainMenu : public AppState
 {
 	protected:
-		Model* asteroidModel;
-		Model* projectileModel;
-		Model* shipModel;
+		std::map<std::string,Model*>* models;
+		std::map<std::string, Renderer2D*>* renderer2Ds;
+		Renderer2D* newGameRenderer;
 
 		GLuint colorLocation;
-		GLuint projectionLocation;
-		GLuint viewLocation;
-		GLuint modelLocation;
+		GLuint modelViewLocation;
 
 		Program* texturedColoredShader;
 		Program* blockColorShader;
+
+		FT_Library* ftLibrary;
+		FT_Face* ftMainFont;
 	public:
-		MainMenu(void (*SetState)(AppState*), bool keyPressed[360], Model* asteroidModel, Model* projectileModel, Model* shipModel, GLuint colorLocation, GLuint modelLocation, GLuint projectionLocation, GLuint viewLocation, Program* texturedColoredShader, Program* blockColorShader);
+		MainMenu(void (*SetState)(AppState*), bool keyPressed[360], std::map<std::string,Model*>* models, std::map<std::string, Renderer2D*>* renderer2Ds, GLuint colorLocation, GLuint modelViewLocation, Program* texturedColoredShader, Program* blockColorShader);
 		// Inherited via AppState
 		virtual void Tick() override;
 };

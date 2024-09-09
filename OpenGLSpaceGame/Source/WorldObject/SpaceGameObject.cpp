@@ -11,7 +11,7 @@
 #include "../Delta/DeltaProviders/SpacegameObjectRotationalVelocityProvider.hpp"
 #include "../Model/Model.hpp"
 
-SpaceGameObject::SpaceGameObject(Model* model, glm::vec3 position, glm::vec3 velocity, glm::vec3 rotVelocity, glm::vec3 angle, glm::vec3 scale, GLuint projectionLocation, GLuint viewLocation, GLuint modelLocation, unordered_set<tag> tags) : WorldObject(model, position, angle, scale, projectionLocation, viewLocation, modelLocation, tags)
+SpaceGameObject::SpaceGameObject(Model* model, glm::vec3 position, glm::vec3 velocity, glm::vec3 rotVelocity, glm::vec3 angle, glm::vec3 scale, GLuint modelViewLocation, unordered_set<tag> tags) : WorldObject(model, position, angle, scale, modelViewLocation, tags)
 {
 	this->velocity = velocity;
 	velocityDelta = new Delta<glm::vec3>(
