@@ -24,7 +24,6 @@ Texture::Texture(const char* path)
 	this->handle = handle;
 }
 
-//https://freetype.org/freetype2/docs/glyphs/glyphs-7.html
 Texture::Texture(FT_Bitmap bitmap)
 {
 	constexpr char STRIDE = 4;
