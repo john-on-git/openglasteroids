@@ -6,10 +6,10 @@
 constexpr auto STRIDE = 6; //width of each vert
 constexpr auto INDICES_PER_TRI = 3;
 
-BufferedAiMesh::BufferedAiMesh(aiMesh* mesh, GLuint texture, glm::vec4 colorMask, GLuint textureLocation, GLuint colorLocation)
+BufferedAiMesh::BufferedAiMesh(aiMesh* mesh, GLuint textureHandle, glm::vec4 colorMask, GLuint textureLocation, GLuint colorLocation)
 {
 	//init properties
-	this->texture = texture;
+	this->textureHandle = textureHandle;
 	this->colorMask = colorMask;
 	this->textureLocation = textureLocation;
 	this->colorLocation = colorLocation;
@@ -62,7 +62,6 @@ BufferedAiMesh::BufferedAiMesh(aiMesh* mesh, GLuint texture, glm::vec4 colorMask
 	delete[] vertIndices;
 
 	//set vertex attrib pointers
-	glad_glEnableVertexAttribArray(0);
 	glad_glVertexAttribPointer( //position
 		0,
 		4,
@@ -75,8 +74,8 @@ BufferedAiMesh::BufferedAiMesh(aiMesh* mesh, GLuint texture, glm::vec4 colorMask
 		*/
 		nullptr
 	);
+	glad_glEnableVertexAttribArray(0);
 
-	glad_glEnableVertexAttribArray(1);
 	glad_glVertexAttribPointer( //texCoord
 		1,
 		2,
@@ -85,6 +84,7 @@ BufferedAiMesh::BufferedAiMesh(aiMesh* mesh, GLuint texture, glm::vec4 colorMask
 		STRIDE * sizeof(GLfloat), //1.7.22 same here
 		(GLvoid*)(4 * sizeof(GLfloat)) //offset
 	);
+	glad_glEnableVertexAttribArray(1);
 }
 
 void BufferedAiMesh::Draw()
@@ -96,7 +96,7 @@ void BufferedAiMesh::Draw()
 		//set uniform value
 		glad_glActiveTexture(GL_TEXTURE0);
 
-		glad_glBindTexture(GL_TEXTURE_2D, texture); 
+		glad_glBindTexture(GL_TEXTURE_2D, textureHandle); 
 		//apparently the correct way to do this is to build a RAM representation of which textures are bound, and first use it to check if the texture is already bound, 
 		//as it's cheaper than redundantly sending it to the GPU (a very expensive operation at this timescale)
 		

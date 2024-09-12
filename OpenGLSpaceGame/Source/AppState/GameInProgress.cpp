@@ -211,7 +211,7 @@ static void DrawQuadTree(bool drawAllRegions, bool drawShipRegion, bool drawShip
 }
 
 
-GameInProgress::GameInProgress(void (*SetState)(AppState*), bool keyPressed[360], std::map<std::string, Model*>* models, std::map<std::string, Renderer2D*>* renderer2Ds, GLuint colorLocation, GLuint modelViewLocation, Program* texturedColoredShader, Program* blockColorShader)
+GameInProgress::GameInProgress(void (*SetState)(AppState*), bool keyPressed[360], std::map<std::string, Model*>* models, std::map<std::string, Renderer2D*>* renderer2Ds, GLuint colorLocation, GLuint modelViewLocation, Program* texturedColoredShader, Program* blockColorShader, Program* textShader2D)
 {
 	this->SetState = SetState;
 	this->keyPressed = keyPressed;
@@ -227,6 +227,7 @@ GameInProgress::GameInProgress(void (*SetState)(AppState*), bool keyPressed[360]
 
 	this->texturedColoredShader = texturedColoredShader;
 	this->blockColorShader = blockColorShader;
+	this->textShader2D = textShader2D;
 
 	this->ftLibrary = ftLibrary;
 	this->ftMainFont = ftMainFont;
@@ -268,6 +269,10 @@ GameInProgress::GameInProgress(void (*SetState)(AppState*), bool keyPressed[360]
 
 	showDebugInfo = false;
 	showDebugInfoToggleDelay = 0;
+}
+void GameInProgress::OnEntry()
+{
+	texturedColoredShader->Use();
 }
 void GameInProgress::Tick()
 {
@@ -368,13 +373,13 @@ void GameInProgress::Tick()
 			TemporarySpaceGameObject* projectile = new TemporarySpaceGameObject(
 				projectileModel,
 				glm::vec3(
-					ship->getPosition().x + (sin(rad) * 0.10), //second half moves the spawn point away from the center of the ship
-					ship->getPosition().y + (cos(rad) * 0.10), //0.05 is the distance between the center and tip
+					ship->getPosition().x + (cos(rad) * 0.10), //second half moves the spawn point away from the center of the ship
+					ship->getPosition().y + (sin(rad) * 0.10), //0.05 is the distance between the center and tip
 					ship->getPosition().z
 				),
 				glm::vec3(
-					shipVelocity.x + (sin(rad) * PROJECTILE_VELOCITY_MULT),
-					shipVelocity.y + (cos(rad) * PROJECTILE_VELOCITY_MULT),
+					shipVelocity.x + (cos(rad) * PROJECTILE_VELOCITY_MULT),
+					shipVelocity.y + (sin(rad) * PROJECTILE_VELOCITY_MULT),
 					shipVelocity.z + 0.0f
 				),
 				glm::vec3(0, 0, 0),
@@ -395,7 +400,7 @@ void GameInProgress::Tick()
 	if (showDebugInfoToggleDelay > 0) { showDebugInfoToggleDelay--; }
 	if (keyPressed[GLFW_KEY_F5] && showDebugInfoToggleDelay == 0)
 	{
-		showDebugInfo = !showDebugInfo; //no Intellisense, bitwise ~ was not intended
+		showDebugInfo = !showDebugInfo;
 		showDebugInfoToggleDelay = SHOW_DEBUG_INFO_TOGGLE_DELAY;
 	}
 
@@ -473,9 +478,6 @@ void GameInProgress::Tick()
 	}
 	delete collisions;
 
-	//clear framebuffers
-	glad_glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 	//draw debug info
 	if (showDebugInfo)
 	{
@@ -498,7 +500,7 @@ void GameInProgress::Tick()
 			collisionHandler->Remove(objects.at(i));
 
 			if (objects.at(i) == ship) { //ship destroyed, game over
-				SetState(new MainMenu(SetState, keyPressed, models, renderer2Ds, colorLocation, modelViewLocation, texturedColoredShader, blockColorShader)); //TODO display a game over message & kick back to main menu
+				SetState(new MainMenu(SetState, keyPressed, models, renderer2Ds, colorLocation, modelViewLocation, texturedColoredShader, blockColorShader, textShader2D)); //TODO display a game over message & kick back to main menu
 				//TODO display game over menu
 				return;
 			}

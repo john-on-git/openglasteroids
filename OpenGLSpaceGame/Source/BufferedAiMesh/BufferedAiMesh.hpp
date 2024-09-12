@@ -19,6 +19,6 @@ class BufferedAiMesh
 		GLuint buffers[2]; //vertex buffer, and vertex index buffer
 		GLuint textureLocation;
 		GLuint colorLocation;
-		GLuint texture;
+		GLuint textureHandle;
 		GLsizei numIndices;
 };

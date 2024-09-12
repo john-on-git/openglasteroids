@@ -1,12 +1,11 @@
 #version 410 core
 
-in vec4 colorMask; //this is being passed correctly
-in vec2 texCoords; //this isn't... Because they need to have the same variable name!?
+in vec2 texCoords;
 
 uniform sampler2D tex;
 
 out vec4 colorOut;
 
 void main() {
-	colorOut = texture(tex, texCoords) * colorMask;
+	colorOut = texture(tex, texCoords);
 }

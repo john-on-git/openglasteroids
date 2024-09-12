@@ -10,5 +10,5 @@ class Texture
 		Texture(FT_Bitmap bitmap);
 		
 		const char* path;
-		unsigned int handle;
+		GLuint handle;
 };

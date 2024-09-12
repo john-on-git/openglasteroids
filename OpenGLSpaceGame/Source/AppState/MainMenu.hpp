@@ -20,12 +20,14 @@ class MainMenu : public AppState
 
 		Program* texturedColoredShader;
 		Program* blockColorShader;
+		Program* textShader2D;
 
 		FT_Library* ftLibrary;
 		FT_Face* ftMainFont;
 	public:
-		MainMenu(void (*SetState)(AppState*), bool keyPressed[360], std::map<std::string,Model*>* models, std::map<std::string, Renderer2D*>* renderer2Ds, GLuint colorLocation, GLuint modelViewLocation, Program* texturedColoredShader, Program* blockColorShader);
+		MainMenu(void (*SetState)(AppState*), bool keyPressed[360], std::map<std::string, Model*>* models, std::map<std::string, Renderer2D*>* renderer2Ds, GLuint colorLocation, GLuint modelViewLocation, Program* texturedColoredShader, Program* blockColorShader, Program* textShader2D);
 		// Inherited via AppState
+		virtual void OnEntry() override;
 		virtual void Tick() override;
 };
 

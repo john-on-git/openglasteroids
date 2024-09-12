@@ -2,27 +2,19 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 
-void Renderer2D::Draw(glm::vec2 position, glm::vec2 size)
+
+static constexpr char NUM_VERTS = 6;
+static constexpr char STRIDE = 4; //vec2 vert coords + vec2 texture coords
+static constexpr GLfloat VERTS[NUM_VERTS * STRIDE] = {
+	-1,-1, 0,0,		1,-1, 1,0,
+	-1, 1, 0,1,		1, 1, 1,1,
+};
+static constexpr GLushort VERT_INDICES[NUM_VERTS] = { 0,1,2,	1,2,3 };
+
+Renderer2D::Renderer2D(GLuint textureHandle, GLuint textureLocation)
 {
-	glad_glBindVertexArray(VAO);
-
-	glad_glActiveTexture(GL_TEXTURE0);
-	glad_glBindTexture(GL_TEXTURE_2D, texture->handle);
-
-	glad_glUniform1i(textTextureLocation, 0);
-	//draw (crashes)
-	glad_glDrawElements(
-		GL_TRIANGLES,
-		NUM_VERTS,
-		GL_UNSIGNED_SHORT,
-		nullptr
-	);
-}
-
-Renderer2D::Renderer2D(Texture* texture, GLuint textTextureLocation)
-{
-	this->texture = texture;
-	this->textTextureLocation = textTextureLocation;
+	this->textureHandle = textureHandle;
+	this->textureLocation = textureLocation;
 
 	//generate vertex array object
 	glad_glGenVertexArrays(1, &VAO);
@@ -34,7 +26,7 @@ Renderer2D::Renderer2D(Texture* texture, GLuint textTextureLocation)
 	glad_glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
 	glad_glBufferData( //add verts to buffer
 		GL_ARRAY_BUFFER,
-		static_cast<size_t>(NUM_VERTS) * STRIDE * sizeof(GLfloat),
+		sizeof(VERTS),
 		VERTS,
 		GL_STATIC_DRAW
 	);
@@ -42,13 +34,12 @@ Renderer2D::Renderer2D(Texture* texture, GLuint textTextureLocation)
 	glad_glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers[1]);
 	glad_glBufferData( //add verts to buffer
 		GL_ELEMENT_ARRAY_BUFFER,
-		static_cast<size_t>(NUM_VERTS) * sizeof(GLshort),
-		VERTS,
+		sizeof(VERT_INDICES),
+		VERT_INDICES,
 		GL_STATIC_DRAW
 	);
 		
 	//set vertex attrib pointers
-	glad_glEnableVertexAttribArray(0);
 	glad_glVertexAttribPointer( //position
 		0,
 		2,
@@ -57,8 +48,8 @@ Renderer2D::Renderer2D(Texture* texture, GLuint textTextureLocation)
 		STRIDE * sizeof(GLfloat),
 		nullptr
 	);
+	glad_glEnableVertexAttribArray(0);
 
-	glad_glEnableVertexAttribArray(1);
 	glad_glVertexAttribPointer( //texCoord
 		1,
 		2,
@@ -67,5 +58,22 @@ Renderer2D::Renderer2D(Texture* texture, GLuint textTextureLocation)
 		STRIDE * sizeof(GLfloat),
 		(GLvoid*)(2 * sizeof(GLfloat)) //offset
 	);
+	glad_glEnableVertexAttribArray(1);
+}
 
+void Renderer2D::Draw(glm::vec2 position, glm::vec2 size)
+{
+	glad_glBindVertexArray(VAO);
+
+	glad_glActiveTexture(GL_TEXTURE0);
+	glad_glBindTexture(GL_TEXTURE_2D, textureHandle);
+
+	glad_glUniform1i(textureLocation, 0);
+
+	glad_glDrawElements(
+		GL_TRIANGLES,
+		NUM_VERTS,
+		GL_UNSIGNED_SHORT,
+		nullptr
+	);
 }

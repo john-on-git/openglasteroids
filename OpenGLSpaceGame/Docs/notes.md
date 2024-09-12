@@ -69,3 +69,4 @@ What's the best way to implement projectile decay?
 		- Game Ends When 0 lives or 9999 score.
 		- AFter game ends, user is prompted to enter name for score.
 	
+- The 2D draw error is: 1282 GL_INVALID_OPERATION Wrong Component Type or Count". This indicates that the wrong type is being put in a uniform. There's only one uniform (texture), and it's Sampler2D.

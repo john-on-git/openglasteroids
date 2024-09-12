@@ -1,9 +1,10 @@
 #include "MainMenu.hpp"
 #include "GameInProgress.hpp"
+#include "../Renderer2D/Renderer2D.hpp"
 
 #include <GLFW/glfw3.h>
 
-MainMenu::MainMenu(void (*SetState)(AppState*), bool keyPressed[360], std::map<std::string,Model*>* models, std::map<std::string, Renderer2D*>* renderer2Ds, GLuint colorLocation, GLuint modelViewLocation, Program* texturedColoredShader, Program* blockColorShader)
+MainMenu::MainMenu(void (*SetState)(AppState*), bool keyPressed[360], std::map<std::string,Model*>* models, std::map<std::string, Renderer2D*>* renderer2Ds, GLuint colorLocation, GLuint modelViewLocation, Program* texturedColoredShader, Program* blockColorShader, Program* textShader2D)
 {
 	this->SetState = SetState;
 	this->keyPressed = keyPressed;
@@ -17,16 +18,21 @@ MainMenu::MainMenu(void (*SetState)(AppState*), bool keyPressed[360], std::map<s
 
 	this->texturedColoredShader = texturedColoredShader;
 	this->blockColorShader = blockColorShader;
+	this->textShader2D = textShader2D;
 
 	this->ftLibrary = ftLibrary;
 	this->ftMainFont = ftMainFont;
 }
 
+void MainMenu::OnEntry()
+{
+	textShader2D->Use();
+}
 void MainMenu::Tick()
 {
 	newGameRenderer->Draw(glm::vec2(0, 0), glm::vec2(1, 1));
 	if (keyPressed[GLFW_KEY_ENTER]) //TODO placeholder replace once clicky buttons implemented
 	{
-		SetState(new GameInProgress(SetState, keyPressed, models, renderer2Ds, colorLocation, modelViewLocation, texturedColoredShader, blockColorShader));
+		SetState(new GameInProgress(SetState, keyPressed, models, renderer2Ds, colorLocation, modelViewLocation, texturedColoredShader, blockColorShader, textShader2D));
 	}
 }

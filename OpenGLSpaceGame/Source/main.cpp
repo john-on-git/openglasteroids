@@ -49,8 +49,13 @@ static void SetState(AppState* newState) {
 
 	appState = newState;
 	delete oldState; //delete this after switching just in case deleting before causes any wacky behaviour
+	appState->OnEntry();
 }
 
+static void GLErrorCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam)
+{
+	std::cerr << "GL Error: " << id << " " << message << std::endl;
+}
 
 int main()
 {
@@ -132,6 +137,7 @@ int main()
 	glfwSwapInterval(1);
 	
 	//initialize glad
+
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
 		OutputDebugStringW(L"FATAL: failed to initialize glad\n");
@@ -139,13 +145,14 @@ int main()
 	}
 	
 	//glEnables
+	glad_glEnable(GL_DEBUG_OUTPUT);
 	glad_glEnable(GL_DEPTH_TEST);
 	glad_glEnable(GL_TEXTURE_2D);
 	glad_glEnable(GL_BLEND);
 	glad_glBlendEquation(GL_FUNC_ADD); // this is default
 	glad_glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	//gl drawing config
-	glad_glClearColor(0.0f, 0.0f, 0.0f, 1);
+	glad_glClearColor(0.0f, 0.0f, 1.0f, 1);
 	glad_glPointSize(5.0f);
 
 	//shader setup
@@ -164,7 +171,7 @@ int main()
 	);
 	//get uniform locations
 	textShader2D.Use();
-	GLuint textTextureLocation = glad_glGetUniformLocation(texturedColoredShader.handle, "tex");
+	GLuint textureLocation2D = 0;//glad_glGetUniformLocation(textShader2D.handle, "tex");
 
 	blockColorShader.Use();
 	GLuint colorLocation = glad_glGetUniformLocation(blockColorShader.handle, "color");
@@ -181,7 +188,7 @@ int main()
 		projectionLocation,
 		1,
 		GL_FALSE,
-		glm::value_ptr(glm::perspective(75.0f, 1.0f, 0.1f, 10.0f))
+		glm::value_ptr(glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, 0.1f, 10.0f)) //glm::value_ptr(glm::perspective(75.0f, 1.0f, 0.1f, 10.0f))
 	);
 
 	//check for failure
@@ -200,7 +207,7 @@ int main()
 	auto newGameTextTex = Texture(ftMainFont->glyph->bitmap);
 
 	//2d renderers
-	auto newGameTextRenderer = Renderer2D(&cubeTex, textTextureLocation); //TODO
+	auto newGameTextRenderer = Renderer2D(cubeTex.handle, textureLocation2D); //TODO
 
 	//model
 	auto asteroidModel = Model(
@@ -231,7 +238,7 @@ int main()
 		"Models/ship.obj",
 		textureLocation,
 		colorMaskLocation,
-		std::vector<GLuint>{ greeblingTex.handle },
+		std::vector<GLuint>{ blankWhiteTex.handle },
 		std::vector<glm::vec4>{ glm::vec4(1, 1, 1, 1) },
 		1
 	);
@@ -247,23 +254,24 @@ int main()
 		{"newGameText",&newGameTextRenderer}
 	};
 
-	appState = new MainMenu(SetState, keyPressed, &models, &renderer2ds, colorLocation, modelViewLocation, &texturedColoredShader, &blockColorShader);
-
+	SetState(new MainMenu(SetState, keyPressed, &models, &renderer2ds, colorLocation, modelViewLocation, &texturedColoredShader, &blockColorShader, &textShader2D));
 	while (!glfwWindowShouldClose(window)) //window
 	{
+		//clear framebuffers
+		glad_glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 		//check for button clicks
 		appState->Tick();
 
-		//cerr << "High scores not implemented" << endl;
-
+		glad_glDebugMessageCallback(GLErrorCallback, nullptr);
 		//check for GL errors
+		/* TODO uncomment or delete
 		GLenum err = glad_glGetError();
 		while (err != GL_NO_ERROR)
 		{
-			cout << "\nGL Error: " << to_string(err);
+			cout << "\nGL Error: " << to_string(err) << endl;
 			err = glad_glGetError();
-			err = glad_glGetError();
-		}
+		}*/
 		//glfw stuff
 		glfwSwapBuffers(window);
 		glfwPollEvents();

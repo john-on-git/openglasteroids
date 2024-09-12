@@ -53,10 +53,10 @@ protected:
 		);
 
 		GLuint textureLocation = glad_glGetUniformLocation(texturedColoredShader.handle, "tex");
-		GLuint colorMaskLocation = glad_glGetUniformLocation(texturedColoredShader.handle, "colorMask");
-		projectionLocation = glad_glGetUniformLocation(texturedColoredShader.handle, "projection");
-		viewLocation = glad_glGetUniformLocation(texturedColoredShader.handle, "view");
-		viewModelLocation = glad_glGetUniformLocation(texturedColoredShader.handle, "model");
+		GLuint 
+			colorMaskLocation = glad_glGetUniformLocation(texturedColoredShader.handle, "colorMask"),
+			projectionLocation = glad_glGetUniformLocation(texturedColoredShader.handle, "projection"),
+			modelViewLocation = glad_glGetUniformLocation(texturedColoredShader.handle, "modelView");
 
 		Texture shipTex = Texture("C:\\Users\\John\\source\\repos\\OpenGLSpaceGame\\OpenGLSpaceGame\\Textures\\ship.png");
 
@@ -79,7 +79,7 @@ protected:
 	}
 	Model* cubeModel;
 	Model* shipModel;
-	GLuint projectionLocation, viewLocation, viewModelLocation;
+	GLuint modelViewLocation;
 };
 
 //that the correct face data is generated for a basic object
@@ -89,9 +89,7 @@ TEST_F(CollisionDetectionTests, CorrectFacesForCubeAtOrigin) {
 		glm::vec3(0.0f, 0.0f, 0.0f), //pos
 		glm::vec3(0.0f, 0.0f, 0.0f), //rot
 		glm::vec3(1.0f, 1.0f, 1.0f), //scale (1.0f = 2 units wide cube)
-		projectionLocation,
-		viewLocation,
-		viewModelLocation,
+		modelViewLocation,
 		unordered_set<tag>{ }
 	);
 	//there are twelve faces because each square "face" of the cube is split into two tris
@@ -143,9 +141,7 @@ TEST_F(CollisionDetectionTests, CubesIntersectingNearOrigin) {
 		glm::vec3(0.0f, 0.0f, 0.0f), //pos
 		glm::vec3(0.0f, 0.0f, 0.0f), //rot
 		glm::vec3(1.0f, 1.0f, 1.0f), //scale (1.0f = 2 units wide cube)
-		projectionLocation,
-		viewLocation,
-		viewModelLocation,
+		modelViewLocation,
 		unordered_set<tag>{ }
 	);
 	auto secondCube = WorldObject(
@@ -153,9 +149,7 @@ TEST_F(CollisionDetectionTests, CubesIntersectingNearOrigin) {
 		glm::vec3(1.9f, 0.1f, 0.1f), //pos
 		glm::vec3(0.0f, 0.0f, 0.0f), //rot
 		glm::vec3(1.0f, 1.0f, 1.0f), //scale (1.0f = 2 units wide cube)
-		projectionLocation,
-		viewLocation,
-		viewModelLocation,
+		modelViewLocation,
 		unordered_set<tag>{ }
 	);
 	QuadTreeCollisionHandler collisionHandler(
@@ -183,9 +177,7 @@ TEST_F(CollisionDetectionTests, CubesIntersectingFarFromOrigin) {
 		glm::vec3(0.0f + 20.0f, 0.0f + 20.0f, 0.0f + 20.0f), //pos
 		glm::vec3(0.0f, 0.0f, 0.0f), //rot
 		glm::vec3(1.0f, 1.0f, 1.0f), //scale (1.0f = 2 units wide cube)
-		projectionLocation,
-		viewLocation,
-		viewModelLocation,
+		modelViewLocation,
 		unordered_set<tag>{ }
 	);
 	auto secondCube = WorldObject(
@@ -193,9 +185,7 @@ TEST_F(CollisionDetectionTests, CubesIntersectingFarFromOrigin) {
 		glm::vec3(1.9f + 20.0f, 0.1f + 20.0f, 0.1f + 20.0f), //pos
 		glm::vec3(0.0f, 0.0f, 0.0f), //rot
 		glm::vec3(1.0f, 1.0f, 1.0f), //scale (1.0f = 2 units wide cube)
-		projectionLocation,
-		viewLocation,
-		viewModelLocation,
+		modelViewLocation,
 		unordered_set<tag>{ }
 	);
 	QuadTreeCollisionHandler collisionHandler(
@@ -233,9 +223,7 @@ TEST_F(CollisionDetectionTests, CubesNonintersectingNearOrigin) {
 		glm::vec3(0.0f, 0.0f, 0.0f), //pos
 		glm::vec3(0.0f, 0.0f, 0.0f), //rot
 		glm::vec3(1.0f, 1.0f, 1.0f), //scale (1.0f = 2 units wide cube)
-		projectionLocation,
-		viewLocation,
-		viewModelLocation,
+		modelViewLocation,
 		unordered_set<tag>{ }
 	);
 	auto secondCube = WorldObject(
@@ -243,9 +231,7 @@ TEST_F(CollisionDetectionTests, CubesNonintersectingNearOrigin) {
 		glm::vec3(2.001f, 0.1f, 0.1f), //pos
 		glm::vec3(0.0f, 0.0f, 0.0f), //rot
 		glm::vec3(1.0f, 1.0f, 1.0f), //scale (1.0f = 2 units wide cube)
-		projectionLocation,
-		viewLocation,
-		viewModelLocation,
+		modelViewLocation,
 		unordered_set<tag>{ }
 	);
 	QuadTreeCollisionHandler collisionHandler(
@@ -265,9 +251,7 @@ TEST_F(CollisionDetectionTests, CubesNonintersectingFarFromOrigin) {
 		glm::vec3(0.0f + 20.0f, 0.0f + 20.0f, 0.0f + 20.0f), //pos
 		glm::vec3(0.0f, 0.0f, 0.0f), //rot
 		glm::vec3(1.0f, 1.0f, 1.0f), //scale (1.0f = 2 units wide cube)
-		projectionLocation,
-		viewLocation,
-		viewModelLocation,
+		modelViewLocation,
 		unordered_set<tag>{ }
 	);
 	auto secondCube = WorldObject(
@@ -275,9 +259,7 @@ TEST_F(CollisionDetectionTests, CubesNonintersectingFarFromOrigin) {
 		glm::vec3(2.001f + 20.0f, 0.1f + 20.0f, 0.1f + 20.0f), //pos
 		glm::vec3(0.0f, 0.0f, 0.0f), //rot
 		glm::vec3(1.0f, 1.0f, 1.0f), //scale (1.0f = 2 units wide cube)
-		projectionLocation,
-		viewLocation,
-		viewModelLocation,
+		modelViewLocation,
 		unordered_set<tag>{ }
 	);
 	QuadTreeCollisionHandler collisionHandler(
@@ -312,9 +294,7 @@ TEST_F(CollisionDetectionTests, ManuallyFoundFalsePositive) {
 		glm::vec3(-0.984208584f, -1.37918746f, -15.0f), //pos
 		glm::vec3(270.0f, 316.4f, 0.0f), //rot
 		glm::vec3(1.0f, 1.0f, 1.0f), //scale (1.0f = 2 units wide cube)
-		projectionLocation,
-		viewLocation,
-		viewModelLocation,
+		modelViewLocation,
 		unordered_set<tag>{ SHIP }
 	);
 	auto cube = WorldObject(
@@ -322,9 +302,7 @@ TEST_F(CollisionDetectionTests, ManuallyFoundFalsePositive) {
 		glm::vec3(0.4f,   0.4f, -15.0f), //pos
 		glm::vec3(270.0f, 0.0f, 0.0f), //rot
 		glm::vec3(1.0f,   1.0f, 1.0f), //scale (1.0f = 2 units wide cube)
-		projectionLocation,
-		viewLocation,
-		viewModelLocation,
+		modelViewLocation,
 		unordered_set<tag>{ }
 	);
 	QuadTreeCollisionHandler collisionHandler(
