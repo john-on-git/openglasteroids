@@ -9,6 +9,5 @@ class Texture
 		Texture(const char* path);
 		Texture(FT_Bitmap bitmap);
 		
-		const char* path;
 		GLuint handle;
 };

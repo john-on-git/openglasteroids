@@ -30,7 +30,7 @@ void MainMenu::OnEntry()
 }
 void MainMenu::Tick()
 {
-	newGameRenderer->Draw(glm::vec2(0, 0), glm::vec2(1, 1));
+	newGameRenderer->Draw();
 	if (keyPressed[GLFW_KEY_ENTER]) //TODO placeholder replace once clicky buttons implemented
 	{
 		SetState(new GameInProgress(SetState, keyPressed, models, renderer2Ds, colorLocation, modelViewLocation, texturedColoredShader, blockColorShader, textShader2D));

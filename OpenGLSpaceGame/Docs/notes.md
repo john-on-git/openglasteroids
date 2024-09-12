@@ -45,7 +45,16 @@ What's the best way to implement projectile decay?
 	- Should really just use inheritance to get the funcitonality of different object types, composition system rn is rubbish.
 
 - Freetype for text rendering?
-	
+	- TODO
+		1. Render anything 2d on screen. DONE
+			1. ISSUE: ftMainFont->glyph->bitmap.buffer is nullptr. CAUSE: was not calling FT_Render_Glyph
+			2. ISSUE: crashes in Texture constructor. Probably because the bitmap is in the wrong format. CAUSE: old logic free'd the bitmap, causes a stack free bc it's no longer a pointer
+			3. ISSUE: doesn't crash but nothing renders. Prob an issue with the vert shader, or rendering something really wacky bc of the bitmap format. CAUSE: 2d text shader was not being used.
+		2. Position it. DONE
+		3. Render one character.
+			1. ISSUE: it's all corrupt, straight out of freetype.
+		4. Render a string of characters.
+		
 - Actual Requirements.
 	- Constant 144fps on my machine.
 	- Main Menu.
@@ -69,4 +78,3 @@ What's the best way to implement projectile decay?
 		- Game Ends When 0 lives or 9999 score.
 		- AFter game ends, user is prompted to enter name for score.
 	
-- The 2D draw error is: 1282 GL_INVALID_OPERATION Wrong Component Type or Count". This indicates that the wrong type is being put in a uniform. There's only one uniform (texture), and it's Sampler2D.

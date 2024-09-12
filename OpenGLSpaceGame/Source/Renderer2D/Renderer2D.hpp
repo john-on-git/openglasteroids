@@ -2,7 +2,7 @@
 
 #include <glm/ext/vector_float2.hpp>
 #include <glad/glad.h>
-#include <glm/ext/vector_float4.hpp>
+#include <glm/ext/matrix_float4x4.hpp>
 
 class Renderer2D {
 	protected:
@@ -12,7 +12,10 @@ class Renderer2D {
 
 		GLuint textureHandle;
 		GLuint textureLocation;
+		GLuint translationLocation;
+
+		glm::mat4 translationMatrix;
 	public:
-		void Draw(glm::vec2 position, glm::vec2 size);
-		Renderer2D(GLuint textureHandle, GLuint textTextureLocation);
+		void Draw();
+		Renderer2D(GLuint textureHandle, GLuint textureLocation, GLuint translationLocation, glm::vec2 position, glm::vec2 size);
 };

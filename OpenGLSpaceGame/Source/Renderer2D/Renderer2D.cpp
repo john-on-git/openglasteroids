@@ -6,15 +6,21 @@
 static constexpr char NUM_VERTS = 6;
 static constexpr char STRIDE = 4; //vec2 vert coords + vec2 texture coords
 static constexpr GLfloat VERTS[NUM_VERTS * STRIDE] = {
-	-1,-1, 0,0,		1,-1, 1,0,
-	-1, 1, 0,1,		1, 1, 1,1,
+	-1,-1, 0,1,		1,-1, 1,1,
+	-1, 1, 0,0,		1, 1, 1,0,
 };
 static constexpr GLushort VERT_INDICES[NUM_VERTS] = { 0,1,2,	1,2,3 };
 
-Renderer2D::Renderer2D(GLuint textureHandle, GLuint textureLocation)
+Renderer2D::Renderer2D(GLuint textureHandle, GLuint textureLocation, GLuint translationLocation, glm::vec2 position, glm::vec2 size)
 {
 	this->textureHandle = textureHandle;
 	this->textureLocation = textureLocation;
+	this->translationLocation = translationLocation;
+
+	//build the translation matrix
+	translationMatrix = glm::mat4(1);
+	translationMatrix = glm::translate(translationMatrix, glm::vec3(position, 0));
+	translationMatrix = glm::scale(translationMatrix, glm::vec3(size, 1));
 
 	//generate vertex array object
 	glad_glGenVertexArrays(1, &VAO);
@@ -61,7 +67,7 @@ Renderer2D::Renderer2D(GLuint textureHandle, GLuint textureLocation)
 	glad_glEnableVertexAttribArray(1);
 }
 
-void Renderer2D::Draw(glm::vec2 position, glm::vec2 size)
+void Renderer2D::Draw()
 {
 	glad_glBindVertexArray(VAO);
 
@@ -69,6 +75,12 @@ void Renderer2D::Draw(glm::vec2 position, glm::vec2 size)
 	glad_glBindTexture(GL_TEXTURE_2D, textureHandle);
 
 	glad_glUniform1i(textureLocation, 0);
+	glad_glUniformMatrix4fv(
+		translationLocation,
+		1,
+		GL_FALSE,
+		glm::value_ptr(translationMatrix)
+	);
 
 	glad_glDrawElements(
 		GL_TRIANGLES,

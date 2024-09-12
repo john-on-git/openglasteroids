@@ -134,7 +134,6 @@
     <ClCompile Include="Source\Renderer2D\Renderer2D.hpp" />
     <ClCompile Include="Source\AppState\MainMenu.cpp" />
     <ClCompile Include="Source\AppState\GameInProgress.cpp" />
-    <ClCompile Include="Source\bmp_loader.cpp" />
     <ClCompile Include="Source\BufferedAiMesh\BufferedAiMesh.cpp" />
     <ClCompile Include="Source\Delta\DeltaProviders\DragProvider.cpp" />
     <ClCompile Include="Source\Delta\DeltaProviders\SpaceGameObjectRotationalVelocityProvider.cpp" />
@@ -159,7 +158,6 @@
     <ClInclude Include="Source\AppState\MainMenu.hpp" />
     <ClInclude Include="Source\AppState\GameInProgress.hpp" />
     <ClInclude Include="Source\AppState\AppState.hpp" />
-    <ClInclude Include="Source\bmp_loader.hpp" />
     <ClInclude Include="Source\BufferedAiMesh\BufferedAiMesh.hpp" />
     <ClInclude Include="Source\Delta\Delta.hpp" />
     <ClInclude Include="Source\Delta\DeltaProvider.hpp" />

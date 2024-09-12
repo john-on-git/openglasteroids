@@ -20,6 +20,7 @@
 #include <assimp\postprocess.h>
 #include <ft2build.h>
 #include FT_FREETYPE_H
+#include <freetype/ftbitmap.h>
 
 #include "Program/program.hpp"
 #include "BufferedAiMesh/BufferedAiMesh.hpp"
@@ -96,26 +97,23 @@ int main()
 		OutputDebugStringW(L"FATAL: failed to init font\n");
 		exit(1);
 	}
-	err = FT_Load_Glyph(
+	err = FT_Load_Char(
 		ftMainFont,
-		'A', //in ASCII
+		'B', //in ASCII
 		FT_LOAD_DEFAULT
 	);
 	if (err)
 	{
-		OutputDebugStringW(L"FATAL: failed to init font\n");
+		OutputDebugStringW(L"FATAL: failed to load glpyh\n");
 		exit(1);
 	}
 	err = FT_Render_Glyph(ftMainFont->glyph, FT_RENDER_MODE_NORMAL);
 	if (err)
 	{
-		OutputDebugStringW(L"FATAL: failed to init font\n");
+		OutputDebugStringW(L"FATAL: failed to render glyph\n");
 		exit(1);
 	}
-	//TODO list of issues
-	//	1. ISSUE: ftMainFont->glyph->bitmap.buffer is nullptr. CAUSE: was not calling FT_Render_Glyph
-	//	2. ISSUE: crashes in Texture constructor. Probably because the bitmap is in the wrong format. CAUSE: old logic free'd the bitmap, causes a stack free bc it's no longer a pointer
-	//	3. ISSUE: doesn't crash but nothing renders. Prob an issue with the vert shader, or rendering something really wacky bc of the bitmap format
+
 
 	srand(time(NULL)); //initialize random
 
@@ -152,7 +150,7 @@ int main()
 	glad_glBlendEquation(GL_FUNC_ADD); // this is default
 	glad_glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	//gl drawing config
-	glad_glClearColor(0.0f, 0.0f, 1.0f, 1);
+	glad_glClearColor(0.1f, 0.1f, 0.1f, 1);
 	glad_glPointSize(5.0f);
 
 	//shader setup
@@ -171,7 +169,9 @@ int main()
 	);
 	//get uniform locations
 	textShader2D.Use();
-	GLuint textureLocation2D = 0;//glad_glGetUniformLocation(textShader2D.handle, "tex");
+	GLuint 
+		textureLocation2D = glad_glGetUniformLocation(textShader2D.handle, "tex"),
+		translationLocation2D = glad_glGetUniformLocation(textShader2D.handle, "translation");
 
 	blockColorShader.Use();
 	GLuint colorLocation = glad_glGetUniformLocation(blockColorShader.handle, "color");
@@ -188,7 +188,7 @@ int main()
 		projectionLocation,
 		1,
 		GL_FALSE,
-		glm::value_ptr(glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, 0.1f, 10.0f)) //glm::value_ptr(glm::perspective(75.0f, 1.0f, 0.1f, 10.0f))
+		glm::value_ptr(glm::perspective(75.0f, 1.0f, 0.1f, 10.0f))
 	);
 
 	//check for failure
@@ -204,10 +204,12 @@ int main()
 	auto cubeTex = Texture("textures/colored_johncat.bmp");
 
 	//textures (font)
+	//FT_Bitmap convertedBitmap = FT_Bitmap();
+	//FT_Bitmap_Convert(ftLibrary, &ftMainFont->glyph->bitmap, &convertedBitmap, 1);
 	auto newGameTextTex = Texture(ftMainFont->glyph->bitmap);
 
 	//2d renderers
-	auto newGameTextRenderer = Renderer2D(cubeTex.handle, textureLocation2D); //TODO
+	auto newGameTextRenderer = Renderer2D(newGameTextTex.handle, textureLocation2D, translationLocation2D, glm::vec2(-.8,.8), glm::vec2(.1,.1)); //TODO
 
 	//model
 	auto asteroidModel = Model(
