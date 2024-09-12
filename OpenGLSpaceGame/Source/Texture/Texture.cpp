@@ -1,7 +1,3 @@
-#define _CRT_SECURE_NO_WARNINGS
-#define STB_IMAGE_WRITE_IMPLEMENTATION
-#include <stb_image_write.h>
-
 #include "Texture.hpp"
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
@@ -44,8 +40,6 @@ Texture::Texture(FT_Bitmap bitmap)
 		data[i * STRIDE + 2] = bitmap.buffer[i]; //B
 		data[i * STRIDE + 3] = bitmap.buffer[i]; //A
 	}
-
-	stbi_write_bmp("Textures/TestOut.bmp", bitmap.width, bitmap.rows, 4, data);
 
 	GLuint handle;
 	glad_glGenTextures(1, &handle);
