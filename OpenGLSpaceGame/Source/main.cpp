@@ -163,6 +163,9 @@ int main()
 		"Shaders/TextShader2D/textShader2D.vert"
 	);
 	//get uniform locations
+	textShader2D.Use();
+	GLuint textTextureLocation = glad_glGetUniformLocation(texturedColoredShader.handle, "tex");
+
 	blockColorShader.Use();
 	GLuint colorLocation = glad_glGetUniformLocation(blockColorShader.handle, "color");
 
@@ -173,20 +176,12 @@ int main()
 		projectionLocation = glad_glGetUniformLocation(texturedColoredShader.handle, "projection"),
 		modelViewLocation  = glad_glGetUniformLocation(texturedColoredShader.handle, "modelView");
 
-	//set up projection matrix
-		//init with identity
-		//glm::mat4 projectionMatrix = glm::ortho(
-		//	1.0f, -1.0f,	//left-right
-		//	1.0f, -1.0f,	//bottom-top
-		//	1.0f, 100.0f	//near-far
-		//);
-	glm::mat4 projectionMatrix = glm::perspective(75.0f, 1.0f, 1.0f, 100.0f);
-	//view
+	//set up projection matrix, put it on the GPU
 	glad_glUniformMatrix4fv(
 		projectionLocation,
 		1,
 		GL_FALSE,
-		glm::value_ptr(projectionMatrix)
+		glm::value_ptr(glm::perspective(75.0f, 1.0f, 0.1f, 10.0f))
 	);
 
 	//check for failure
@@ -198,20 +193,21 @@ int main()
 
 	//textures (from file)
 	auto blankWhiteTex = Texture("textures/blankwhite.png");
-	auto graniteTex = Texture("textures/wikimedia_Pink_granite_tileable_1024x1024.png");
+	auto greeblingTex = Texture("textures/ship.png");
+	auto cubeTex = Texture("textures/colored_johncat.bmp");
 
 	//textures (font)
 	auto newGameTextTex = Texture(ftMainFont->glyph->bitmap);
 
 	//2d renderers
-	auto newGameTextRenderer = Renderer2D(&newGameTextTex); //TODO
+	auto newGameTextRenderer = Renderer2D(&cubeTex, textTextureLocation); //TODO
 
 	//model
 	auto asteroidModel = Model(
 		"Models/cube.obj",
 		textureLocation,
 		colorMaskLocation,
-		std::vector<GLuint>{ graniteTex.handle },
+		std::vector<GLuint>{ cubeTex.handle },
 		std::vector<glm::vec4>{ glm::vec4(1, 1, 1, 1) },
 		1
 	);
@@ -235,7 +231,7 @@ int main()
 		"Models/ship.obj",
 		textureLocation,
 		colorMaskLocation,
-		std::vector<GLuint>{ blankWhiteTex.handle },
+		std::vector<GLuint>{ greeblingTex.handle },
 		std::vector<glm::vec4>{ glm::vec4(1, 1, 1, 1) },
 		1
 	);

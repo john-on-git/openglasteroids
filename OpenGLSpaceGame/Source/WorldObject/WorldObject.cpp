@@ -53,6 +53,10 @@ glm::vec3 WorldObject::getAngle()
 void WorldObject::setAngle(glm::vec3 angle)
 {
 	this->angle = angle;
+	//wraparound
+	this->angle.x = (angle.x>=0 ? 0 : 360) + fmod(angle.x, 360);
+	this->angle.y = (angle.y>=0 ? 0 : 360) + fmod(angle.y, 360);
+	this->angle.z = (angle.z>=0 ? 0 : 360) + fmod(angle.z, 360);
 	UpdateModelMatrix();
 }
 

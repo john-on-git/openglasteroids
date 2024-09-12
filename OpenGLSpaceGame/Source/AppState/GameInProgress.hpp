@@ -37,6 +37,7 @@ class GameInProgress : public AppState
 		unsigned char showDebugInfoToggleDelay;
 		bool showDebugInfo;
 
+
 		QuadTreeCollisionHandler* collisionHandler;
 
 		static constexpr auto COLOR_FLASH = glm::vec4(2.0f, 2.0f, 0.25f, 1.0f);

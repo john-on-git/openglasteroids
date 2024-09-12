@@ -16,7 +16,6 @@ class WorldObject {
 		Model *model;
 		bool markedForDelete;
 		unordered_set<tag> tags;
-		glm::mat4 modelMatrix;
 
 		WorldObject(Model *model, glm::vec3 position, glm::vec3 angle, glm::vec3 scale, GLuint modelViewLocation, unordered_set<tag> tags);
 		virtual void Tick();
@@ -37,5 +36,6 @@ class WorldObject {
 		GLuint modelViewLocation;
 		glm::vec3* boundingBox;
 		glm::vec3 boundingBoxAngle; //angle at which the current value of boundingBox^ was calculated
+		glm::mat4 modelMatrix;
 		void UpdateModelMatrix();
 };

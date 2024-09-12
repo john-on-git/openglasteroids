@@ -42,6 +42,7 @@ What's the best way to implement projectile decay?
 	- Make deltas only have one target.
 	- Move all deltas onto these collections.
 	- When an object is destroyed, the inComingDeltas as destroyed too.
+	- Should really just use inheritance to get the funcitonality of different object types, composition system rn is rubbish.
 
 - Freetype for text rendering?
 	
@@ -67,3 +68,4 @@ What's the best way to implement projectile decay?
 			- Invincibility.
 		- Game Ends When 0 lives or 9999 score.
 		- AFter game ends, user is prompted to enter name for score.
+	

@@ -234,10 +234,10 @@ GameInProgress::GameInProgress(void (*SetState)(AppState*), bool keyPressed[360]
 	//set up game & world stuff
 	ship = new SpaceGameObject(
 		shipModel,
-		glm::vec3(0.0f, 0.0f, -5.0f),	//pos
+		glm::vec3(0.0f, 0.0f, 0.0f),	//pos
 		glm::vec3(0.0f, 0.0f, 0.0f),	//vel
 		glm::vec3(0.0f, 0.0f, 0.0f),	//rot vel
-		glm::vec3(270.0f, 50.0f, 0.0f),	//rot
+		glm::vec3(90.0f, 0.0f, 0.0f),	//rot
 		glm::vec3(0.05f, 0.05f, 0.05f), //scale
 		modelViewLocation,
 		unordered_set<tag>{ SHIP }
@@ -281,19 +281,19 @@ void GameInProgress::Tick()
 		switch (asteroidSide)
 		{
 		case 0:
-			pos = glm::vec3(-.95f * ARENA_W, rel, -5.0f); //left
+			pos = glm::vec3(-.95f * ARENA_W, rel, 0.0f); //left
 			angle = 0 - (M_PI / 4) + ((float)rand()) / RAND_MAX * (M_PI / 2); //right
 			break;
 		case 1:
-			pos = glm::vec3(rel, -.95f * ARENA_H, -5.0f); //bottom
+			pos = glm::vec3(rel, -.95f * ARENA_H, 0.0f); //bottom
 			angle = (M_PI / 2) - (M_PI / 4) + ((float)rand()) / RAND_MAX * (M_PI / 2); //up
 			break;
 		case 2:
-			pos = glm::vec3(.95f * ARENA_W, rel, -5.0f); //right
+			pos = glm::vec3(.95f * ARENA_W, rel, 0.0f); //right
 			angle = (M_PI)-(M_PI / 4) + ((float)rand()) / RAND_MAX * (M_PI / 2); //left
 			break;
 		case 3:
-			pos = glm::vec3(rel, .95f * ARENA_H, -5.0f); //top
+			pos = glm::vec3(rel, .95f * ARENA_H, 0.0f); //top
 			angle = (M_PI * 3 / 2) - (M_PI / 4) + ((float)rand()) / RAND_MAX * (M_PI / 2); //down
 			break;
 		}
@@ -318,29 +318,29 @@ void GameInProgress::Tick()
 		controlsDisabled--;
 		if (controlsDisabled % (FPS / 4) == 0)
 		{
-			if (shipModel->meshes[0].colorMask == COLOR_NONE)
+			if (shipModel->meshes[0]->colorMask == COLOR_NONE)
 			{
-				shipModel->meshes[0].colorMask = COLOR_FLASH;
+				shipModel->meshes[0]->colorMask = COLOR_FLASH;
 			}
 			else
 			{
-				shipModel->meshes[0].colorMask = COLOR_NONE;
+				shipModel->meshes[0]->colorMask = COLOR_NONE;
 			}
 		}
 	}
 	else
 	{
-		shipModel->meshes[0].colorMask = COLOR_NONE;
+		shipModel->meshes[0]->colorMask = COLOR_NONE;
 		//get player input
-		auto rad = glm::radians(ship->getAngle().y);
+		auto rad = glm::radians(ship->getAngle().y-90);
 
 		if (ship != nullptr && (keyPressed[GLFW_KEY_W] || keyPressed[GLFW_KEY_UP]))
 		{
-			ship->velocityDelta->addDependent(new Delta<glm::vec3>(new Vec3Provider(glm::vec3(SHIP_MOVERATE_MULT * sin(rad), SHIP_MOVERATE_MULT * cos(rad), 0.0f)), {new SpaceGameObjectVelocityTarget(ship)}, {}, 10, SHIP_MAX_VELOCITY));
+			ship->velocityDelta->addDependent(new Delta<glm::vec3>(new Vec3Provider(glm::vec3(SHIP_MOVERATE_MULT * cos(rad), SHIP_MOVERATE_MULT * sin(rad), 0.0f)), {new SpaceGameObjectVelocityTarget(ship)}, {}, 10, SHIP_MAX_VELOCITY));
 		}
 		else if (ship != nullptr && (keyPressed[GLFW_KEY_S] || keyPressed[GLFW_KEY_DOWN]))
 		{
-			ship->velocityDelta->addDependent(new Delta<glm::vec3>(new Vec3Provider(glm::vec3(-SHIP_MOVERATE_MULT * sin(rad), -SHIP_MOVERATE_MULT * cos(rad), 0.0f)), { new SpaceGameObjectVelocityTarget(ship) }, {}, 10, SHIP_MAX_VELOCITY));
+			ship->velocityDelta->addDependent(new Delta<glm::vec3>(new Vec3Provider(glm::vec3(-SHIP_MOVERATE_MULT * cos(rad), -SHIP_MOVERATE_MULT * sin(rad), 0.0f)), { new SpaceGameObjectVelocityTarget(ship) }, {}, 10, SHIP_MAX_VELOCITY));
 		}
 
 		if (ship != nullptr && (keyPressed[GLFW_KEY_A] || keyPressed[GLFW_KEY_LEFT]))
@@ -378,7 +378,7 @@ void GameInProgress::Tick()
 					shipVelocity.z + 0.0f
 				),
 				glm::vec3(0, 0, 0),
-				glm::vec3(270.0f, 0.0f, 0.0f),
+				glm::vec3(0.0f, 0.0f, 0.0f),
 				glm::vec3(0.005f, 0.005f, 0.005f), //glm::vec3(0.005f, 0.005f, 0.005f),
 				modelViewLocation,
 				unordered_set<tag>{ PROJECTILE },
@@ -483,7 +483,10 @@ void GameInProgress::Tick()
 		DrawQuadTree(true, true, true, ship, collisionHandler, texturedColoredShader, blockColorShader, colorLocation);
 	}
 
-	glm::mat4 viewMatrix(glm::lookAt(glm::vec3(0, 0, 0), glm::vec3(0, 0, -1), glm::vec3(0, -1, 0)));
+	auto cameraPosition = glm::vec3(0,0,-5);// +;
+	auto centerPosition = glm::vec3(0,0,0);
+	glm::mat4 viewMatrix(glm::lookAt(cameraPosition, centerPosition, glm::vec3(0, 1, 0))); //calculate view matrix
+
 	for (size_t i = 0; i < objects.size(); i++)
 	{
 		//Tick() everything

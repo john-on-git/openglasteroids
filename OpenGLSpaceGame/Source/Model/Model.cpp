@@ -18,10 +18,10 @@ Model::Model(std::string path, GLuint textureLocation, GLuint colorLocation, std
 	boundingMax = glm::vec4(firstVert.x, firstVert.y, firstVert.z, 1.0f);
 	//convert to buffered meshes
 	aiMesh** aiMeshes = scene->mMeshes;
-	meshes = new BufferedAiMesh[numMeshes];
+	meshes = new BufferedAiMesh*[numMeshes];
 	for (size_t i = 0;i < numMeshes;i++)
 	{
-		meshes[i] = BufferedAiMesh(aiMeshes[i], textures.at(i), colorMasks.at(i), textureLocation, colorLocation);
+		meshes[i] = new BufferedAiMesh(aiMeshes[i], textures.at(i), colorMasks.at(i), textureLocation, colorLocation);
 		//also store the verts here for collision stuff
 		auto firstVert = aiMeshes[i]->mVertices[0];
 		boundingMin.x = std::min(boundingMin.x, firstVert.x);
@@ -69,8 +69,15 @@ Model::Model(std::string path, GLuint textureLocation, GLuint colorLocation, std
 	}
 }
 
+Model::~Model()
+{
+	delete[] meshes;
+}
+
 void Model::Draw()
 {
 	for (size_t i = 0;i < numMeshes;i++)
-		meshes[i].Draw();
+	{
+		meshes[i]->Draw();
+	}
 }
