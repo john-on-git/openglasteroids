@@ -3,7 +3,7 @@
 #include <iostream>
 #include <glm/gtc/type_ptr.hpp>
 
-constexpr auto STRIDE = 6; //width of each vert
+constexpr auto AIMESH_STRIDE = 6; //width of each vert
 constexpr auto INDICES_PER_TRI = 3;
 
 BufferedAiMesh::BufferedAiMesh(aiMesh* mesh, GLuint textureHandle, glm::vec4 colorMask, GLuint textureLocation, GLuint colorLocation)
@@ -16,10 +16,10 @@ BufferedAiMesh::BufferedAiMesh(aiMesh* mesh, GLuint textureHandle, glm::vec4 col
 	this->numIndices = (mesh->mNumFaces) * INDICES_PER_TRI;
 
 	//transform verts to gl format
-	GLfloat* verts = new GLfloat[mesh->mNumVertices * STRIDE];
+	GLfloat* verts = new GLfloat[mesh->mNumVertices * AIMESH_STRIDE];
 	for (size_t i = 0;i < mesh->mNumVertices;i++)
 	{
-		size_t vertsPos = i * STRIDE;
+		size_t vertsPos = i * AIMESH_STRIDE;
 		//position
 		verts[vertsPos]		= mesh->mVertices[i].x;
 		verts[vertsPos + 1] = mesh->mVertices[i].y;
@@ -45,7 +45,7 @@ BufferedAiMesh::BufferedAiMesh(aiMesh* mesh, GLuint textureHandle, glm::vec4 col
 	glad_glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
 	glad_glBufferData( //add verts to buffer
 		GL_ARRAY_BUFFER,
-		static_cast<size_t>(mesh->mNumVertices) * STRIDE * sizeof(GLfloat),
+		static_cast<size_t>(mesh->mNumVertices) * AIMESH_STRIDE * sizeof(GLfloat),
 		verts,
 		GL_STATIC_DRAW
 	);
@@ -67,7 +67,7 @@ BufferedAiMesh::BufferedAiMesh(aiMesh* mesh, GLuint textureHandle, glm::vec4 col
 		4,
 		GL_FLOAT,
 		GL_FALSE,
-		STRIDE * sizeof(GLfloat),
+		AIMESH_STRIDE * sizeof(GLfloat),
 		/*	1.7.22 
 			Value passed here was incorrect, forgot to add the sizeof() here after removing it from STRIDE definition.
 			Resulted in all sorts of bizarre rendering errors, and I was convinced that the problem was with the mesh data.
@@ -81,7 +81,7 @@ BufferedAiMesh::BufferedAiMesh(aiMesh* mesh, GLuint textureHandle, glm::vec4 col
 		2,
 		GL_FLOAT,
 		GL_FALSE,
-		STRIDE * sizeof(GLfloat), //1.7.22 same here
+		AIMESH_STRIDE * sizeof(GLfloat), //1.7.22 same here
 		(GLvoid*)(4 * sizeof(GLfloat)) //offset
 	);
 	glad_glEnableVertexAttribArray(1);

@@ -1,4 +1,9 @@
 ﻿#define _USE_MATH_DEFINES
+
+#define _CRT_SECURE_NO_WARNINGS
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include <stb_image_write.h>
+
 #include <iostream>
 #include <fstream>
 #include <windows.h>
@@ -22,6 +27,7 @@
 #include FT_FREETYPE_H
 #include <freetype/ftbitmap.h>
 
+
 #include "Program/program.hpp"
 #include "BufferedAiMesh/BufferedAiMesh.hpp"
 #include "WorldObject/SpaceGameObject.hpp"
@@ -32,7 +38,7 @@
 #include "AppState/AppState.hpp"
 #include "AppState/MainMenu.hpp"
 #include "AppState/GameInProgress.hpp"
-#include "Renderer2D/Renderer2D.hpp"
+#include "TextBox/TextBox.hpp"
 
 using namespace std;
 
@@ -58,63 +64,23 @@ static void GLErrorCallback(GLenum source, GLenum type, GLuint id, GLenum severi
 	std::cerr << "GL Error: " << id << " " << message << std::endl;
 }
 
+/// <summary>
+/// called whenever a key is pressed
+/// </summary>
+static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+	if (action == GLFW_PRESS)
+	{
+		keyPressed[key] = true;
+	}
+	else if (action == GLFW_RELEASE)
+	{
+		keyPressed[key] = false;
+	}
+}
+
 int main()
 {
-	//initialize freetype
-	FT_Library ftLibrary;
-	FT_Face ftMainFont;
-	FT_Error err;
-
-	err = FT_Init_FreeType(&ftLibrary);
-	if (err)
-	{
-		OutputDebugStringW(L"FATAL: failed to initialize freetype\n");
-		exit(1);
-	}
-	err = FT_New_Face(ftLibrary, "C:/Windows/Fonts/times.ttf", 0, &ftMainFont);
-	if (err)
-	{
-		OutputDebugStringW(L"FATAL: failed to load font (system does not support Times New Roman)\n");
-		exit(1);
-	}
-
-	//(!ftMainFont->size)
-	//FT_Set_Char_Size just calculates some values, then hands control to another function FT_Request_Size, which immediately errors if the above condition is false
-	//no idea why, the purpose of the function is to init Face->size, why would you first check if it's already init?
-	//docs: "When the FT_New_Face function is called (or one of its siblings), it automatically creates a new size object for the returned face. This size object is directly accessible as face−>size."
-	//So I guess it's a bug?
-	//it was bc the index in FT_New_Face was set to -1, docs say 0. -1 is for checking the number of faces
-	
-	err = FT_Set_Char_Size(
-		ftMainFont,
-		0, //docs say "Value of 0 for the character width means ‘same as character height’"
-		FONT_CHAR_SIZE*64, //docs say it's measured in 1/64 of pixel, and recommend mult by 64
-		WINDOW_WIDTH,
-		WINDOW_HEIGHT
-	);
-	if (err)
-	{
-		OutputDebugStringW(L"FATAL: failed to init font\n");
-		exit(1);
-	}
-	err = FT_Load_Char(
-		ftMainFont,
-		'B', //in ASCII
-		FT_LOAD_DEFAULT
-	);
-	if (err)
-	{
-		OutputDebugStringW(L"FATAL: failed to load glpyh\n");
-		exit(1);
-	}
-	err = FT_Render_Glyph(ftMainFont->glyph, FT_RENDER_MODE_NORMAL);
-	if (err)
-	{
-		OutputDebugStringW(L"FATAL: failed to render glyph\n");
-		exit(1);
-	}
-
-
 	srand(time(NULL)); //initialize random
 
 	//initialize glfw
@@ -198,18 +164,106 @@ int main()
 		exit(1);
 	}
 
+
+	//initialize freetype
+	FT_Library ftLibrary;
+	FT_Face ftMainFont;
+	FT_Error err;
+
+	err = FT_Init_FreeType(&ftLibrary);
+	if (err)
+	{
+		OutputDebugStringW(L"FATAL: failed to initialize freetype\n");
+		exit(1);
+	}
+	err = FT_New_Face(ftLibrary, "C:/Windows/Fonts/times.ttf", 0, &ftMainFont);
+	if (err)
+	{
+		OutputDebugStringW(L"FATAL: failed to load font (system does not support Times New Roman)\n");
+		exit(1);
+	}
+
+	FT_Set_Char_Size(
+		ftMainFont,
+		FONT_RESOLUTION * 64, //docs say "Value of 0 for the character width means 'same as character height'"
+		0, //docs say it's measured in 1/64 of pixel, and recommend mult by 64
+		WINDOW_WIDTH,
+		WINDOW_HEIGHT
+	);
+
+	size_t charAtlasWidth = 0;
+	size_t charAtlasRows = 0;
+	size_t widthPerCharacter = 0;
+	vector<FT_Bitmap> charBitmapsTemp = vector<FT_Bitmap>();
+
+	//build the texture atlas
+	for (char i = 'A'; i <= 'Z'; i++)
+	{
+		FT_Load_Char(
+			ftMainFont,
+			i, //in ASCII
+			FT_LOAD_DEFAULT
+		);
+		FT_Render_Glyph(ftMainFont->glyph, FT_RENDER_MODE_NORMAL);
+
+		//take a new copy of the bitmap, just to ensure that rendering characters isn't overwriting the old ones
+		FT_Bitmap temp = FT_Bitmap();
+		temp.width = ftMainFont->glyph->bitmap.width;
+		temp.rows = ftMainFont->glyph->bitmap.rows;
+		temp.buffer = new unsigned char[ftMainFont->glyph->bitmap.width * ftMainFont->glyph->bitmap.rows];
+		copy(ftMainFont->glyph->bitmap.buffer, ftMainFont->glyph->bitmap.buffer + (ftMainFont->glyph->bitmap.width * ftMainFont->glyph->bitmap.rows), temp.buffer);
+
+		charBitmapsTemp.push_back(temp);
+
+		if (ftMainFont->glyph->bitmap.rows > charAtlasRows)
+		{
+			charAtlasRows = ftMainFont->glyph->bitmap.rows;
+		}
+		if (ftMainFont->glyph->bitmap.width > widthPerCharacter)
+		{
+			widthPerCharacter = ftMainFont->glyph->bitmap.width;
+		}
+	}
+	charAtlasWidth = charBitmapsTemp.size() * widthPerCharacter;
+	
+	GLubyte* charAtlasBuffer = new GLubyte[charAtlasWidth * charAtlasRows * RGBA_STRIDE];
+	//build the character texture atlas
+	for (size_t i = 0; i < charAtlasWidth * charAtlasRows * RGBA_STRIDE; i++)//init it all to zero
+	{
+		charAtlasBuffer[i] = 0;
+	}
+
+	size_t offset = 0; //x-offset of the top-left pixel of the image that we are currently copying over to the atlas
+	for (size_t i = 0; i < charBitmapsTemp.size(); i++) //add each character to the atlas
+	{
+		FT_Bitmap* bitmap = &charBitmapsTemp.at(i);
+		size_t dataLength = (static_cast<size_t>(bitmap->width) * bitmap->rows);
+
+		for (size_t j = 0; j < bitmap->rows; j++) //for each row
+		{
+			for (size_t k = 0; k < bitmap->width; k++) //for each pixel
+			{
+				size_t pix = offset * RGBA_STRIDE + (j * charAtlasWidth * RGBA_STRIDE) + (k * RGBA_STRIDE);
+				charAtlasBuffer[pix + 0] = bitmap->buffer[j * bitmap->width + k]; //R
+				charAtlasBuffer[pix + 1] = bitmap->buffer[j * bitmap->width + k]; //G
+				charAtlasBuffer[pix + 2] = bitmap->buffer[j * bitmap->width + k]; //B
+				charAtlasBuffer[pix + 3] = bitmap->buffer[j * bitmap->width + k]; //A
+			}
+		}
+		offset += widthPerCharacter;
+	}
+	//stbi_write_bmp("Textures/TestOut.bmp", charAtlasWidth, charAtlasRows, RGBA_STRIDE, charAtlasBuffer); //for testing, manually inspecting the char atlas. TODO remove me
+
 	//textures (from file)
 	auto blankWhiteTex = Texture("textures/blankwhite.png");
 	auto greeblingTex = Texture("textures/ship.png");
 	auto cubeTex = Texture("textures/colored_johncat.bmp");
-
-	//textures (font)
-	//FT_Bitmap convertedBitmap = FT_Bitmap();
-	//FT_Bitmap_Convert(ftLibrary, &ftMainFont->glyph->bitmap, &convertedBitmap, 1);
-	auto newGameTextTex = Texture(ftMainFont->glyph->bitmap);
+	
+	//texture (from texture atlas)
+	auto charAtlasTex = Texture(charAtlasBuffer, charAtlasWidth, charAtlasRows);
 
 	//2d renderers
-	auto newGameTextRenderer = Renderer2D(newGameTextTex.handle, textureLocation2D, translationLocation2D, glm::vec2(-.8,.8), glm::vec2(.1,.1)); //TODO
+	auto newGameTextBox = TextBox(std::string("NEW GAME"), cubeTex.handle, textureLocation2D, translationLocation2D, glm::vec2(0,0), glm::vec2(.005, .005));
 
 	//model
 	auto asteroidModel = Model(
@@ -252,8 +306,8 @@ int main()
 		{"ship", &shipModel}
 	};
 
-	std::map<std::string, Renderer2D*> renderer2ds = {
-		{"newGameText",&newGameTextRenderer}
+	std::map<std::string, TextBox*> renderer2ds = {
+		{"newGameText",&newGameTextBox}
 	};
 
 	SetState(new MainMenu(SetState, keyPressed, &models, &renderer2ds, colorLocation, modelViewLocation, &texturedColoredShader, &blockColorShader, &textShader2D));
@@ -287,19 +341,4 @@ int main()
 		glfwTerminate();
 		//vertex buffer
 		//vertex array
-}
-
-/// <summary>
-/// called whenever a key is pressed
-/// </summary>
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
-{
-	if (action == GLFW_PRESS)
-	{
-		keyPressed[key] = true;
-	}
-	else if (action==GLFW_RELEASE)
-	{
-		keyPressed[key] = false;
-	}
 }

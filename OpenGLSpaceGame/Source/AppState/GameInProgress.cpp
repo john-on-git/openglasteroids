@@ -211,7 +211,7 @@ static void DrawQuadTree(bool drawAllRegions, bool drawShipRegion, bool drawShip
 }
 
 
-GameInProgress::GameInProgress(void (*SetState)(AppState*), bool keyPressed[360], std::map<std::string, Model*>* models, std::map<std::string, Renderer2D*>* renderer2Ds, GLuint colorLocation, GLuint modelViewLocation, Program* texturedColoredShader, Program* blockColorShader, Program* textShader2D)
+GameInProgress::GameInProgress(void (*SetState)(AppState*), bool keyPressed[360], std::map<std::string, Model*>* models, std::map<std::string, TextBox*>* renderer2Ds, GLuint colorLocation, GLuint modelViewLocation, Program* texturedColoredShader, Program* blockColorShader, Program* textShader2D)
 {
 	this->SetState = SetState;
 	this->keyPressed = keyPressed;

@@ -78,10 +78,10 @@
     <ClCompile Include="Source\Delta\DeltaProviders\SpaceGameObjectVelocityProvider.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Renderer2D\Renderer2D.cpp">
+    <ClCompile Include="Source\TextBox\TextBox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Renderer2D\Renderer2D.hpp">
+    <ClCompile Include="Source\TextBox\TextBox.hpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -130,8 +130,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Renderer2D\Renderer2D.cpp" />
-    <ClCompile Include="Source\Renderer2D\Renderer2D.hpp" />
+    <ClCompile Include="Source\TextBox\TextBox.cpp" />
+    <ClCompile Include="Source\TextBox\TextBox.hpp" />
     <ClCompile Include="Source\AppState\MainMenu.cpp" />
     <ClCompile Include="Source\AppState\GameInProgress.cpp" />
     <ClCompile Include="Source\BufferedAiMesh\BufferedAiMesh.cpp" />

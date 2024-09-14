@@ -3,7 +3,7 @@
 #include "AppState.hpp"
 #include "../WorldObject/SpaceGameObject.hpp"
 #include "../Program/Program.hpp"
-#include "../Renderer2D/Renderer2D.hpp"
+#include "../TextBox/TextBox.hpp"
 #include "../QuadTreeCollisionHandler/QuadTreeCollisionHandler.hpp"
 #include <ft2build.h>
 #include <map>
@@ -13,7 +13,7 @@ class GameInProgress : public AppState
 {
 	protected:
 		std::map<std::string,Model*>* models;
-		std::map<std::string, Renderer2D*>* renderer2Ds;
+		std::map<std::string, TextBox*>* renderer2Ds;
 		Model* asteroidModel;
 		Model* projectileModel;
 		Model* shipModel;
@@ -44,7 +44,7 @@ class GameInProgress : public AppState
 		static constexpr auto COLOR_FLASH = glm::vec4(2.0f, 2.0f, 0.25f, 1.0f);
 		static constexpr auto COLOR_NONE = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 	public:
-		GameInProgress(void (*SetState)(AppState*), bool keyPressed[360], std::map<std::string, Model*>* models, std::map<std::string, Renderer2D*>* renderer2Ds, GLuint colorLocation, GLuint modelViewLocation, Program* texturedColoredShader, Program* blockColorShader, Program* textShader2D);
+		GameInProgress(void (*SetState)(AppState*), bool keyPressed[360], std::map<std::string, Model*>* models, std::map<std::string, TextBox*>* renderer2Ds, GLuint colorLocation, GLuint modelViewLocation, Program* texturedColoredShader, Program* blockColorShader, Program* textShader2D);
 		virtual void OnEntry() override;
 		void Tick();
 };

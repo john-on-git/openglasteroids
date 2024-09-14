@@ -32,7 +32,7 @@ Texture::Texture(FT_Bitmap bitmap)
 	size_t dataLength = (static_cast<size_t>(bitmap.width) * bitmap.rows) * STRIDE;
 	GLubyte* data = new GLubyte[dataLength]();
 	size_t i;
-	for (i = 0; (i*STRIDE+3) < dataLength; i++)
+	for (i = 0; (i * STRIDE + 3) < dataLength; i++)
 	{
 		data[i * STRIDE + 0] = bitmap.buffer[i]; //R
 		data[i * STRIDE + 1] = bitmap.buffer[i]; //G
@@ -49,6 +49,21 @@ Texture::Texture(FT_Bitmap bitmap)
 	glad_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 	glad_glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, bitmap.width, bitmap.rows, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+
+	this->handle = handle;
+}
+
+Texture::Texture(GLubyte* data, size_t width, size_t height)
+{
+	GLuint handle;
+	glad_glGenTextures(1, &handle);
+	glad_glBindTexture(GL_TEXTURE_2D, handle);
+
+	//not duplicates
+	glad_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glad_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+	glad_glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 
 	this->handle = handle;
 }
