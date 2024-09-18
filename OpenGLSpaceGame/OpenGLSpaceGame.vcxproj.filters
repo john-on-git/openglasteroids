@@ -84,6 +84,9 @@
     <ClCompile Include="Source\TextBox\TextBox.hpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\AppState\AppState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\BufferedAiMesh\BufferedAiMesh.hpp">

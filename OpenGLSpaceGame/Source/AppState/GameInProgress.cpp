@@ -1,6 +1,6 @@
 #define _USE_MATH_DEFINES
 #include "GameInProgress.hpp"
-#include "MainMenu.hpp"
+#include "AppState.hpp"
 #include "../main.hpp"
 #include "../Delta/Delta.hpp"
 #include "../Delta/DeltaProvider.hpp"
@@ -211,16 +211,14 @@ static void DrawQuadTree(bool drawAllRegions, bool drawShipRegion, bool drawShip
 }
 
 
-GameInProgress::GameInProgress(void (*SetState)(AppState*), bool keyPressed[360], std::map<std::string, Model*>* models, std::map<std::string, TextBox*>* renderer2Ds, GLuint colorLocation, GLuint modelViewLocation, Program* texturedColoredShader, Program* blockColorShader, Program* textShader2D)
+GameInProgress::GameInProgress(bool keyPressed[360], glm::vec2* cursorPos, bool mousePressed[8], Model* asteroidModel, Model* projectileModel, Model* shipModel, GLuint colorLocation, GLuint modelViewLocation, Program* texturedColoredShader, Program* blockColorShader, Program* textShader2D) : AppState(SetState, keyPressed, cursorPos, mousePressed)
 {
-	this->SetState = SetState;
-	this->keyPressed = keyPressed;
 
 	this->models = models;
 	this->renderer2Ds = renderer2Ds;
-	this->asteroidModel = models->at("asteroid");
-	this->projectileModel = models->at("projectile");
-	this->shipModel = models->at("ship");
+	this->asteroidModel = asteroidModel;
+	this->projectileModel = projectileModel;
+	this->shipModel = shipModel;
 
 	this->colorLocation = colorLocation;
 	this->modelViewLocation = modelViewLocation;
@@ -274,7 +272,7 @@ void GameInProgress::OnEntry()
 {
 	texturedColoredShader->Use();
 }
-void GameInProgress::Tick()
+SwitchState GameInProgress::Tick()
 {
 	while (numAsteroids < NUM_TARGET_ASTEROIDS)
 	{
@@ -500,12 +498,12 @@ void GameInProgress::Tick()
 			collisionHandler->Remove(objects.at(i));
 
 			if (objects.at(i) == ship) { //ship destroyed, game over
-				SetState(new MainMenu(SetState, keyPressed, models, renderer2Ds, colorLocation, modelViewLocation, texturedColoredShader, blockColorShader, textShader2D)); //TODO display a game over message & kick back to main menu
-				//TODO display game over menu
-				return;
+				return MAIN_MENU;
+				//TODO display game over 
 			}
 			objects.erase(objects.begin() + i);
 			i--;
 		}
 	}
+	return UNCHANGED;
 }

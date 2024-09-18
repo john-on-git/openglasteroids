@@ -14,6 +14,7 @@ class MainMenu : public AppState
 		std::map<std::string,Model*>* models;
 		std::map<std::string, TextBox*>* renderer2Ds;
 		TextBox* newGameRenderer;
+		TextBox* highScoresRenderer;
 
 		GLuint colorLocation;
 		GLuint modelViewLocation;
@@ -25,9 +26,9 @@ class MainMenu : public AppState
 		FT_Library* ftLibrary;
 		FT_Face* ftMainFont;
 	public:
-		MainMenu(void (*SetState)(AppState*), bool keyPressed[360], std::map<std::string, Model*>* models, std::map<std::string, TextBox*>* renderer2Ds, GLuint colorLocation, GLuint modelViewLocation, Program* texturedColoredShader, Program* blockColorShader, Program* textShader2D);
+		MainMenu(bool keyPressed[360], glm::vec2* cursorPos, bool mousePressed[8], TextBox* newGameTextBox, TextBox* highScoresTextBox, GLuint colorLocation, GLuint modelViewLocation, Program* texturedColoredShader, Program* blockColorShader, Program* textShader2D);
 		// Inherited via AppState
 		virtual void OnEntry() override;
-		virtual void Tick() override;
+		virtual SwitchState Tick() override;
 };
 

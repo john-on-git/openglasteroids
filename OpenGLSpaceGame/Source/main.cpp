@@ -1,10 +1,4 @@
-﻿#define _USE_MATH_DEFINES
-
-#define _CRT_SECURE_NO_WARNINGS
-#define STB_IMAGE_WRITE_IMPLEMENTATION
-#include <stb_image_write.h>
-
-#include <iostream>
+﻿#include <iostream>
 #include <fstream>
 #include <windows.h>
 #include <cmath>
@@ -12,6 +6,7 @@
 #include <map>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include "glm/vec2.hpp"
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
@@ -23,8 +18,6 @@
 #include <conio.h>
 #include <assimp/Importer.hpp>
 #include <assimp\postprocess.h>
-#include <ft2build.h>
-#include FT_FREETYPE_H
 #include <freetype/ftbitmap.h>
 
 
@@ -42,30 +35,22 @@
 
 using namespace std;
 
-AppState* appState;
 GLFWwindow* window;
 bool keyPressed[360];
+bool mousePressed[8];
+glm::vec2 cursorPos;
 
-//AppState uses GoF State Pattern, with main.cpp as the Context
-static void SetState(AppState* newState) {
-	auto oldState = appState;
-	//clear any GL state the old AppState left over
-	glad_glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glfwSwapBuffers(window);
-	glad_glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	appState = newState;
-	delete oldState; //delete this after switching just in case deleting before causes any wacky behaviour
-	appState->OnEntry();
-}
 
 static void GLErrorCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam)
 {
-	std::cerr << "GL Error: " << id << " " << message << std::endl;
+	if (severity!=GL_DEBUG_SEVERITY_NOTIFICATION) //only print errors
+	{
+		std::cerr << "GL Error: " << id << " " << message << std::endl;
+	}
 }
 
 /// <summary>
-/// called whenever a key is pressed
+/// called whenever a key is pressed/released
 /// </summary>
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
@@ -76,6 +61,28 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 	else if (action == GLFW_RELEASE)
 	{
 		keyPressed[key] = false;
+	}
+}
+/// <summary>
+/// called whenever the mouse is moved
+/// </summary>
+static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
+{
+	cursorPos.x = xpos;
+	cursorPos.y = ypos;
+}
+/// <summary>
+/// called whenever a mouse button is pressed/released
+/// </summary>
+static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
+{
+	if (action == GLFW_PRESS)
+	{
+		mousePressed[button] = true;
+	}
+	else if (action == GLFW_RELEASE)
+	{
+		mousePressed[button] = false;
 	}
 }
 
@@ -97,7 +104,24 @@ int main()
 		exit(1);
 	}
 	glfwMakeContextCurrent(window);
+
+	//set up keyboard input handling
+	for (size_t i = 0; i < 360; i++)
+	{
+		keyPressed[i] = false;
+	}
 	glfwSetKeyCallback(window, key_callback);
+
+	//set up mouse input handling
+	cursorPos = glm::vec2(0, 0);
+	// set up keyboard input handling
+	for (size_t i = 0; i < 8; i++)
+	{
+		mousePressed[i] = false;
+	}
+	glfwSetCursorPosCallback(window, cursor_position_callback);
+	glfwSetMouseButtonCallback(window, mouse_button_callback);
+	
 	glfwSwapInterval(1);
 	
 	//initialize glad
@@ -107,6 +131,9 @@ int main()
 		OutputDebugStringW(L"FATAL: failed to initialize glad\n");
 		exit(1);
 	}
+
+	//catch all GL errors
+	glad_glDebugMessageCallback(GLErrorCallback, nullptr);
 	
 	//glEnables
 	glad_glEnable(GL_DEBUG_OUTPUT);
@@ -135,9 +162,10 @@ int main()
 	);
 	//get uniform locations
 	textShader2D.Use();
-	GLuint 
+	GLuint
 		textureLocation2D = glad_glGetUniformLocation(textShader2D.handle, "tex"),
-		translationLocation2D = glad_glGetUniformLocation(textShader2D.handle, "translation");
+		translationLocation2D = glad_glGetUniformLocation(textShader2D.handle, "translation"),
+		colorMaskLocation2D = glad_glGetUniformLocation(textShader2D.handle, "colorMask");
 
 	blockColorShader.Use();
 	GLuint colorLocation = glad_glGetUniformLocation(blockColorShader.handle, "color");
@@ -176,10 +204,10 @@ int main()
 		OutputDebugStringW(L"FATAL: failed to initialize freetype\n");
 		exit(1);
 	}
-	err = FT_New_Face(ftLibrary, "C:/Windows/Fonts/times.ttf", 0, &ftMainFont);
+	err = FT_New_Face(ftLibrary, "C:/Windows/Fonts/courbd.ttf", 0, &ftMainFont);
 	if (err)
 	{
-		OutputDebugStringW(L"FATAL: failed to load font (system does not support Times New Roman)\n");
+		OutputDebugStringW(L"FATAL: failed to load font (system does not support Courier New)\n");
 		exit(1);
 	}
 
@@ -197,7 +225,7 @@ int main()
 	vector<FT_Bitmap> charBitmapsTemp = vector<FT_Bitmap>();
 
 	//build the texture atlas
-	for (char i = 'A'; i <= 'Z'; i++)
+	for (char i = ' '; i <= '~'; i++)
 	{
 		FT_Load_Char(
 			ftMainFont,
@@ -228,7 +256,7 @@ int main()
 	
 	GLubyte* charAtlasBuffer = new GLubyte[charAtlasWidth * charAtlasRows * RGBA_STRIDE];
 	//build the character texture atlas
-	for (size_t i = 0; i < charAtlasWidth * charAtlasRows * RGBA_STRIDE; i++)//init it all to zero
+	for (size_t i = 0; i < charAtlasWidth * charAtlasRows * RGBA_STRIDE; i++) //init it all to zero
 	{
 		charAtlasBuffer[i] = 0;
 	}
@@ -243,6 +271,7 @@ int main()
 		{
 			for (size_t k = 0; k < bitmap->width; k++) //for each pixel
 			{
+				//convert from single-channel to RGBA
 				size_t pix = offset * RGBA_STRIDE + (j * charAtlasWidth * RGBA_STRIDE) + (k * RGBA_STRIDE);
 				charAtlasBuffer[pix + 0] = bitmap->buffer[j * bitmap->width + k]; //R
 				charAtlasBuffer[pix + 1] = bitmap->buffer[j * bitmap->width + k]; //G
@@ -252,7 +281,6 @@ int main()
 		}
 		offset += widthPerCharacter;
 	}
-	//stbi_write_bmp("Textures/TestOut.bmp", charAtlasWidth, charAtlasRows, RGBA_STRIDE, charAtlasBuffer); //for testing, manually inspecting the char atlas. TODO remove me
 
 	//textures (from file)
 	auto blankWhiteTex = Texture("textures/blankwhite.png");
@@ -263,7 +291,8 @@ int main()
 	auto charAtlasTex = Texture(charAtlasBuffer, charAtlasWidth, charAtlasRows);
 
 	//2d renderers
-	auto newGameTextBox = TextBox(std::string("NEW GAME"), cubeTex.handle, textureLocation2D, translationLocation2D, glm::vec2(0,0), glm::vec2(.005, .005));
+	auto newGameTextBox = TextBox(std::string("NEW GAME"), charAtlasTex.handle, textureLocation2D, translationLocation2D, colorMaskLocation2D, glm::vec2(-0.9, 0.9), glm::vec2(0.05, 0.05), glm::vec2(WINDOW_WIDTH, WINDOW_HEIGHT));
+	auto highScoresTextBox = TextBox(std::string("HIGH SCORES"), charAtlasTex.handle, textureLocation2D, translationLocation2D, colorMaskLocation2D, glm::vec2(-0.9, 0.7), glm::vec2(0.05, 0.05), glm::vec2(WINDOW_WIDTH, WINDOW_HEIGHT));
 
 	//model
 	auto asteroidModel = Model(
@@ -282,14 +311,6 @@ int main()
 		std::vector<glm::vec4>{ glm::vec4(2, 2, 2, 1) },
 		1
 	);
-	auto planeModel = Model(
-		"Models/plane.obj",
-		textureLocation,
-		colorMaskLocation,
-		std::vector<GLuint>{ blankWhiteTex.handle },
-		std::vector<glm::vec4>{ glm::vec4(1, 1, 1, 1) },
-		1
-	);
 	auto shipModel = Model(
 		"Models/ship.obj",
 		textureLocation,
@@ -299,35 +320,43 @@ int main()
 		1
 	);
 
-	std::map<std::string, Model*> models = {
-		{"asteroid",&asteroidModel},
-		{"projectile", &projectileModel},
-		{"plane", &planeModel},
-		{"ship", &shipModel}
-	};
+	AppState* appState = new MainMenu(keyPressed, &cursorPos, mousePressed, &newGameTextBox, &highScoresTextBox, colorLocation, modelViewLocation, &texturedColoredShader, &blockColorShader, &textShader2D);
+	appState->OnEntry();
 
-	std::map<std::string, TextBox*> renderer2ds = {
-		{"newGameText",&newGameTextBox}
-	};
-
-	SetState(new MainMenu(SetState, keyPressed, &models, &renderer2ds, colorLocation, modelViewLocation, &texturedColoredShader, &blockColorShader, &textShader2D));
 	while (!glfwWindowShouldClose(window)) //window
 	{
 		//clear framebuffers
 		glad_glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		//check for button clicks
-		appState->Tick();
-
-		glad_glDebugMessageCallback(GLErrorCallback, nullptr);
-		//check for GL errors
-		/* TODO uncomment or delete
-		GLenum err = glad_glGetError();
-		while (err != GL_NO_ERROR)
+		//change state if the current state calls for it
+		SwitchState switchState = appState->Tick();
+		AppState* oldState = nullptr;
+		switch (switchState)
 		{
-			cout << "\nGL Error: " << to_string(err) << endl;
-			err = glad_glGetError();
-		}*/
+			case MAIN_MENU:
+				oldState = appState;
+				appState = new MainMenu(keyPressed, &cursorPos, mousePressed, &newGameTextBox, &highScoresTextBox, colorLocation, modelViewLocation, &texturedColoredShader, &blockColorShader, &textShader2D);
+				break;
+			case GAME_IN_PROGRESS:
+				oldState = appState;
+				appState = new GameInProgress(keyPressed, &cursorPos, mousePressed, &asteroidModel, &projectileModel, &shipModel, colorLocation, modelViewLocation, &texturedColoredShader, &blockColorShader, &textShader2D);
+				break;
+		}
+		if (switchState!=UNCHANGED) //if the state changed
+		{
+			//clear any GL state the old AppState left over
+			glad_glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			glfwSwapBuffers(window);
+			glad_glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+			delete oldState; //delete this after switching just in case deleting before causes any wacky behaviour
+			appState->OnEntry();
+		}
+
+		//clear any errors from memory (they are printed using glad's callback system, this is just to remove them from memory)
+		while (glad_glGetError() != GL_NO_ERROR)
+			continue;
+
 		//glfw stuff
 		glfwSwapBuffers(window);
 		glfwPollEvents();

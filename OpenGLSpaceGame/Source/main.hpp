@@ -9,7 +9,7 @@ static constexpr auto FPS			= 144;
 static constexpr auto FRAME_DELAY	= 1000 / FPS;
 
 //font
-static constexpr char FONT_RESOLUTION = 64;
+static constexpr char FONT_RESOLUTION = 16;
 static constexpr char RGBA_STRIDE = 4;
 
 //debug info
@@ -34,3 +34,6 @@ static constexpr auto PROJECTILE_DURATION	   = FIRE_DELAY * 10;
 //asteroids
 static constexpr auto NUM_TARGET_ASTEROIDS = 6;
 static constexpr auto ASTEROID_INIT_VEL	   = 0.005;
+
+//ids
+static constexpr auto ASTEROIDMODEL_ID = 0;
