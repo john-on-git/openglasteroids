@@ -16,9 +16,16 @@ class SpaceGameObject : public WorldObject
 		void Tick() override;
 		Delta<glm::vec3>* velocityDelta;
 		Delta<glm::vec3>* rotationalVelocityDelta;
+		bool IsStunned() const;
+		void StunFor(size_t duration);
+		size_t fireDelay;
 	protected:
+		static constexpr auto COLOR_FLASH = glm::vec4(2.0f, 2.0f, 0.25f, 1.0f);
+
 		glm::vec3 velocity;
 		glm::vec3 rotationalVelocity;
 		vector<Delta<glm::vec3>*> deltas;
+		size_t stunnedDuration;
+		glm::vec4 originalColorMask;
 };
 

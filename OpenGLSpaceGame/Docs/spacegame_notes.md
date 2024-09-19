@@ -46,7 +46,13 @@
 	- It's going to be a little bit hacky towards the end. I want this finished and it won't be maintained, so I don't particularly care about finding generalisations. 
 	  I suppose it must look clean if anyone's going to look at it? Hopefully they understand the call.
 	- Ok so the state pattern won't work because it introduces circular dependencies between states. Should have thought about this before but at least it's been caught now.
-
+		- This has been resolved by moving some responsibilites to the context.
+	- I should refactor the game objects to improve the encapsulation because currently it's a bit of a mess.
+	  For the sake of time it is probably better if I just have them inherit rather than trying to come up with a composition-based design.
+	  No, after giving it some more thought I've recalled the original reason for this design choice: the objects must share so much info that encapsulating it doesn't really give us
+	  much additional clarity. If they need to share an interface on Tick(), it would require a bunch of arguments, and they need to modify the state. It could be passed in, or taken as a return value?
+	  Either way I don't think it's really that much clearer than an imperative style. It splits everything into a dozen different files, and the generalisations provide very little benefit since none of it will be modified.
+	- WorldObject.getPosition, this is nullptr? man I give up for today
 What's the best way to implement projectile decay?
 	- Property of WorldObject? Nah, should inherit/compose: not really a property of all worldobjects.
 	- Child class of WorldObject?

@@ -1,4 +1,5 @@
 #include "TextBox.hpp"
+#include "../main.hpp"
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 #include "../Texture/Texture.hpp"
@@ -6,14 +7,25 @@
 
 static constexpr char N_SUPPORTED_CHARS = '~' - ' ' + 1;
 static constexpr char TEXTBOX_STRIDE = 4;
+static constexpr auto WINDOW_DIMENSIONS = glm::vec2(WINDOW_WIDTH, WINDOW_HEIGHT);
 
-TextBox::TextBox(std::string text, GLuint textureHandle, GLuint textureLocation, GLuint translationLocation, GLuint colorMaskLocation, glm::vec2 position, glm::vec2 size, glm::vec2 windowDimensions)
+void TextBox::UpdateBounds()
+{
+	transformedBounds = glm::mat2(
+		glm::vec2((((bounds[0].x * size.x) + position.x) + 1.0f) / 2 * windowDimensions->x, (((bounds[0].y * size.y) - position.y) + 1.0f) / 2 * windowDimensions->y), //min coords
+		glm::vec2((((bounds[1].x * size.x) + position.x) + 1.0f) / 2 * windowDimensions->x, (((bounds[1].y * size.y) - position.y) + 1.0f) / 2 * windowDimensions->y) //max coords
+	);
+}
+
+TextBox::TextBox(std::string text, GLuint textureHandle, GLuint textureLocation, GLuint translationLocation, GLuint colorMaskLocation, glm::vec2 position, glm::vec2 size, glm::vec2* windowDimensions)
 {
 	this->textureHandle = textureHandle;
 	this->textureLocation = textureLocation;
 	this->translationLocation = translationLocation;
 	this->colorMaskLocation = colorMaskLocation;
 
+	this->windowDimensions = windowDimensions;
+	this->lastWindowDimensions = *windowDimensions;
 	//build the translation matrix
 	translationMatrix = glm::mat4(1);
 	translationMatrix = glm::translate(translationMatrix, glm::vec3(position, 0));
@@ -76,10 +88,15 @@ TextBox::TextBox(std::string text, GLuint textureHandle, GLuint textureLocation,
 		vertIndices[i*6+4] = i*4+2;
 		vertIndices[i*6+5] = i*4+3;
 	}
-	//min coords
-	bounds[0] = glm::vec2((((verts[0] * size.x) + position.x) + 1.0f) / 2 * windowDimensions.x, (((verts[1] * size.y) - position.y) + 1.0f) / 2 * windowDimensions.y);
-	//max coords
-	bounds[1] = glm::vec2((((verts[(numChars - 1) * 16 + 12] * size.x) + position.x) + 1.0f) / 2 * windowDimensions.x, (((verts[(numChars - 1) * 16 + 13] * size.y) - position.y) + 1.0f) / 2 * windowDimensions.y);
+
+	//info for calculating bounds
+	this->position = position;
+	this->size = size;
+	bounds = glm::mat2(
+		verts[0],						 verts[1],
+		verts[(numChars - 1) * 16 + 12], verts[(numChars - 1) * 16 + 13]
+	);
+	UpdateBounds();
 
 	//render each glyph, copying it over to the texture atlas
 
@@ -154,9 +171,15 @@ void TextBox::Draw()
 
 bool TextBox::InBounds(glm::vec2 pos)
 {
+	//check if the window has been resized (we need to recalculate the bounds)
+	if (lastWindowDimensions != *windowDimensions)
+	{
+		UpdateBounds();
+	}
+	lastWindowDimensions = *windowDimensions;
 	return
-		pos.x > bounds[0].x &&
-		pos.y > bounds[0].y &&
-		pos.x < bounds[1].x &&
-		pos.y < bounds[1].y;
+		pos.x > transformedBounds[0].x &&
+		pos.y > transformedBounds[0].y &&
+		pos.x < transformedBounds[1].x &&
+		pos.y < transformedBounds[1].y;
 }

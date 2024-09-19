@@ -152,7 +152,7 @@
     <ClCompile Include="Source\QuadTreeCollisionHandler\QuadTreeCollisionHandler.cpp" />
     <ClCompile Include="Source\Texture\Texture.cpp" />
     <ClCompile Include="Source\WorldObject\WorldObject.cpp" />
-    <ClCompile Include="Source\WorldObject\TemporarySpaceGameObject.cpp" />
+    <ClCompile Include="Source\WorldObject\SpaceGameObject\TemporarySpaceGameObject.cpp" />
     <ClCompile Include="Source\WorldObject\SpaceGameObject.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -182,7 +182,7 @@
     <ClInclude Include="Source\Texture\Texture.hpp" />
     <ClInclude Include="Source\UnorderedPair\UnorderedPair.hpp" />
     <ClInclude Include="Source\WorldObject\WorldObject.hpp" />
-    <ClInclude Include="Source\WorldObject\TemporarySpaceGameObject.hpp" />
+    <ClInclude Include="Source\WorldObject\SpaceGameObject\TemporarySpaceGameObject.hpp" />
     <ClInclude Include="Source\WorldObject\SpaceGameObject.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

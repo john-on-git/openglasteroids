@@ -10,6 +10,7 @@
 #include "../Delta/DeltaProviders/SpacegameObjectVelocityProvider.hpp"
 #include "../Delta/DeltaProviders/SpacegameObjectRotationalVelocityProvider.hpp"
 #include "../Model/Model.hpp"
+#include "../main.hpp"
 
 SpaceGameObject::SpaceGameObject(Model* model, glm::vec3 position, glm::vec3 velocity, glm::vec3 rotVelocity, glm::vec3 angle, glm::vec3 scale, GLuint modelViewLocation, unordered_set<tag> tags) : WorldObject(model, position, angle, scale, modelViewLocation, tags)
 {
@@ -25,6 +26,9 @@ SpaceGameObject::SpaceGameObject(Model* model, glm::vec3 position, glm::vec3 vel
 		{ new WorldObjectAngleTarget(this) },
 		{ } //drag delta
 	);
+	this->originalColorMask = model->meshes[0]->colorMask;
+	this->stunnedDuration = 0;
+	this->fireDelay = 0;
 }
 
 glm::vec3 SpaceGameObject::getVelocity()
@@ -62,5 +66,42 @@ void SpaceGameObject::Tick()
 			deltas.erase(deltas.begin() + i);
 			i--;
 		}
+	}
+
+	if (stunnedDuration > 0)
+	{
+		stunnedDuration--;
+		if (stunnedDuration == 0)
+		{
+			model->meshes[0]->colorMask = originalColorMask;
+		}
+		else if (stunnedDuration % (FPS / 4) == 0)
+		{
+			if (stunnedDuration % (FPS / 2) == 0)
+			{
+				model->meshes[0]->colorMask = originalColorMask;
+			}
+			else
+			{
+				model->meshes[0]->colorMask = COLOR_FLASH;
+			}
+		} 
+	}
+	if (fireDelay > 0)
+	{
+		fireDelay--;
+	}
+}
+
+bool SpaceGameObject::IsStunned() const
+{
+	return stunnedDuration > 0;
+}
+
+void SpaceGameObject::StunFor(size_t duration)
+{
+	if (this->stunnedDuration < duration)
+	{
+		this->stunnedDuration = duration;
 	}
 }

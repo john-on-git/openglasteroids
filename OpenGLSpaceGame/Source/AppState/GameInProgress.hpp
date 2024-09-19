@@ -16,9 +16,21 @@ class GameInProgress : public AppState
 		std::map<std::string,Model*>* models;
 		std::map<std::string, TextBox*>* renderer2Ds;
 		Model* asteroidModel;
-		Model* projectileModel;
+		Model* shipProjectileModel;
 		Model* shipModel;
+		Model* alienModel;
+		Model* alienProjectileModel;
 
+		TextBox* scoreCounter;
+
+
+		GLuint textureAtlasHandle;
+		
+		GLuint textureLocation2D; 
+		GLuint translationLocation2D; 
+		GLuint colorMaskLocation2D; 
+		glm::vec2* windowDimensions;
+		
 		GLuint colorLocation;
 		GLuint modelViewLocation;
 
@@ -34,18 +46,19 @@ class GameInProgress : public AppState
 
 		unsigned char numAsteroids;
 		unsigned char asteroidSide;
-		unsigned char fireDelay;
-		unsigned char controlsDisabled;
+
+		unsigned char numAliens;
+		unsigned char numTargetAliens;
+		unsigned char alienSide;
+
 		unsigned char showDebugInfoToggleDelay;
 		bool showDebugInfo;
 
+		unsigned short score;
 
 		QuadTreeCollisionHandler* collisionHandler;
-
-		static constexpr auto COLOR_FLASH = glm::vec4(2.0f, 2.0f, 0.25f, 1.0f);
-		static constexpr auto COLOR_NONE = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 	public:
-		GameInProgress(bool keyPressed[360], glm::vec2* cursorPos, bool mousePressed[8], Model* asteroidModel, Model* projectileModel, Model* shipModel, GLuint colorLocation, GLuint modelViewLocation, Program* texturedColoredShader, Program* blockColorShader, Program* textShader2D);
+		GameInProgress(bool keyPressed[360], glm::vec2* cursorPos, bool mousePressed[8], Model* asteroidModel, Model* shipProjectileModel, Model* shipModel, Model* alienModel, Model* alienProjectileModel, GLuint colorLocation, GLuint modelViewLocation, Program* texturedColoredShader, Program* blockColorShader, Program* textShader2D, GLuint textureAtlasHandle, GLuint textureLocation2D, GLuint translationLocation2D, GLuint colorMaskLocation2D, glm::vec2* windowDimensions);
 		virtual void OnEntry() override;
 		SwitchState Tick();
 };

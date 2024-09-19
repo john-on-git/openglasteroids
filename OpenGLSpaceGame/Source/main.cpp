@@ -24,7 +24,7 @@
 #include "Program/program.hpp"
 #include "BufferedAiMesh/BufferedAiMesh.hpp"
 #include "WorldObject/SpaceGameObject.hpp"
-#include "WorldObject/TemporarySpaceGameObject.hpp"
+#include "WorldObject/SpacegameObject/TemporarySpaceGameObject.hpp"
 #include "Texture/Texture.hpp"
 #include "main.hpp"
 #include "QuadTreeCollisionHandler/QuadTreeCollisionHandler.hpp"
@@ -96,8 +96,9 @@ int main()
 		OutputDebugStringW(L"FATAL: failed to initialize glfw\n");
 		exit(1);
 	}
-	//initialize window
-	window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE, nullptr, nullptr);
+	//initialize window5
+	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+	window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE, NULL, NULL);
 	if (window == nullptr)
 	{
 		OutputDebugStringW(L"FATAL: failed to initialize glfw window\n");
@@ -291,8 +292,10 @@ int main()
 	auto charAtlasTex = Texture(charAtlasBuffer, charAtlasWidth, charAtlasRows);
 
 	//2d renderers
-	auto newGameTextBox = TextBox(std::string("NEW GAME"), charAtlasTex.handle, textureLocation2D, translationLocation2D, colorMaskLocation2D, glm::vec2(-0.9, 0.9), glm::vec2(0.05, 0.05), glm::vec2(WINDOW_WIDTH, WINDOW_HEIGHT));
-	auto highScoresTextBox = TextBox(std::string("HIGH SCORES"), charAtlasTex.handle, textureLocation2D, translationLocation2D, colorMaskLocation2D, glm::vec2(-0.9, 0.7), glm::vec2(0.05, 0.05), glm::vec2(WINDOW_WIDTH, WINDOW_HEIGHT));
+	//TODO window dimensions are an arg to support window resizing
+	auto windowDimensions = glm::vec2(WINDOW_WIDTH, WINDOW_HEIGHT); //TODO update whenever window size changes (should pass pointers in that case as well)
+	auto newGameTextBox = TextBox(std::string("NEW GAME"), charAtlasTex.handle, textureLocation2D, translationLocation2D, colorMaskLocation2D, glm::vec2(-0.9, 0.9), glm::vec2(0.05, 0.05), &windowDimensions);
+	auto highScoresTextBox = TextBox(std::string("HIGH SCORES"), charAtlasTex.handle, textureLocation2D, translationLocation2D, colorMaskLocation2D, glm::vec2(-0.9, 0.7), glm::vec2(0.05, 0.05), &windowDimensions);
 
 	//model
 	auto asteroidModel = Model(
@@ -303,12 +306,20 @@ int main()
 		std::vector<glm::vec4>{ glm::vec4(1, 1, 1, 1) },
 		1
 	);
-	auto projectileModel = Model(
+	auto shipProjectileModel = Model(
 		"Models/sphere.obj",
 		textureLocation,
 		colorMaskLocation,
 		std::vector<GLuint>{ blankWhiteTex.handle },
-		std::vector<glm::vec4>{ glm::vec4(2, 2, 2, 1) },
+		std::vector<glm::vec4>{ glm::vec4(2, 1, 1, 1) },
+		1
+	);
+	auto alienProjectileModel = Model(
+		"Models/sphere.obj",
+		textureLocation,
+		colorMaskLocation,
+		std::vector<GLuint>{ blankWhiteTex.handle },
+		std::vector<glm::vec4>{ glm::vec4(0, 1, 0, 1) }, //TODO make color masks the responsibility of WorldObject, so we don't need two of these projectile models
 		1
 	);
 	auto shipModel = Model(
@@ -317,6 +328,14 @@ int main()
 		colorMaskLocation,
 		std::vector<GLuint>{ blankWhiteTex.handle },
 		std::vector<glm::vec4>{ glm::vec4(1, 1, 1, 1) },
+		1
+	);
+	auto alienModel = Model(
+		"Models/ship.obj", //TODO replace this placeholder model
+		textureLocation,
+		colorMaskLocation,
+		std::vector<GLuint>{ blankWhiteTex.handle },
+		std::vector<glm::vec4>{ glm::vec4(0, 1, 0, 1) },
 		1
 	);
 
@@ -339,7 +358,7 @@ int main()
 				break;
 			case GAME_IN_PROGRESS:
 				oldState = appState;
-				appState = new GameInProgress(keyPressed, &cursorPos, mousePressed, &asteroidModel, &projectileModel, &shipModel, colorLocation, modelViewLocation, &texturedColoredShader, &blockColorShader, &textShader2D);
+				appState = new GameInProgress(keyPressed, &cursorPos, mousePressed, &asteroidModel, &shipProjectileModel, &shipModel, &alienModel, &alienProjectileModel, colorLocation, modelViewLocation, &texturedColoredShader, &blockColorShader, &textShader2D, charAtlasTex.handle, textureLocation2D, translationLocation2D, colorMaskLocation2D, &windowDimensions);
 				break;
 		}
 		if (switchState!=UNCHANGED) //if the state changed

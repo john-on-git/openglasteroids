@@ -1,5 +1,5 @@
 #pragma once
-#include "../WorldObject/SpaceGameObject.hpp"
+#include "../SpaceGameObject.hpp"
 
  class TemporarySpaceGameObject : public SpaceGameObject
 {
