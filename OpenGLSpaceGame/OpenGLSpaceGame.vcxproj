@@ -131,6 +131,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Source\AppState\AppState.cpp" />
+    <ClCompile Include="Source\AppState\GameOver.cpp" />
     <ClCompile Include="Source\TextBox\TextBox.cpp" />
     <ClCompile Include="Source\TextBox\TextBox.hpp" />
     <ClCompile Include="Source\AppState\MainMenu.cpp" />
@@ -175,6 +176,7 @@
     <ClInclude Include="Source\Delta\DeltaProviders\RotDragProvider.hpp" />
     <ClInclude Include="Source\ICollisionHandler\ICollisionHandler.hpp" />
     <ClInclude Include="Source\main.hpp" />
+    <ClInclude Include="Source\AppState\GameOver.hpp" />
     <ClInclude Include="Source\Model\Model.hpp" />
     <ClInclude Include="Source\Program\program.hpp" />
     <ClInclude Include="Source\QuadTreeCollisionHandler\QuadTreeCollisionHandler.hpp" />

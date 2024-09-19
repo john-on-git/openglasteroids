@@ -1,7 +1,7 @@
 #pragma once
 
 #include <glad/glad.h>
-#include <glm/ext/vector_float2.hpp>
+#include <glm/vec2.hpp>
 #include <glm/ext/matrix_float4x4.hpp>
 #include <glm/ext/matrix_float2x2.hpp>
 #include <glm/vec4.hpp>

@@ -1,12 +1,19 @@
 #pragma once
 #include "glm/vec2.hpp"
 
-enum SwitchState
+enum MENU_STATE
 {
 	UNCHANGED = 0,
 	MAIN_MENU,
 	GAME_IN_PROGRESS,
+	GAME_OVER,
 	VIEW_HIGH_SCORES
+};
+
+struct SwitchState
+{
+	MENU_STATE nextState;
+	size_t score;
 };
 
 class AppState

@@ -6,7 +6,7 @@
 #include <map>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include "glm/vec2.hpp"
+#include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
@@ -20,7 +20,6 @@
 #include <assimp\postprocess.h>
 #include <freetype/ftbitmap.h>
 
-
 #include "Program/program.hpp"
 #include "BufferedAiMesh/BufferedAiMesh.hpp"
 #include "WorldObject/SpaceGameObject.hpp"
@@ -31,6 +30,7 @@
 #include "AppState/AppState.hpp"
 #include "AppState/MainMenu.hpp"
 #include "AppState/GameInProgress.hpp"
+#include "AppState/GameOver.hpp"
 #include "TextBox/TextBox.hpp"
 
 using namespace std;
@@ -294,8 +294,13 @@ int main()
 	//2d renderers
 	//TODO window dimensions are an arg to support window resizing
 	auto windowDimensions = glm::vec2(WINDOW_WIDTH, WINDOW_HEIGHT); //TODO update whenever window size changes (should pass pointers in that case as well)
+	
 	auto newGameTextBox = TextBox(std::string("NEW GAME"), charAtlasTex.handle, textureLocation2D, translationLocation2D, colorMaskLocation2D, glm::vec2(-0.9, 0.9), glm::vec2(0.05, 0.05), &windowDimensions);
 	auto highScoresTextBox = TextBox(std::string("HIGH SCORES"), charAtlasTex.handle, textureLocation2D, translationLocation2D, colorMaskLocation2D, glm::vec2(-0.9, 0.7), glm::vec2(0.05, 0.05), &windowDimensions);
+	
+	auto scoreTextBox = TextBox(std::string("FINAL SCORE:"), charAtlasTex.handle, textureLocation2D, translationLocation2D, colorMaskLocation2D, glm::vec2(-0.9, 0), glm::vec2(0.05, 0.05), &windowDimensions);
+
+	auto mainMenuTextBox = TextBox(std::string("MAIN MENU"), charAtlasTex.handle, textureLocation2D, translationLocation2D, colorMaskLocation2D, glm::vec2(-0.9, -0.9), glm::vec2(0.05, 0.05), &windowDimensions);
 
 	//model
 	auto asteroidModel = Model(
@@ -339,7 +344,7 @@ int main()
 		1
 	);
 
-	AppState* appState = new MainMenu(keyPressed, &cursorPos, mousePressed, &newGameTextBox, &highScoresTextBox, colorLocation, modelViewLocation, &texturedColoredShader, &blockColorShader, &textShader2D);
+	AppState* appState = new MainMenu(&cursorPos, mousePressed, &newGameTextBox, &highScoresTextBox, &textShader2D);
 	appState->OnEntry();
 
 	while (!glfwWindowShouldClose(window)) //window
@@ -350,18 +355,24 @@ int main()
 		//change state if the current state calls for it
 		SwitchState switchState = appState->Tick();
 		AppState* oldState = nullptr;
-		switch (switchState)
+		switch (switchState.nextState)
 		{
 			case MAIN_MENU:
 				oldState = appState;
-				appState = new MainMenu(keyPressed, &cursorPos, mousePressed, &newGameTextBox, &highScoresTextBox, colorLocation, modelViewLocation, &texturedColoredShader, &blockColorShader, &textShader2D);
+				appState = new MainMenu(&cursorPos, mousePressed, &newGameTextBox, &highScoresTextBox, &textShader2D);
 				break;
 			case GAME_IN_PROGRESS:
 				oldState = appState;
 				appState = new GameInProgress(keyPressed, &cursorPos, mousePressed, &asteroidModel, &shipProjectileModel, &shipModel, &alienModel, &alienProjectileModel, colorLocation, modelViewLocation, &texturedColoredShader, &blockColorShader, &textShader2D, charAtlasTex.handle, textureLocation2D, translationLocation2D, colorMaskLocation2D, &windowDimensions);
 				break;
+			case GAME_OVER:
+				oldState = appState;
+				appState = new GameOver(switchState.score, &cursorPos, mousePressed, &scoreTextBox, &mainMenuTextBox, &textShader2D, charAtlasTex.handle, textureLocation2D, translationLocation2D, colorMaskLocation2D, &windowDimensions);
+				//TODO
+				//appState = new GameOver(keyPressed, &cursorPos, mousePressed, &asteroidModel, &shipProjectileModel, &shipModel, &alienModel, &alienProjectileModel, colorLocation, modelViewLocation, &texturedColoredShader, &blockColorShader, &textShader2D, charAtlasTex.handle, textureLocation2D, translationLocation2D, colorMaskLocation2D, &windowDimensions);
+				break;
 		}
-		if (switchState!=UNCHANGED) //if the state changed
+		if (switchState.nextState!=UNCHANGED) //if the state changed
 		{
 			//clear any GL state the old AppState left over
 			glad_glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

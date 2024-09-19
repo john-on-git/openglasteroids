@@ -1,5 +1,4 @@
 #include "TextBox.hpp"
-#include "../main.hpp"
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 #include "../Texture/Texture.hpp"
@@ -7,7 +6,6 @@
 
 static constexpr char N_SUPPORTED_CHARS = '~' - ' ' + 1;
 static constexpr char TEXTBOX_STRIDE = 4;
-static constexpr auto WINDOW_DIMENSIONS = glm::vec2(WINDOW_WIDTH, WINDOW_HEIGHT);
 
 void TextBox::UpdateBounds()
 {
