@@ -7,3 +7,7 @@ AppState::AppState(void (*SetState)(AppState*), bool keyPressed[360], glm::vec2*
 	this->cursorPos = cursorPos;
 	this->mousePressed = mousePressed;
 }
+
+AppState::~AppState()
+{
+}

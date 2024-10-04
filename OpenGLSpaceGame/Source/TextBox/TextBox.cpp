@@ -112,6 +112,7 @@ TextBox::TextBox(std::string text, GLuint textureHandle, GLuint textureLocation,
 		verts,
 		GL_STATIC_DRAW
 	);
+	delete verts;
 	//vertex index buffer
 	glad_glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers[1]);
 	glad_glBufferData( //add verts to buffer
@@ -120,6 +121,7 @@ TextBox::TextBox(std::string text, GLuint textureHandle, GLuint textureLocation,
 		vertIndices,
 		GL_STATIC_DRAW
 	);
+	delete vertIndices;
 		
 	//set vertex attrib pointers
 	glad_glVertexAttribPointer( //position

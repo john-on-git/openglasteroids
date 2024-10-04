@@ -149,7 +149,7 @@ class QuadTreeCollisionHandler : public ICollisionHandler {
 					}
 				}
 			protected:
-				bool WillFit(WorldObject* obj)
+				bool WillFit(WorldObject* obj) const
 				{
 					//calculate world coordinates of object's object-aligned bounding box
 					auto objBBox = obj->getOrientedBoundingBox();
@@ -167,5 +167,5 @@ class QuadTreeCollisionHandler : public ICollisionHandler {
 				}
 		};
 		qnode* root; //the root node of the quadtree. here instead of at the top because qnode needs to be defined first
-		pair<unordered_set<UnorderedPair<WorldObject*>>*, vector<WorldObject*>*> GetBroadCollisionsHelper(unordered_set<UnorderedPair<WorldObject*>>* store, qnode* node);
+		vector<WorldObject*>* GetBroadCollisionsHelper(unordered_set<UnorderedPair<WorldObject*>>* store, qnode* node);
 };

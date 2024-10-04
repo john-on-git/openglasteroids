@@ -12,8 +12,8 @@ class BufferedAiMesh
 {
 	public:
 		glm::vec4 colorMask;
-		BufferedAiMesh(aiMesh* mesh, GLuint texture, glm::vec4 colorMask, GLuint textureLocation, GLuint colorLocation);
-		void Draw();
+		BufferedAiMesh(aiMesh* mesh, GLuint texture, GLuint textureLocation, GLuint colorLocation);
+		void Draw(glm::vec4 colorMask);
 	protected:
 		GLuint VAO;
 		GLuint buffers[2]; //vertex buffer, and vertex index buffer

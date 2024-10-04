@@ -12,7 +12,7 @@
 #include "../Model/Model.hpp"
 #include "../main.hpp"
 
-SpaceGameObject::SpaceGameObject(Model* model, glm::vec3 position, glm::vec3 velocity, glm::vec3 rotVelocity, glm::vec3 angle, glm::vec3 scale, GLuint modelViewLocation, unordered_set<tag> tags) : WorldObject(model, position, angle, scale, modelViewLocation, tags)
+SpaceGameObject::SpaceGameObject(Model* model, glm::vec3 position, glm::vec3 velocity, glm::vec3 rotVelocity, glm::vec3 angle, glm::vec3 scale, GLuint modelViewLocation, unordered_set<tag> tags, glm::vec4 colorMask) : WorldObject(model, position, angle, scale, modelViewLocation, tags)
 {
 	this->velocity = velocity;
 	velocityDelta = new Delta<glm::vec3>(
@@ -21,19 +21,38 @@ SpaceGameObject::SpaceGameObject(Model* model, glm::vec3 position, glm::vec3 vel
 		{ } //drag delta
 	);
 	this->rotationalVelocity = rotVelocity;
+	this->deltas.push_back(velocityDelta);
+
 	rotationalVelocityDelta = new Delta<glm::vec3>(
 		new SpaceGameObjectRotationalVelocityProvider(this),
 		{ new WorldObjectAngleTarget(this) },
 		{ } //drag delta
 	);
-	this->originalColorMask = model->meshes[0]->colorMask;
+	this->deltas.push_back(rotationalVelocityDelta);
+
+	this->originalColorMask = colorMask;
+	this->colorMask = colorMask;
 	this->stunnedDuration = 0;
 	this->fireDelay = 0;
 }
 
+SpaceGameObject::SpaceGameObject(Model* model, glm::vec3 position, glm::vec3 velocity, glm::vec3 rotVelocity, glm::vec3 angle, glm::vec3 scale, GLuint modelViewLocation, unordered_set<tag> tags) : SpaceGameObject(model, position, velocity, rotVelocity, angle, scale, modelViewLocation, tags, glm::vec4(1))
+{
+}
+
+SpaceGameObject::~SpaceGameObject()
+{
+	tags.clear();
+	for (auto delta : deltas)
+	{
+		delete delta;
+	}
+	deltas.clear();
+}
+
 glm::vec3 SpaceGameObject::getVelocity()
 {
-	return velocity;
+	return this->velocity;
 }
 void SpaceGameObject::setVelocity(glm::vec3 velocity)
 {
@@ -56,8 +75,6 @@ void SpaceGameObject::addDelta(Delta<glm::vec3>* delta)
 
 void SpaceGameObject::Tick()
 {
-	velocityDelta->Tick();
-	rotationalVelocityDelta->Tick();
 	//apply all deltas, deleting any that have expired
 	for (size_t i = 0; i < deltas.size(); i++)
 	{
@@ -73,17 +90,17 @@ void SpaceGameObject::Tick()
 		stunnedDuration--;
 		if (stunnedDuration == 0)
 		{
-			model->meshes[0]->colorMask = originalColorMask;
+			colorMask = originalColorMask;
 		}
 		else if (stunnedDuration % (FPS / 4) == 0)
 		{
 			if (stunnedDuration % (FPS / 2) == 0)
 			{
-				model->meshes[0]->colorMask = originalColorMask;
+				colorMask = originalColorMask;
 			}
 			else
 			{
-				model->meshes[0]->colorMask = COLOR_FLASH;
+				colorMask = COLOR_FLASH;
 			}
 		} 
 	}

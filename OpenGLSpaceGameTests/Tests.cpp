@@ -65,7 +65,6 @@ protected:
 			textureLocation,
 			colorMaskLocation,
 			std::vector<GLuint>{ shipTex.handle },
-			std::vector<glm::vec4>{ glm::vec4(1, 1, 1, 1) },
 			1
 		);
 		shipModel = new Model(
@@ -73,7 +72,6 @@ protected:
 			textureLocation,
 			colorMaskLocation,
 			std::vector<GLuint>{ shipTex.handle },
-			std::vector<glm::vec4>{ glm::vec4(1, 1, 1, 1) },
 			1
 		);
 	}
@@ -113,8 +111,8 @@ TEST_F(CollisionDetectionTests, CorrectFacesForCubeAtOrigin) {
 		glm::vec4(0.0f,0.0f,1.0f,  -1.0f), //+z (2)
 	};
 	auto actualFaces = cube.calcFaces();
-	ASSERT_EQ(actualFaces->size(), expectedFaces.size());
-	for (auto itActual = actualFaces->begin(); itActual != actualFaces->end(); itActual++)
+	ASSERT_EQ(actualFaces.size(), expectedFaces.size());
+	for (auto itActual = actualFaces.begin(); itActual != actualFaces.end(); itActual++)
 	{
 		//remove this face if it was expected
 		int match = -1; //no match

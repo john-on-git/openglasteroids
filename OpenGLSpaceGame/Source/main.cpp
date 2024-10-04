@@ -103,7 +103,7 @@ int main()
 	glm::vec2 windowDimensions = glm::vec2(mode->width, mode->height); //TODO update whenever window size changes (should pass pointers in that case as well)
 
 	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
-	GLFWwindow* window = glfwCreateWindow(windowDimensions.x, windowDimensions.y, WINDOW_TITLE, monitor, NULL);
+	GLFWwindow* window = glfwCreateWindow(windowDimensions.x, windowDimensions.y, WINDOW_TITLE, NULL, NULL);
 	if (window == nullptr)
 	{
 		OutputDebugStringW(L"FATAL: failed to initialize glfw window\n");
@@ -223,8 +223,8 @@ int main()
 		ftMainFont,
 		FONT_RESOLUTION * 64, //docs say "Value of 0 for the character width means 'same as character height'"
 		0, //docs say it's measured in 1/64 of pixel, and recommend mult by 64
-		windowDimensions.x,
-		windowDimensions.y
+		FONT_RESOLUTION * 64,
+		FONT_RESOLUTION * 64
 	);
 
 	size_t charAtlasWidth = 0;
@@ -289,7 +289,12 @@ int main()
 		}
 		offset += widthPerCharacter;
 	}
-
+	for (auto& bitmap : charBitmapsTemp)
+	{
+		delete bitmap.buffer;
+	}
+	charBitmapsTemp.clear();
+	
 	stbi_set_flip_vertically_on_load(true);
 	//textures (from file)
 	auto whiteTex = Texture("textures/white.png");
@@ -297,7 +302,7 @@ int main()
 	
 	//texture (from texture atlas)
 	auto charAtlasTex = Texture(charAtlasBuffer, charAtlasWidth, charAtlasRows);
-
+	delete charAtlasBuffer;
 	//2d renderers
 	
 	auto newGameTextBox = TextBox(std::string("NEW GAME"), charAtlasTex.handle, textureLocation2D, translationLocation2D, colorMaskLocation2D, glm::vec2(-0.9, 0.9), glm::vec2(0.05, 0.05), &windowDimensions);
@@ -313,23 +318,13 @@ int main()
 		textureLocation,
 		colorMaskLocation,
 		std::vector<GLuint>{ cubeTex.handle },
-		std::vector<glm::vec4>{ glm::vec4(1, 1, 1, 1) },
 		1
 	);
-	auto shipProjectileModel = Model(
+	auto projectileModel = Model(
 		"Models/sphere.obj",
 		textureLocation,
 		colorMaskLocation,
 		std::vector<GLuint>{ whiteTex.handle },
-		std::vector<glm::vec4>{ glm::vec4(2, 1, 1, 1) },
-		1
-	);
-	auto alienProjectileModel = Model(
-		"Models/sphere.obj",
-		textureLocation,
-		colorMaskLocation,
-		std::vector<GLuint>{ whiteTex.handle },
-		std::vector<glm::vec4>{ glm::vec4(0, 1, 0, 1) }, //TODO make color masks the responsibility of WorldObject, so we don't need two of these projectile models
 		1
 	);
 	auto shipModel = Model(
@@ -337,7 +332,6 @@ int main()
 		textureLocation,
 		colorMaskLocation,
 		std::vector<GLuint>{ whiteTex.handle },
-		std::vector<glm::vec4>{ glm::vec4(1, 1, 1, 1) },
 		1
 	);
 	auto alienModel = Model(
@@ -345,7 +339,6 @@ int main()
 		textureLocation,
 		colorMaskLocation,
 		std::vector<GLuint>{ whiteTex.handle },
-		std::vector<glm::vec4>{ glm::vec4(0, 1, 0, 1) },
 		1
 	);
 
@@ -368,7 +361,7 @@ int main()
 				break;
 			case GAME_IN_PROGRESS:
 				oldState = appState;
-				appState = new GameInProgress(keyPressed, &cursorPos, mousePressed, &asteroidModel, &shipProjectileModel, &shipModel, &alienModel, &alienProjectileModel, colorLocation, modelViewLocation, &texturedColoredShader, &blockColorShader, &textShader2D, charAtlasTex.handle, textureLocation2D, translationLocation2D, colorMaskLocation2D, &windowDimensions);
+				appState = new GameInProgress(keyPressed, &cursorPos, mousePressed, &asteroidModel, &projectileModel, &shipModel, &alienModel, colorLocation, modelViewLocation, &texturedColoredShader, &blockColorShader, &textShader2D, charAtlasTex.handle, textureLocation2D, translationLocation2D, colorMaskLocation2D, &windowDimensions);
 				break;
 			case GAME_OVER:
 				oldState = appState;

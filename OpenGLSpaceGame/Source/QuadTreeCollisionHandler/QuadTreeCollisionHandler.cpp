@@ -79,36 +79,32 @@ static bool GetFineCollision(WorldObject* p, WorldObject* q)
 	//one issue is that the edges aren't scaled. Fixed!
 
 	//README! Currently trying to go case-by case on the first call. edge 18 of p intersects (but not really). rayDirection is NaN for it.
-	std::vector<glm::mat2x4>* edges;
-	std::vector<glm::vec4>* faces;
+	std::vector<glm::mat2x4> edges;
+	std::vector<glm::vec4> faces;
 
 	//the objects are intersecting if any of the edges of p intersect q
 	edges = p->calcEdges();
 	faces = q->calcFaces();
-	for (size_t i = 0; i < edges->size(); i++)
+	for (size_t i = 0; i < edges.size(); i++)
 	{
 		//return true if this edge intersects the polygon, transforming everything so the start of the edge is the origin
-		if (LineIntersectsPolygon(edges->at(i), faces)) //TODO
+		if (LineIntersectsPolygon(edges.at(i), &faces)) //TODO
 		{
 			return true;
 		}
 	}
-	delete faces;
-	delete edges;
 
 	//or if any of the edges of q intersect p
 	edges = q->calcEdges();
 	faces = p->calcFaces();
-	for (size_t i = 0; i < edges->size(); i++)
+	for (size_t i = 0; i < edges.size(); i++)
 	{
 		//return true if this edge intersects the polygon, transforming everything so the start of the edge is the origin
-		if (LineIntersectsPolygon(edges->at(i), faces)) //TODO
+		if (LineIntersectsPolygon(edges.at(i), &faces)) //TODO
 		{
 			return true;
 		}
 	}
-	delete faces;
-	delete edges;
 
 	//TODO special case for identical & aligned shapes
 
@@ -117,10 +113,10 @@ static bool GetFineCollision(WorldObject* p, WorldObject* q)
 
 QuadTreeCollisionHandler::QuadTreeCollisionHandler(unsigned char maxDepth, glm::vec2 bottomLeft, glm::vec2 topRight)
 {
+	this->root = nullptr;
 	this->maxDepth = maxDepth;
 	initialBounds[0] = bottomLeft;
 	initialBounds[1] = topRight;
-	root = nullptr;
 }
 
 void QuadTreeCollisionHandler::Register(WorldObject* o)
@@ -136,14 +132,8 @@ void QuadTreeCollisionHandler::Remove(WorldObject* o)
 unordered_set<UnorderedPair<WorldObject*>>* QuadTreeCollisionHandler::Check()
 {
 	unordered_set<UnorderedPair<WorldObject*>>* collisions = new unordered_set<UnorderedPair<WorldObject*>>();
-	
-	//clear any existing quadtree
-	if (root != nullptr)
-	{
-		delete root; //clear it
-	}
 
-	//and construct the new one
+	//construct the quadtree
 	root = new qnode(nullptr, initialBounds[0], initialBounds[1]);
 	for (auto obj : this->objects)
 	{
@@ -163,23 +153,20 @@ unordered_set<UnorderedPair<WorldObject*>>* QuadTreeCollisionHandler::Check()
 			collisions->insert(*it);
 		}
 	}
+	delete root; //delete the quadtree
+	delete broadCollisions;
 	return collisions;
 }
 
 unordered_set<UnorderedPair<WorldObject*>>* QuadTreeCollisionHandler::GetBroadCollisions()
 {
-	auto o = new unordered_set<UnorderedPair<WorldObject*>>;
-	if (root == nullptr) //this has never been updated
-		return nullptr;
-	else
-	{
-		auto pair = GetBroadCollisionsHelper(o, root);
-		delete pair.second;
-		return pair.first;
-	}
+	auto o = new unordered_set<UnorderedPair<WorldObject*>>();
+	vector<WorldObject*>* cache = GetBroadCollisionsHelper(o, root);
+	delete cache;
+	return o;
 }
 
-pair<unordered_set<UnorderedPair<WorldObject*>>*, vector<WorldObject*>*> QuadTreeCollisionHandler::GetBroadCollisionsHelper(unordered_set<UnorderedPair<WorldObject*>>* store, qnode* node)
+vector<WorldObject*>* QuadTreeCollisionHandler::GetBroadCollisionsHelper(unordered_set<UnorderedPair<WorldObject*>>* store, qnode* node)
 {
 	//methods?
 		//iterating the tree a bunch
@@ -191,7 +178,7 @@ pair<unordered_set<UnorderedPair<WorldObject*>>*, vector<WorldObject*>*> QuadTre
 		for (char i = 0;i < 4;i++)
 		{
 			//get all content from subtree & move to this node's cache
-			vector<WorldObject*>* subCache = GetBroadCollisionsHelper(store, node->children[i]).second;
+			vector<WorldObject*>* subCache = GetBroadCollisionsHelper(store, node->children[i]);
 			cache->insert(cache->end(),
 				std::make_move_iterator(subCache->begin()),
 				std::make_move_iterator(subCache->end())
@@ -208,7 +195,7 @@ pair<unordered_set<UnorderedPair<WorldObject*>>*, vector<WorldObject*>*> QuadTre
 		cache->push_back(item);
 	}
 	
-	return pair<unordered_set<UnorderedPair<WorldObject*>>*, vector<WorldObject*>*>(store, cache);
+	return cache;
 }
 
 //for debugging

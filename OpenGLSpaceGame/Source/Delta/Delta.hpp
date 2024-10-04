@@ -61,10 +61,17 @@ Delta<T>::Delta(DeltaProvider<T>* provider, vector<DeltaTarget<T>*> targets, vec
 template<typename T>
 Delta<T>::~Delta()
 {
-	delete this->provider;
-	this->targets.clear();
-	this->dependents.clear();
-	delete this;
+	delete provider;
+	for (auto target : targets)
+	{
+		delete target;
+	}
+	targets.clear();
+	for (auto delta : dependents)
+	{
+		delete delta;
+	}
+	dependents.clear();
 }
 
 template <typename T>
@@ -84,10 +91,12 @@ bool Delta<T>::Tick()
 	if (duration > 0) //update the duration
 		duration--;
 	//apply all dependent deltas, deleting any that have expired
+	vector<Delta*> toDelete = vector<Delta*>();
 	for (size_t i = 0; i < dependents.size(); i++)
 	{
 		if (dependents.at(i)->Tick()) //returns true when expired
 		{
+			delete dependents.at(i);
 			dependents.erase(dependents.begin() + i);
 			i--;
 		}

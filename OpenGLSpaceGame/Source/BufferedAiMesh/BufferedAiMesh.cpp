@@ -6,11 +6,10 @@
 constexpr auto AIMESH_STRIDE = 6; //width of each vert
 constexpr auto INDICES_PER_TRI = 3;
 
-BufferedAiMesh::BufferedAiMesh(aiMesh* mesh, GLuint textureHandle, glm::vec4 colorMask, GLuint textureLocation, GLuint colorLocation)
+BufferedAiMesh::BufferedAiMesh(aiMesh* mesh, GLuint textureHandle, GLuint textureLocation, GLuint colorLocation)
 {
 	//init properties
 	this->textureHandle = textureHandle;
-	this->colorMask = colorMask;
 	this->textureLocation = textureLocation;
 	this->colorLocation = colorLocation;
 	this->numIndices = (mesh->mNumFaces) * INDICES_PER_TRI;
@@ -87,7 +86,7 @@ BufferedAiMesh::BufferedAiMesh(aiMesh* mesh, GLuint textureHandle, glm::vec4 col
 	glad_glEnableVertexAttribArray(1);
 }
 
-void BufferedAiMesh::Draw()
+void BufferedAiMesh::Draw(glm::vec4 colorMask)
 {
 	//bind the buffer (no, don't! https://stackoverflow.com/a/27877433) 7.7.22
 	//bind the array object instead
@@ -96,12 +95,13 @@ void BufferedAiMesh::Draw()
 		//set uniform value
 		glad_glActiveTexture(GL_TEXTURE0);
 
-		glad_glBindTexture(GL_TEXTURE_2D, textureHandle); 
 		//apparently the correct way to do this is to build a RAM representation of which textures are bound, and first use it to check if the texture is already bound, 
 		//as it's cheaper than redundantly sending it to the GPU (a very expensive operation at this timescale)
+		glad_glBindTexture(GL_TEXTURE_2D, textureHandle); 
 		
-		glad_glUniform1i(textureLocation, 0);
 		glad_glUniform4fv(colorLocation, 1, glm::value_ptr(colorMask));
+
+		glad_glUniform1i(textureLocation, 0);
 		//draw
 		glad_glDrawElements(
 			GL_TRIANGLES,

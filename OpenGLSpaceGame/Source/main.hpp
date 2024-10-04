@@ -21,29 +21,29 @@ static constexpr auto SHIP_ACCELERATION = 0.00004f;
 static constexpr auto SHIP_TURNRATE_MULT = 1.f;
 static constexpr auto SHIP_MIN_VELOCITY  = 0.0f;
 static constexpr auto SHIP_MAX_VELOCITY  = 0.0333f;
-static constexpr size_t SHIP_STUN_DURATION = FPS * 1.0f;
+static constexpr size_t SHIP_STUN_DURATION = FPS * 1.0;
 
 //projectiles
 static constexpr auto PROJECTILE_VELOCITY_MULT = 0.02f;
-static constexpr size_t SHIP_FIRE_DELAY		   = FPS * .25f;
+static constexpr size_t SHIP_FIRE_DELAY		   = FPS / 4;
 static constexpr size_t PROJECTILE_DURATION	   = SHIP_FIRE_DELAY * 5;
 
 //asteroids
-static constexpr auto NUM_TARGET_ASTEROIDS = 6;
-static constexpr auto ASTEROID_INIT_VEL	   = 0.005;
+static constexpr size_t NUM_TARGET_ASTEROIDS = 6;
+static constexpr auto ASTEROID_INIT_VEL	   = 0.005f;
 
 //aliens
-static constexpr auto INITIAL_NUM_TARGET_ALIENS = 3;
-static constexpr auto ALIEN_CAP_INCREASE_PERIOD = FPS * 60;
-static constexpr auto MAX_ALIENS = 10;
+static constexpr size_t INITIAL_NUM_TARGET_ALIENS = 3;
+static constexpr size_t ALIEN_CAP_INCREASE_PERIOD = FPS * 60;
+static constexpr size_t MAX_ALIENS = 10;
 
 static constexpr auto ALIEN_ACCELERATION = 0.0001f;
 static constexpr auto ALIEN_TURNRATE_MULT = 0.1f;
 static constexpr auto ALIEN_MIN_VELOCITY  = 0.0f;
 static constexpr auto ALIEN_MAX_VELOCITY  = 0.01f;
 
-static constexpr auto HALF_ALIEN_TRACKING_CONE_DEGREES = 5;
-static constexpr size_t ALIEN_FIRE_DELAY = FPS * 1.5f;
+static constexpr unsigned char HALF_ALIEN_TRACKING_CONE_DEGREES = 5;
+static constexpr size_t ALIEN_FIRE_DELAY = FPS * 1.5;
 
-static constexpr size_t ALIEN_STUN_DURATION = FPS * 2.0f;
+static constexpr size_t ALIEN_STUN_DURATION = FPS * 2;
 static constexpr size_t ALIEN_GRACE_PERIOD = ALIEN_FIRE_DELAY * 1;

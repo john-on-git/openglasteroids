@@ -6,7 +6,7 @@
 #include <vector>
 #include <glm/mat4x4.hpp>
 
-Model::Model(std::string path, GLuint textureLocation, GLuint colorLocation, std::vector<GLuint> textures, std::vector<glm::vec4> colorMasks, size_t numTextures)
+Model::Model(std::string path, GLuint textureLocation, GLuint colorLocation, std::vector<GLuint> textures, size_t numTextures)
 {
 	//load mesh
 	Assimp::Importer importer;
@@ -19,9 +19,11 @@ Model::Model(std::string path, GLuint textureLocation, GLuint colorLocation, std
 	//convert to buffered meshes
 	aiMesh** aiMeshes = scene->mMeshes;
 	meshes = new BufferedAiMesh*[numMeshes];
+	auto edgeVector = std::vector<glm::mat2x3>();
+	auto faceVector = std::vector<glm::mat3x3>();
 	for (size_t i = 0;i < numMeshes;i++)
 	{
-		meshes[i] = new BufferedAiMesh(aiMeshes[i], textures.at(i), colorMasks.at(i), textureLocation, colorLocation);
+		meshes[i] = new BufferedAiMesh(aiMeshes[i], textures.at(i), textureLocation, colorLocation);
 		//also store the verts here for collision stuff
 		auto firstVert = aiMeshes[i]->mVertices[0];
 		boundingMin.x = std::min(boundingMin.x, firstVert.x);
@@ -32,7 +34,7 @@ Model::Model(std::string path, GLuint textureLocation, GLuint colorLocation, std
 
 		boundingMin.z = std::min(boundingMin.z, firstVert.z);
 		boundingMax.z = std::max(boundingMax.z, firstVert.z);
-		for (unsigned int j = 1;j < aiMeshes[i]->mNumVertices;j++)
+		for (size_t j = 1;j < aiMeshes[i]->mNumVertices;j++)
 		{
 			//also update the bounding box
 			auto secondVert = aiMeshes[i]->mVertices[j];
@@ -52,32 +54,46 @@ Model::Model(std::string path, GLuint textureLocation, GLuint colorLocation, std
 			);
 			if (glm::length(edge[1] - edge[0]) > 0)
 			{
-				edges.push_back(edge);
+				edgeVector.push_back(edge);
+				nEdges++;
 			}
 			firstVert = secondVert;
 		}
 		//add each face
-		for (unsigned int j = 0;j < aiMeshes[i]->mNumFaces;j++)
+		for (size_t j = 0;j < aiMeshes[i]->mNumFaces;j++)
 		{
 			aiFace face = aiMeshes[i]->mFaces[j];
 			auto a = aiMeshes[i]->mVertices[face.mIndices[0]];
 			auto b = aiMeshes[i]->mVertices[face.mIndices[1]];
 			auto c = aiMeshes[i]->mVertices[face.mIndices[2]];
 
-			faces.push_back(glm::mat3x3(glm::vec3(a.x,a.y,a.z), glm::vec3(b.x,b.y,b.z), glm::vec3(c.x,c.y,c.z)));
+			faceVector.push_back(glm::mat3x3(glm::vec3(a.x,a.y,a.z), glm::vec3(b.x,b.y,b.z), glm::vec3(c.x,c.y,c.z)));
+			nFaces++;
 		}
+	}
+	edges = new glm::mat2x3[nEdges];
+	for (size_t i = 0; i < edgeVector.size(); i++)
+	{
+		edges[i] = edgeVector.at(i);
+	}
+	faces = new glm::mat3x3[nFaces];
+	for (size_t i = 0; i < faceVector.size(); i++)
+	{
+		faces[i] = faceVector.at(i);
 	}
 }
 
 Model::~Model()
 {
 	delete[] meshes;
+	delete[] edges;
+	delete[] faces;
 }
 
-void Model::Draw()
+void Model::Draw(glm::vec4 colorMask)
 {
 	for (size_t i = 0;i < numMeshes;i++)
 	{
-		meshes[i]->Draw();
+		meshes[i]->Draw(colorMask);
 	}
 }

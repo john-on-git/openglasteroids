@@ -213,11 +213,10 @@ static void DrawQuadTree(bool drawAllRegions, bool drawShipRegion, bool drawShip
 constexpr auto SCORE_COUNTER_SIZE = glm::vec2(0.05f, 0.05f);
 constexpr auto SCORE_COUNTER_POSITION = glm::vec2(-0.9f, -0.9f);
 
-GameInProgress::GameInProgress(bool keyPressed[360], glm::vec2* cursorPos, bool mousePressed[8], Model* asteroidModel, Model* shipProjectileModel, Model* shipModel, Model* alienModel, Model* alienProjectileModel, GLuint colorLocation, GLuint modelViewLocation, Program* texturedColoredShader, Program* blockColorShader, Program* textShader2D, GLuint textureAtlasHandle, GLuint textureLocation2D, GLuint translationLocation2D, GLuint colorMaskLocation2D, glm::vec2* windowDimensions) : AppState(SetState, keyPressed, cursorPos, mousePressed)
+GameInProgress::GameInProgress(bool keyPressed[360], glm::vec2* cursorPos, bool mousePressed[8], Model* asteroidModel, Model* projectileModel, Model* shipModel, Model* alienModel, GLuint colorLocation, GLuint modelViewLocation, Program* texturedColoredShader, Program* blockColorShader, Program* textShader2D, GLuint textureAtlasHandle, GLuint textureLocation2D, GLuint translationLocation2D, GLuint colorMaskLocation2D, glm::vec2* windowDimensions) : AppState(SetState, keyPressed, cursorPos, mousePressed)
 {
 	this->asteroidModel = asteroidModel;
-	this->shipProjectileModel = shipProjectileModel;
-	this->alienProjectileModel = alienProjectileModel;
+	this->projectileModel = projectileModel;
 	this->shipModel = shipModel;
 	this->alienModel = alienModel;
 
@@ -287,6 +286,17 @@ void GameInProgress::OnEntry()
 {
 	texturedColoredShader->Use();
 }
+
+GameInProgress::~GameInProgress()
+{
+	for (auto object : objects)
+	{
+		delete object;
+	}
+	delete scoreValueTextBox;
+	delete collisionHandler;
+}
+
 SwitchState GameInProgress::Tick()
 {
 	time++;
@@ -379,7 +389,8 @@ SwitchState GameInProgress::Tick()
 			glm::vec3(90.0f, 0.0f, 0.0f),	//rot
 			glm::vec3(0.05f,0.05f,0.05f),	//scale
 			modelViewLocation,
-			std::unordered_set<tag> { ALIEN }
+			std::unordered_set<tag> { ALIEN },
+			glm::vec4(0,1,0,1)
 		);
 		alien->fireDelay = ALIEN_GRACE_PERIOD - FPS + (FPS * ((float)rand()) / RAND_MAX);
 		objects.push_back(alien);
@@ -424,7 +435,7 @@ SwitchState GameInProgress::Tick()
 		{
 			glm::vec3 shipVelocity = ship->getVelocity();
 			TemporarySpaceGameObject* shipProjectile = new TemporarySpaceGameObject(
-				shipProjectileModel,
+				projectileModel,
 				glm::vec3(
 					ship->getPosition().x + (cos(rad) * 0.07), //second half moves the spawn point away from the center of the ship
 					ship->getPosition().y + (sin(rad) * 0.07), //0.05 is the distance between the center and tip
@@ -440,6 +451,7 @@ SwitchState GameInProgress::Tick()
 				glm::vec3(0.005f, 0.005f, 0.005f), //glm::vec3(0.005f, 0.005f, 0.005f),
 				modelViewLocation,
 				unordered_set<tag>{ SHIP_PROJECTILE },
+				glm::vec4(1,1,1,1),
 				PROJECTILE_DURATION
 			);
 			objects.push_back(shipProjectile);
@@ -541,7 +553,7 @@ SwitchState GameInProgress::Tick()
 					auto alienVelocity = object->getVelocity();
 					auto objectPosition = object->getPosition();
 					TemporarySpaceGameObject* alienProjectile = new TemporarySpaceGameObject(
-						alienProjectileModel,
+						projectileModel,
 						glm::vec3(
 							objectPosition.x + (cos(theta) * 0.07), //second half moves the spawn point away from the center of the ship
 							objectPosition.y + (sin(theta) * 0.07), //0.05 is the distance between the center and tip
@@ -557,6 +569,7 @@ SwitchState GameInProgress::Tick()
 						glm::vec3(0.005f, 0.005f, 0.005f), //glm::vec3(0.005f, 0.005f, 0.005f),
 						modelViewLocation,
 						unordered_set<tag>{ ALIEN_PROJECTILE },
+						glm::vec4(0, 1, 0, 1),
 						PROJECTILE_DURATION
 					);
 					toAdd.push_back(alienProjectile);
@@ -696,12 +709,11 @@ SwitchState GameInProgress::Tick()
 			}
 			else if (target == ship) { //ship destroyed, game over
 				return SwitchState{ GAME_OVER, score };
-				//TODO display game over 
 			}
 
 			collisionHandler->Remove(target);
 			objects.erase(objects.begin() + i);
-
+			delete target;
 			i--;
 		}
 	}
