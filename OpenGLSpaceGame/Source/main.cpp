@@ -36,7 +36,6 @@
 
 using namespace std;
 
-GLFWwindow* window;
 bool keyPressed[360];
 bool mousePressed[8];
 glm::vec2 cursorPos;
@@ -89,6 +88,7 @@ static void mouse_button_callback(GLFWwindow* window, int button, int action, in
 
 int main()
 {
+	
 	srand(time(NULL)); //initialize random
 
 	//initialize glfw
@@ -98,8 +98,12 @@ int main()
 		exit(1);
 	}
 	//initialize window5
+	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+	const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+	glm::vec2 windowDimensions = glm::vec2(mode->width, mode->height); //TODO update whenever window size changes (should pass pointers in that case as well)
+
 	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
-	window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE, NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(windowDimensions.x, windowDimensions.y, WINDOW_TITLE, monitor, NULL);
 	if (window == nullptr)
 	{
 		OutputDebugStringW(L"FATAL: failed to initialize glfw window\n");
@@ -148,6 +152,8 @@ int main()
 	glad_glClearColor(0.1f, 0.1f, 0.1f, 1);
 	glad_glPointSize(5.0f);
 
+	glad_glViewport(0,0, windowDimensions.x, windowDimensions.y);
+
 	//shader setup
 	//compile
 	Program texturedColoredShader(
@@ -184,7 +190,7 @@ int main()
 		projectionLocation,
 		1,
 		GL_FALSE,
-		glm::value_ptr(glm::perspective(75.0f, 1.0f, 0.1f, 10.0f))
+		glm::value_ptr(glm::perspective(75.0f, (float)(windowDimensions.x / windowDimensions.y), 0.1f, 10.0f))
 	);
 
 	//check for failure
@@ -217,8 +223,8 @@ int main()
 		ftMainFont,
 		FONT_RESOLUTION * 64, //docs say "Value of 0 for the character width means 'same as character height'"
 		0, //docs say it's measured in 1/64 of pixel, and recommend mult by 64
-		WINDOW_WIDTH,
-		WINDOW_HEIGHT
+		windowDimensions.x,
+		windowDimensions.y
 	);
 
 	size_t charAtlasWidth = 0;
@@ -293,8 +299,6 @@ int main()
 	auto charAtlasTex = Texture(charAtlasBuffer, charAtlasWidth, charAtlasRows);
 
 	//2d renderers
-	//TODO window dimensions are an arg to support window resizing
-	auto windowDimensions = glm::vec2(WINDOW_WIDTH, WINDOW_HEIGHT); //TODO update whenever window size changes (should pass pointers in that case as well)
 	
 	auto newGameTextBox = TextBox(std::string("NEW GAME"), charAtlasTex.handle, textureLocation2D, translationLocation2D, colorMaskLocation2D, glm::vec2(-0.9, 0.9), glm::vec2(0.05, 0.05), &windowDimensions);
 	auto highScoresTextBox = TextBox(std::string("HIGH SCORES"), charAtlasTex.handle, textureLocation2D, translationLocation2D, colorMaskLocation2D, glm::vec2(-0.9, 0.7), glm::vec2(0.05, 0.05), &windowDimensions);
@@ -380,8 +384,14 @@ int main()
 			glfwSwapBuffers(window);
 			glad_glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-			delete oldState; //delete this after switching just in case deleting before causes any wacky behaviour
+			delete oldState;
 			appState->OnEntry();
+		}
+
+		//handle esc press
+		if (keyPressed[GLFW_KEY_ESCAPE])
+		{
+			glfwSetWindowShouldClose(window, true);
 		}
 
 		//clear any errors from memory (they are printed using glad's callback system, this is just to remove them from memory)

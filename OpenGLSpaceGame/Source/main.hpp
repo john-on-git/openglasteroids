@@ -3,8 +3,6 @@
 
 //glfw/window
 static constexpr auto WINDOW_TITLE  = "Space Game";
-static constexpr auto WINDOW_WIDTH  = 1000;
-static constexpr auto WINDOW_HEIGHT = 1000;
 static constexpr auto FPS			= 144;
 static constexpr auto FRAME_DELAY	= 1000 / FPS;
 
@@ -14,10 +12,6 @@ static constexpr char RGBA_STRIDE = 4;
 
 //debug info
 static constexpr auto SHOW_DEBUG_INFO_TOGGLE_DELAY = FPS / 10;
-
-//world
-static constexpr auto ARENA_H = 1.1f;
-static constexpr auto ARENA_W = 1.1f;
 
 //score
 static constexpr auto SCORE_KILL_ALIEN = 100;

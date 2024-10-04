@@ -291,6 +291,12 @@ SwitchState GameInProgress::Tick()
 {
 	time++;
 	unsigned short newScore = score; //for tracking changes in score this tick, to determine whether we need to update the score counter
+
+	glm::vec2 arenaDimensions = glm::vec2(
+		(static_cast<float>(windowDimensions->x) / min(windowDimensions->x, windowDimensions->y)) * 1.1f,
+		(static_cast<float>(windowDimensions->y) / min(windowDimensions->x, windowDimensions->y)) * 1.1f
+	);
+
 	while (numAsteroids < NUM_TARGET_ASTEROIDS)
 	{
 		//asteroids launch from a different side each time rotating counterclockwise, from a random point on the side, towards the center, +-45°
@@ -301,19 +307,19 @@ SwitchState GameInProgress::Tick()
 		switch (asteroidSide)
 		{
 		case 0:
-			pos = glm::vec3(-.95f * ARENA_W, rel, 0.0f); //left
+			pos = glm::vec3(-.95f * arenaDimensions.x, rel, 0.0f); //left
 			angle = 0 - (M_PI / 4) + ((float)rand()) / RAND_MAX * (M_PI / 2); //right
 			break;
 		case 1:
-			pos = glm::vec3(rel, -.95f * ARENA_H, 0.0f); //bottom
+			pos = glm::vec3(rel, -.95f * arenaDimensions.y, 0.0f); //bottom
 			angle = (M_PI / 2) - (M_PI / 4) + ((float)rand()) / RAND_MAX * (M_PI / 2); //up
 			break;
 		case 2:
-			pos = glm::vec3(.95f * ARENA_W, rel, 0.0f); //right
+			pos = glm::vec3(.95f * arenaDimensions.x, rel, 0.0f); //right
 			angle = (M_PI)-(M_PI / 4) + ((float)rand()) / RAND_MAX * (M_PI / 2); //left
 			break;
 		case 3:
-			pos = glm::vec3(rel, .95f * ARENA_H, 0.0f); //top
+			pos = glm::vec3(rel, .95f * arenaDimensions.y, 0.0f); //top
 			angle = (M_PI * 3 / 2) - (M_PI / 4) + ((float)rand()) / RAND_MAX * (M_PI / 2); //down
 			break;
 		}
@@ -349,19 +355,19 @@ SwitchState GameInProgress::Tick()
 		switch (alienSide)
 		{
 			case 0:
-				pos = glm::vec3(-.95f * ARENA_W, rel, 0.0f); //left
+				pos = glm::vec3(-.95f * arenaDimensions.x, rel, 0.0f); //left
 				angle = 0 - (M_PI / 4) + ((float)rand()) / RAND_MAX * (M_PI / 2); //right
 				break;
 			case 1:
-				pos = glm::vec3(rel, -.95f * ARENA_H, 0.0f); //bottom
+				pos = glm::vec3(rel, -.95f * arenaDimensions.y, 0.0f); //bottom
 				angle = (M_PI / 2) - (M_PI / 4) + ((float)rand()) / RAND_MAX * (M_PI / 2); //up
 				break;
 			case 2:
-				pos = glm::vec3(.95f * ARENA_W, rel, 0.0f); //right
+				pos = glm::vec3(.95f * arenaDimensions.x, rel, 0.0f); //right
 				angle = (M_PI)-(M_PI / 4) + ((float)rand()) / RAND_MAX * (M_PI / 2); //left
 				break;
 			case 3:
-				pos = glm::vec3(rel, .95f * ARENA_H, 0.0f); //top
+				pos = glm::vec3(rel, .95f * arenaDimensions.y, 0.0f); //top
 				angle = (M_PI * 3 / 2) - (M_PI / 4) + ((float)rand()) / RAND_MAX * (M_PI / 2); //down
 				break;
 		}
@@ -457,22 +463,22 @@ SwitchState GameInProgress::Tick()
 	{
 		//toroidal space
 		auto objectPosition = object->getPosition();
-		if (objectPosition.x > ARENA_W) //off right
+		if (objectPosition.x > arenaDimensions.x) //off right
 		{
-			objectPosition.x = -ARENA_W;
+			objectPosition.x = -arenaDimensions.x;
 		}
-		else if (objectPosition.x < -ARENA_W) //off left
+		else if (objectPosition.x < -arenaDimensions.x) //off left
 		{
-			objectPosition.x = ARENA_W;
+			objectPosition.x = arenaDimensions.x;
 		}
 
-		if (objectPosition.y < -ARENA_H) //off top
+		if (objectPosition.y < -arenaDimensions.y) //off top
 		{
-			objectPosition.y = ARENA_W;
+			objectPosition.y = arenaDimensions.y;
 		}
-		else if (objectPosition.y > ARENA_H) //off bottom
+		else if (objectPosition.y > arenaDimensions.y) //off bottom
 		{
-			objectPosition.y = -ARENA_W;
+			objectPosition.y = -arenaDimensions.y;
 		}
 		object->setPosition(objectPosition);
 

@@ -26,7 +26,7 @@ class GameInProgress : public AppState
 		
 		GLuint textureLocation2D; 
 		GLuint translationLocation2D; 
-		GLuint colorMaskLocation2D; 
+		GLuint colorMaskLocation2D;
 		glm::vec2* windowDimensions;
 		
 		GLuint colorLocation;
@@ -50,6 +50,7 @@ class GameInProgress : public AppState
 		bool showDebugInfo;
 
 		unsigned short score;
+
 
 		QuadTreeCollisionHandler* collisionHandler;
 
