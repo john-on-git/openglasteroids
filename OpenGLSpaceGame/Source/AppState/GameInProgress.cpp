@@ -479,49 +479,49 @@ SwitchState GameInProgress::Tick()
 		//CPU control
 		if (object->tags.count(ALIEN)==1)
 		{
-			glm::vec3 towardsShip = ship->getPosition() - object->getPosition(); //calculate for later
-
-			//point towards ship
-			//get the signed angle between towardsShip & the positive y-axis, this is the direction the alien should point in
-			auto theta = atan2(towardsShip.y, towardsShip.x) - (M_PI/2) + M_PI; // M_PI/2 = atan2(1,0)
-			auto angleCurrent = object->getAngle().y;
-			auto angleTarget = glm::degrees(theta);
-			float dif = angleTarget - angleCurrent;
-			//turn the other way if it's a shorter path
-			if (dif > 0 && (360 - dif < dif))
-			{ 
-				dif = dif-360; 
-			}
-			else if (dif<0 && (-360-dif > dif))
-			{
-				dif = dif+360;
-			}
-
-			if (dif < -HALF_ALIEN_TRACKING_CONE_DEGREES)
-			{
-				object->rotationalVelocityDelta->addDependent(new Delta<glm::vec3>(
-					new Vec3Provider(glm::vec3(0,-ALIEN_TURNRATE_MULT,0)), 
-					{ new SpaceGameObjectRotationalVelocityTarget(object) }, 
-					{}, 
-					1
-				)); //add delta
-			}
-			else if (dif > HALF_ALIEN_TRACKING_CONE_DEGREES)
-			{
-				object->rotationalVelocityDelta->addDependent(new Delta<glm::vec3>(
-					new Vec3Provider(glm::vec3(0, ALIEN_TURNRATE_MULT, 0)), 
-					{ new SpaceGameObjectRotationalVelocityTarget(object) }, 
-					{}, 
-					1
-				)); //add delta
-			}
-			else
-			{
-				object->rotationalVelocityDelta->addDependent(new Delta<glm::vec3>(new RotDragProvider(object, 10), { new SpaceGameObjectRotationalVelocityTarget(object) }, {}, 10));
-			}
-
 			if (!object->IsStunned())
 			{
+				glm::vec3 towardsShip = ship->getPosition() - object->getPosition(); //calculate for later
+
+				//point towards ship
+				//get the signed angle between towardsShip & the positive y-axis, this is the direction the alien should point in
+				auto theta = atan2(towardsShip.y, towardsShip.x) - (M_PI / 2) + M_PI; // M_PI/2 = atan2(1,0)
+				auto angleCurrent = object->getAngle().y;
+				auto angleTarget = glm::degrees(theta);
+				float dif = angleTarget - angleCurrent;
+				//turn the other way if it's a shorter path
+				if (dif > 0 && (360 - dif < dif))
+				{
+					dif = dif - 360;
+				}
+				else if (dif < 0 && (-360 - dif > dif))
+				{
+					dif = dif + 360;
+				}
+
+				if (dif < -HALF_ALIEN_TRACKING_CONE_DEGREES)
+				{
+					object->rotationalVelocityDelta->addDependent(new Delta<glm::vec3>(
+						new Vec3Provider(glm::vec3(0, -ALIEN_TURNRATE_MULT, 0)),
+						{ new SpaceGameObjectRotationalVelocityTarget(object) },
+						{},
+						1
+					)); //add delta
+				}
+				else if (dif > HALF_ALIEN_TRACKING_CONE_DEGREES)
+				{
+					object->rotationalVelocityDelta->addDependent(new Delta<glm::vec3>(
+						new Vec3Provider(glm::vec3(0, ALIEN_TURNRATE_MULT, 0)),
+						{ new SpaceGameObjectRotationalVelocityTarget(object) },
+						{},
+						1
+					)); //add delta
+				}
+				else
+				{
+					object->rotationalVelocityDelta->addDependent(new Delta<glm::vec3>(new RotDragProvider(object, 10), { new SpaceGameObjectRotationalVelocityTarget(object) }, {}, 10));
+				}
+
 				//move to strafe around ship
 				auto perpendicular = glm::cross(towardsShip, glm::vec3(0, 0, 1)); //get the velocity vector, by finding the perpendicular vector using the cross product
 				auto movement = ALIEN_ACCELERATION * glm::normalize(perpendicular); //rescale it
@@ -599,9 +599,8 @@ SwitchState GameInProgress::Tick()
 		}
 		else { //bouncy collision
 
-			//alright, so my lack of understanding of classical physics is coming back to bite me in the ass
 			//this current implemention conserves the magnitude of velocity. This is not a thing in real life.
-			//Some guy on Reddit says it is a thing if all masses are identical, and based on my tests: with this constraint in place energy is also conserved.
+			//Some guy on Reddit (src: trust me bro :skull:) says it is a thing if all masses are identical, and based on my tests: with this constraint in place energy is also conserved.
 
 			//if the ship is in there, the system will always gain/lose whatever because the ship's magic (makes energy from controls, loses it from drag).
 
@@ -634,7 +633,7 @@ SwitchState GameInProgress::Tick()
 				{
 					first->StunFor(ALIEN_STUN_DURATION);
 				}
-				else if (secondIs[ALIEN])
+				if (secondIs[ALIEN])
 				{
 					second->StunFor(ALIEN_STUN_DURATION);
 				}

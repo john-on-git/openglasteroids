@@ -32,6 +32,7 @@
 #include "AppState/GameInProgress.hpp"
 #include "AppState/GameOver.hpp"
 #include "TextBox/TextBox.hpp"
+#include <stb_image.h>
 
 using namespace std;
 
@@ -283,10 +284,10 @@ int main()
 		offset += widthPerCharacter;
 	}
 
+	stbi_set_flip_vertically_on_load(true);
 	//textures (from file)
-	auto blankWhiteTex = Texture("textures/blankwhite.png");
-	auto greeblingTex = Texture("textures/ship.png");
-	auto cubeTex = Texture("textures/colored_johncat.bmp");
+	auto whiteTex = Texture("textures/white.png");
+	auto cubeTex = Texture("textures/noiseCube.png");
 	
 	//texture (from texture atlas)
 	auto charAtlasTex = Texture(charAtlasBuffer, charAtlasWidth, charAtlasRows);
@@ -315,7 +316,7 @@ int main()
 		"Models/sphere.obj",
 		textureLocation,
 		colorMaskLocation,
-		std::vector<GLuint>{ blankWhiteTex.handle },
+		std::vector<GLuint>{ whiteTex.handle },
 		std::vector<glm::vec4>{ glm::vec4(2, 1, 1, 1) },
 		1
 	);
@@ -323,7 +324,7 @@ int main()
 		"Models/sphere.obj",
 		textureLocation,
 		colorMaskLocation,
-		std::vector<GLuint>{ blankWhiteTex.handle },
+		std::vector<GLuint>{ whiteTex.handle },
 		std::vector<glm::vec4>{ glm::vec4(0, 1, 0, 1) }, //TODO make color masks the responsibility of WorldObject, so we don't need two of these projectile models
 		1
 	);
@@ -331,7 +332,7 @@ int main()
 		"Models/ship.obj",
 		textureLocation,
 		colorMaskLocation,
-		std::vector<GLuint>{ blankWhiteTex.handle },
+		std::vector<GLuint>{ whiteTex.handle },
 		std::vector<glm::vec4>{ glm::vec4(1, 1, 1, 1) },
 		1
 	);
@@ -339,7 +340,7 @@ int main()
 		"Models/ship.obj", //TODO replace this placeholder model
 		textureLocation,
 		colorMaskLocation,
-		std::vector<GLuint>{ blankWhiteTex.handle },
+		std::vector<GLuint>{ whiteTex.handle },
 		std::vector<glm::vec4>{ glm::vec4(0, 1, 0, 1) },
 		1
 	);

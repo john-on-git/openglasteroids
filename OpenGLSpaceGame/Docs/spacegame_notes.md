@@ -1,4 +1,11 @@
-﻿- TODO
+﻿- Some old notes.
+	- gldrawarrays https://stackoverflow.com/a/19102301
+	- shader issues
+		1. Was not passing the matrix value to my vert shader.
+			- FIX: Passed values using glUniform.
+		2. glUniform not working.
+			- FIX: glUniform only updates the state if the shader it is called on is currently used (by calling glUseProgram).
+- TODO
 	1. texture support			 ✓
 	2. loading models from file ✓
 	3. licensing stuff for libs ✓
@@ -60,6 +67,11 @@ What's the best way to implement projectile decay?
 		- Composition w/ WorldObject?
 		- Just used in main
 	- imperative in main.cpp
+- 19.9.24
+	- Bugs.
+		- Ship's color is properly set when stunned, aliens' isn't.
+			- It's caused by state (colormask on model) not being reset properly between games. Moving colormask responsiblity to worldobjects will fix this.
+		- Cube textures are mis-aligned. UV map error?
 
 - Delta cleanup
 	- DeltaAttachable class, go through tree. When an provider/ referencing the target is located, 
