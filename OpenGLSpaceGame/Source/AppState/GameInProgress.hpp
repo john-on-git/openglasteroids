@@ -13,7 +13,7 @@
 class GameInProgress : public AppState
 {
 	protected:
-		Model* asteroidModel;
+		Model** asteroidModels;
 		Model* projectileModel;
 		Model* shipModel;
 		Model* alienModel;
@@ -50,14 +50,12 @@ class GameInProgress : public AppState
 
 		unsigned short score;
 
-
 		QuadTreeCollisionHandler* collisionHandler;
-
-		size_t time;
 	public:
-		GameInProgress(bool keyPressed[360], glm::vec2* cursorPos, bool mousePressed[8], Model* asteroidModel, Model* projectileModel, Model* shipModel, Model* alienModel, GLuint colorLocation, GLuint modelViewLocation, Program* texturedColoredShader, Program* blockColorShader, Program* textShader2D, GLuint textureAtlasHandle, GLuint textureLocation2D, GLuint translationLocation2D, GLuint colorMaskLocation2D, glm::vec2* windowDimensions);
+		GameInProgress(bool keyPressed[360], glm::vec2* cursorPos, bool mousePressed[8], Model** asteroidModels, Model* projectileModel, Model* shipModel, Model* alienModel, GLuint colorLocation, GLuint modelViewLocation, Program* texturedColoredShader, Program* blockColorShader, Program* textShader2D, GLuint textureAtlasHandle, GLuint textureLocation2D, GLuint translationLocation2D, GLuint colorMaskLocation2D, glm::vec2* windowDimensions);
 		~GameInProgress();
 		virtual void OnEntry() override;
-		SwitchState Tick();
+		virtual void Draw() override;
+		virtual SwitchState Tick(size_t time) override;
 };
 

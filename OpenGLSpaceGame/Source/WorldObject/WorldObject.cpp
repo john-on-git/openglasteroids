@@ -125,10 +125,10 @@ glm::vec3* WorldObject::getOrientedBoundingBox()
 	return boundingBox;
 }
 
-std::vector<glm::vec4> WorldObject::calcFaces()
+glm::vec4* WorldObject::calcFaces()
 {
-	auto faces = std::vector<glm::vec4>();
-	for (unsigned int i = 0;i < this->model->nFaces;i++)
+	glm::vec4* faces = new glm::vec4[this->model->nFaces];
+	for (size_t i = 0;i < this->model->nFaces;i++)
 	{
 		//the shift in position is probably what's breaking this.
 		glm::mat3x3 face = this->model->faces[i]; //get the face representation
@@ -140,21 +140,22 @@ std::vector<glm::vec4> WorldObject::calcFaces()
 		auto normal = glm::normalize(glm::cross(glm::vec3(b - a), glm::vec3(c - a)));
 		auto d = -glm::dot(normal, glm::vec3(a));
 
-		faces.push_back(glm::vec4(normal, d));
+		faces[i] = glm::vec4(normal, d);
 	}
 	return faces;
 }
 
-std::vector<glm::mat2x4> WorldObject::calcEdges()
+glm::mat2x4* WorldObject::calcEdges()
 {
-	auto edges = std::vector<glm::mat2x4>();
-	for (unsigned int i = 0; i < this->model->nEdges; i++)
+	glm::mat2x4* edges = new glm::mat2x4[this->model->nEdges];
+	for (size_t i = 0; i < this->model->nEdges; i++)
 	{
 		glm::mat2x3 edge = this->model->edges[i]; //get the edge representation
 		//TODO WHY ISN'T THE MATRIX WORKING 😭 (it was because the w component was 0)
-		auto a = this->modelMatrix * glm::vec4(edge[0], 1.0f);
-		auto b = this->modelMatrix * glm::vec4(edge[1], 1.0f);
-		edges.push_back(glm::mat2x4(a,b));
+		edges[i] = glm::mat2x4(
+			this->modelMatrix * glm::vec4(edge[0], 1.0f),
+			this->modelMatrix * glm::vec4(edge[1], 1.0f)
+		);
 	}
 	return edges;
 }

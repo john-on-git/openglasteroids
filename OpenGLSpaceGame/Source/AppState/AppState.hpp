@@ -27,6 +27,7 @@ class AppState
 		AppState(void (*SetState)(AppState*), bool keyPressed[360], glm::vec2* cursorPos, bool mousePressed[8]);
 		virtual ~AppState();
 		virtual void OnEntry() = 0;
-		virtual SwitchState Tick() = 0;
+		virtual SwitchState Tick(size_t time) = 0;
+		virtual void Draw() = 0;
 };
 

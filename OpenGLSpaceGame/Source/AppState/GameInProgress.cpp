@@ -212,10 +212,11 @@ static void DrawQuadTree(bool drawAllRegions, bool drawShipRegion, bool drawShip
 
 constexpr auto SCORE_COUNTER_SIZE = glm::vec2(0.05f, 0.05f);
 constexpr auto SCORE_COUNTER_POSITION = glm::vec2(-0.9f, -0.9f);
+constexpr auto COLLISION_EVERY = 3;
 
-GameInProgress::GameInProgress(bool keyPressed[360], glm::vec2* cursorPos, bool mousePressed[8], Model* asteroidModel, Model* projectileModel, Model* shipModel, Model* alienModel, GLuint colorLocation, GLuint modelViewLocation, Program* texturedColoredShader, Program* blockColorShader, Program* textShader2D, GLuint textureAtlasHandle, GLuint textureLocation2D, GLuint translationLocation2D, GLuint colorMaskLocation2D, glm::vec2* windowDimensions) : AppState(SetState, keyPressed, cursorPos, mousePressed)
+GameInProgress::GameInProgress(bool keyPressed[360], glm::vec2* cursorPos, bool mousePressed[8], Model** asteroidModels, Model* projectileModel, Model* shipModel, Model* alienModel, GLuint colorLocation, GLuint modelViewLocation, Program* texturedColoredShader, Program* blockColorShader, Program* textShader2D, GLuint textureAtlasHandle, GLuint textureLocation2D, GLuint translationLocation2D, GLuint colorMaskLocation2D, glm::vec2* windowDimensions) : AppState(SetState, keyPressed, cursorPos, mousePressed)
 {
-	this->asteroidModel = asteroidModel;
+	this->asteroidModels = asteroidModels;
 	this->projectileModel = projectileModel;
 	this->shipModel = shipModel;
 	this->alienModel = alienModel;
@@ -279,8 +280,6 @@ GameInProgress::GameInProgress(bool keyPressed[360], glm::vec2* cursorPos, bool 
 
 	showDebugInfo = false;
 	showDebugInfoToggleDelay = 0;
-
-	time = 1;
 }
 void GameInProgress::OnEntry()
 {
@@ -297,9 +296,35 @@ GameInProgress::~GameInProgress()
 	delete collisionHandler;
 }
 
-SwitchState GameInProgress::Tick()
+void GameInProgress::Draw()
 {
-	time++;
+	auto cameraPosition = glm::vec3(0, 0, -5);// +;
+	auto centerPosition = glm::vec3(0, 0, 0);
+	glm::mat4 viewMatrix(glm::lookAt(cameraPosition, centerPosition, glm::vec3(0, 1, 0))); //calculate view matrix
+
+	//draw debug info
+	if (showDebugInfo)
+	{
+		//draw the bounds of the quadtree, highlighting the node that the ship is in
+		DrawQuadTree(true, true, true, ship, collisionHandler, texturedColoredShader, blockColorShader, colorLocation);
+	}
+
+	//draw text
+	textShader2D->Use();
+	scoreValueTextBox->Draw();
+
+	//draw world objects
+	texturedColoredShader->Use();
+	for (size_t i = 0; i < objects.size(); i++)
+	{
+		auto target = objects.at(i);
+		//draw all objects
+		target->Draw(viewMatrix);
+	}
+}
+
+SwitchState GameInProgress::Tick(size_t time)
+{
 	unsigned short newScore = score; //for tracking changes in score this tick, to determine whether we need to update the score counter
 
 	glm::vec2 arenaDimensions = glm::vec2(
@@ -312,7 +337,7 @@ SwitchState GameInProgress::Tick()
 		//asteroids launch from a different side each time rotating counterclockwise, from a random point on the side, towards the center, +-45°
 		float rel = ((float)rand()) / RAND_MAX;
 		float angle = 0;
-		float scale = 0.03 + ((float)rand()) / RAND_MAX * 0.1;
+		float scale = 0.075 + (((float)rand()) / RAND_MAX * 0.06f);
 		glm::vec3 pos;
 		switch (asteroidSide)
 		{
@@ -333,11 +358,12 @@ SwitchState GameInProgress::Tick()
 			angle = (M_PI * 3 / 2) - (M_PI / 4) + ((float)rand()) / RAND_MAX * (M_PI / 2); //down
 			break;
 		}
+		size_t asteroidType = rand() % NUM_ASTEROID_TYPES;
 		SpaceGameObject* asteroid = new SpaceGameObject(
-			asteroidModel,
+			asteroidModels[asteroidType],
 			pos,	//pos
 			glm::vec3(ASTEROID_INIT_VEL * cos(angle), ASTEROID_INIT_VEL * sin(angle), 0.0f),	//vel
-			glm::vec3(((float)rand()) / RAND_MAX * .5, ((float)rand()) / RAND_MAX * .5, ((float)rand()) / RAND_MAX * .5),	//rot vel
+			glm::vec3(((float)rand()) / RAND_MAX * 0.5f, ((float)rand()) / RAND_MAX * 0.5f, ((float)rand()) / RAND_MAX * 0.5f),	//rot vel
 			glm::vec3(0.0f, 0.0f, 0.0f),	//rot
 			glm::vec3(scale, scale, scale),	//scale
 			modelViewLocation,
@@ -548,7 +574,7 @@ SwitchState GameInProgress::Tick()
 				//fire
 				if (object->fireDelay == 0)
 				{
-					theta -= M_PI/2;
+					theta = glm::radians(object->getAngle().y - 90);
 					object->fireDelay = ALIEN_FIRE_DELAY;
 					auto alienVelocity = object->getVelocity();
 					auto objectPosition = object->getPosition();
@@ -584,82 +610,92 @@ SwitchState GameInProgress::Tick()
 	}
 	
 	//check for collisions
-	auto collisions = collisionHandler->Check();
-	for (auto it = collisions->begin(); it != collisions->end(); it++) //for each collision
+	if ((time / TICK_EVERY) % COLLISION_EVERY == 0)
 	{
-		bool firstIs[5] = {
-			it->first->tags.count(SHIP) == 1,
-			it->first->tags.count(SHIP_PROJECTILE) == 1,
-			it->first->tags.count(ASTEROID) == 1,
-			it->first->tags.count(ALIEN) == 1,
-			it->first->tags.count(ALIEN_PROJECTILE) == 1
-		};
-		bool secondIs[5] = {
-			it->second->tags.count(SHIP) == 1,
-			it->second->tags.count(SHIP_PROJECTILE) == 1,
-			it->second->tags.count(ASTEROID) == 1,
-			it->second->tags.count(ALIEN) == 1,
-			it->second->tags.count(ALIEN_PROJECTILE) == 1
-		};
-		//destroy both if it's a projectile and the other is not friendly
-		if ((firstIs[SHIP_PROJECTILE] && !secondIs[SHIP]) || (secondIs[SHIP_PROJECTILE] && !firstIs[SHIP]))
+		auto collisions = collisionHandler->Check();
+		for (auto it = collisions->begin(); it != collisions->end(); it++) //for each collision
 		{
-			it->first->markedForDelete = true;
-			it->second->markedForDelete = true;
-			if (firstIs[ALIEN] || secondIs[ALIEN])
+			bool firstIs[5] = {
+				it->first->tags.count(SHIP) == 1,
+				it->first->tags.count(SHIP_PROJECTILE) == 1,
+				it->first->tags.count(ASTEROID) == 1,
+				it->first->tags.count(ALIEN) == 1,
+				it->first->tags.count(ALIEN_PROJECTILE) == 1
+			};
+			bool secondIs[5] = {
+				it->second->tags.count(SHIP) == 1,
+				it->second->tags.count(SHIP_PROJECTILE) == 1,
+				it->second->tags.count(ASTEROID) == 1,
+				it->second->tags.count(ALIEN) == 1,
+				it->second->tags.count(ALIEN_PROJECTILE) == 1
+			};
+
+			if ((firstIs[SHIP_PROJECTILE] && secondIs[ALIEN]) || (secondIs[SHIP_PROJECTILE] && firstIs[ALIEN])) //alien hit by ship projectile
 			{
+				it->first->markedForDelete = true;
+				it->second->markedForDelete = true;
 				newScore += SCORE_KILL_ALIEN;
 			}
-		}
-		else if ((firstIs[ALIEN_PROJECTILE] && !secondIs[ALIEN]) || (secondIs[ALIEN_PROJECTILE] && !firstIs[ALIEN]))
-		{
-			it->first->markedForDelete = true;
-			it->second->markedForDelete = true;
-		}
-		else { //bouncy collision
-
-			//this current implemention conserves the magnitude of velocity. This is not a thing in real life.
-			//Some guy on Reddit (src: trust me bro :skull:) says it is a thing if all masses are identical, and based on my tests: with this constraint in place energy is also conserved.
-
-			//if the ship is in there, the system will always gain/lose whatever because the ship's magic (makes energy from controls, loses it from drag).
-
-			SpaceGameObject* first = (SpaceGameObject*)(it->first);
-			SpaceGameObject* second = (SpaceGameObject*)(it->second);
-
-			glm::vec3 dir = glm::normalize(first->getPosition() - second->getPosition());
-			constexpr float m1 = 1;
-			constexpr float m2 = 1; //might add real mass later idk, will have to use a more realistic collision calculation because making this change stops energy from being conserved
-
-			auto v = glm::length(first->getVelocity()) + glm::length(second->getVelocity());
-
-			first->setVelocity((m2 / (m1 + m2))* v* dir);
-			second->setVelocity((m1 / (m1 + m2))* v * -dir);
-
-			//asteroids trade spin
-			if (firstIs[ASTEROID] && secondIs[ASTEROID])
+			else if ((firstIs[ALIEN_PROJECTILE] && secondIs[SHIP]) || (secondIs[ALIEN_PROJECTILE] && firstIs[SHIP])) //ship hit by alien projectile
 			{
-				auto averageRotation = (first->getRotationalVelocity() + second->getRotationalVelocity()) * 0.5f;
-				first->setRotationalVelocity(averageRotation);
-				second->setRotationalVelocity(averageRotation);
+				it->first->markedForDelete = true;
+				it->second->markedForDelete = true;
 			}
-			else {
-				if (firstIs[SHIP] || secondIs[SHIP])
-				{
-					ship->StunFor(SHIP_STUN_DURATION);
-				}
+			else if ((firstIs[ALIEN_PROJECTILE] && secondIs[ASTEROID]) || (firstIs[SHIP_PROJECTILE] && secondIs[ASTEROID])) //asteroid hit by projectile
+			{
+				it->first->markedForDelete = true;
+			}
+			else if ((firstIs[ASTEROID] && secondIs[ALIEN_PROJECTILE]) || (firstIs[ASTEROID] && secondIs[SHIP_PROJECTILE])) //asteroid hit by projectile
+			{
+				it->second->markedForDelete = true;
+			}
+			else { //bouncy collision
 
-				if (firstIs[ALIEN])
+				//this current implemention conserves the magnitude of velocity. This is not a thing in real life.
+				//Some guy on Reddit (src: trust me bro :skull:) says it is a thing if all masses are identical, and based on my tests: with this constraint in place energy is also conserved.
+
+				//if the ship is in there, the system will always gain/lose whatever because the ship's magic (makes energy from controls, loses it from drag).
+
+				SpaceGameObject* first = (SpaceGameObject*)(it->first);
+				SpaceGameObject* second = (SpaceGameObject*)(it->second);
+
+				glm::vec3 dir = glm::normalize(first->getPosition() - second->getPosition());
+				constexpr float m1 = 1;
+				constexpr float m2 = 1; //might add real mass later idk, will have to use a more realistic collision calculation because making this change stops energy from being conserved
+
+				auto v = glm::length(first->getVelocity()) + glm::length(second->getVelocity());
+
+				first->setVelocity((m2 / (m1 + m2)) * v * dir);
+				second->setVelocity((m1 / (m1 + m2)) * v * -dir);
+
+				//asteroids trade spin
+				if (firstIs[ASTEROID] && secondIs[ASTEROID])
 				{
-					first->StunFor(ALIEN_STUN_DURATION);
+					auto averageRotation = (first->getRotationalVelocity() + second->getRotationalVelocity()) * 0.5f;
+					first->setRotationalVelocity(averageRotation);
+					second->setRotationalVelocity(averageRotation);
 				}
-				if (secondIs[ALIEN])
-				{
-					second->StunFor(ALIEN_STUN_DURATION);
+				else {
+					if (firstIs[SHIP] || secondIs[SHIP])
+					{
+						ship->StunFor(SHIP_STUN_DURATION);
+					}
+
+					if (firstIs[ALIEN])
+					{
+						first->StunFor(ALIEN_STUN_DURATION);
+					}
+					if (secondIs[ALIEN])
+					{
+						second->StunFor(ALIEN_STUN_DURATION);
+					}
 				}
 			}
 		}
+		delete collisions;
 	}
-	delete collisions;
+
+
 	//TODO update score counter
 	if (newScore != score)
 	{
@@ -673,30 +709,12 @@ SwitchState GameInProgress::Tick()
 		return SwitchState{ GAME_OVER, score };
 	}
 
-	//draw debug info
-	if (showDebugInfo)
-	{
-		//draw the bounds of the quadtree, highlighting the node that the ship is in
-		DrawQuadTree(true, true, true, ship, collisionHandler, texturedColoredShader, blockColorShader, colorLocation);
-	}
 
-	auto cameraPosition = glm::vec3(0,0,-5);// +;
-	auto centerPosition = glm::vec3(0,0,0);
-	glm::mat4 viewMatrix(glm::lookAt(cameraPosition, centerPosition, glm::vec3(0, 1, 0))); //calculate view matrix
-
-	//draw text
-	textShader2D->Use();
-	scoreValueTextBox->Draw();
-
-	//draw world objects
-	texturedColoredShader->Use();
+	//tick all objects, deleting any objects that have been marked for delete
 	for (size_t i = 0; i < objects.size(); i++)
 	{
 		auto target = objects.at(i);
-		//Tick everything
 		target->Tick();
-		//draw all objects, deleting any that have been marked for delete
-		target->Draw(viewMatrix);
 		if (target->markedForDelete)
 		{
 			if (target->tags.count(ASTEROID) == 1)

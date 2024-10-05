@@ -53,25 +53,27 @@ protected:
 		);
 
 		GLuint textureLocation = glad_glGetUniformLocation(texturedColoredShader.handle, "tex");
-		GLuint 
-			colorMaskLocation = glad_glGetUniformLocation(texturedColoredShader.handle, "colorMask"),
-			projectionLocation = glad_glGetUniformLocation(texturedColoredShader.handle, "projection"),
-			modelViewLocation = glad_glGetUniformLocation(texturedColoredShader.handle, "modelView");
+		auto colorMaskLocation = glad_glGetUniformLocation(texturedColoredShader.handle, "colorMask");
+		auto projectionLocation = glad_glGetUniformLocation(texturedColoredShader.handle, "projection");
+		modelViewLocation = glad_glGetUniformLocation(texturedColoredShader.handle, "modelView");
 
-		Texture shipTex = Texture("C:\\Users\\John\\source\\repos\\OpenGLSpaceGame\\OpenGLSpaceGame\\Textures\\ship.png");
+		Texture noiseTex = Texture("C:\\Users\\John\\source\\repos\\OpenGLSpaceGame\\OpenGLSpaceGameTests\\Textures\\noise.png");
+
+		auto a = "C:\\Users\\John\\source\\repos\\OpenGLSpaceGame\\OpenGLSpaceGameTests";
+		auto b = "C:\\Users\\John\\source\\repos\\OpenGLSpaceGame\\OpenGLSpaceGameTests\\Models\\cube.obj";
 
 		cubeModel = new Model(
-			"C:\\Users\\John\\source\\repos\\OpenGLSpaceGame\\OpenGLSpaceGame\\Models\\cube.obj",
+			"C:\\Users\\John\\source\\repos\\OpenGLSpaceGame\\OpenGLSpaceGameTests\\Models\\cube.obj",
 			textureLocation,
 			colorMaskLocation,
-			std::vector<GLuint>{ shipTex.handle },
+			std::vector<GLuint>{ noiseTex.handle },
 			1
 		);
 		shipModel = new Model(
-			"C:\\Users\\John\\source\\repos\\OpenGLSpaceGame\\OpenGLSpaceGame\\Models\\ship.obj",
+			"C:\\Users\\John\\source\\repos\\OpenGLSpaceGame\\OpenGLSpaceGameTests\\Models\\ship.obj",
 			textureLocation,
 			colorMaskLocation,
-			std::vector<GLuint>{ shipTex.handle },
+			std::vector<GLuint>{ noiseTex.handle },
 			1
 		);
 	}
@@ -91,7 +93,8 @@ TEST_F(CollisionDetectionTests, CorrectFacesForCubeAtOrigin) {
 		unordered_set<tag>{ }
 	);
 	//there are twelve faces because each square "face" of the cube is split into two tris
-	vector<glm::vec4> expectedFaces = {
+	constexpr size_t EXPECTED_NUM_FACES = 12;
+	glm::vec4 expectedFaces[EXPECTED_NUM_FACES] = {
 		glm::vec4(0.0f,-1.0f,0.0f,  -1.0f), //-y (1)
 		glm::vec4(0.0f,0.0f,-1.0f,  -1.0f), //-z (1)
 
@@ -110,25 +113,25 @@ TEST_F(CollisionDetectionTests, CorrectFacesForCubeAtOrigin) {
 		glm::vec4(-1.0f,0.0f,0.0f,  -1.0f), //-x (2)
 		glm::vec4(0.0f,0.0f,1.0f,  -1.0f), //+z (2)
 	};
-	auto actualFaces = cube.calcFaces();
-	ASSERT_EQ(actualFaces.size(), expectedFaces.size());
-	for (auto itActual = actualFaces.begin(); itActual != actualFaces.end(); itActual++)
+	glm::vec4* actualFaces = cube.calcFaces();
+	
+	size_t matches = 0;
+	for (size_t i=0;i<EXPECTED_NUM_FACES;i++)
 	{
-		//remove this face if it was expected
-		int match = -1; //no match
-		for (unsigned char i = 0; i < expectedFaces.size(); i++)
+		//i = 9, j = 2
+		//remove this face if it was 
+		for (size_t j = 0; j < EXPECTED_NUM_FACES; j++)
 		{
-			if (*itActual == expectedFaces.at(i)) {
-				match = i;
+			if (expectedFaces[i] == actualFaces[j]) {
+				expectedFaces[i] = glm::vec4(0, 0, 0, 0);
+				matches++;
 				break;
 			}
 		}
-		if (match != -1) {
-			expectedFaces.erase(expectedFaces.begin() + match);
-		}
 	}
 	//expect all expected faces to have been removed (because they were all in the actual faces)
-	EXPECT_EQ(expectedFaces.size(),0);
+	EXPECT_EQ(matches,12);
+	delete[] actualFaces;
 }
 
 //that the collision is correctly detected for simple objects in a few different positions

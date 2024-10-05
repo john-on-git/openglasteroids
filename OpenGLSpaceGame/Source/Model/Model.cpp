@@ -21,6 +21,8 @@ Model::Model(std::string path, GLuint textureLocation, GLuint colorLocation, std
 	meshes = new BufferedAiMesh*[numMeshes];
 	auto edgeVector = std::vector<glm::mat2x3>();
 	auto faceVector = std::vector<glm::mat3x3>();
+	nEdges = 0;
+	nFaces = 0;
 	for (size_t i = 0;i < numMeshes;i++)
 	{
 		meshes[i] = new BufferedAiMesh(aiMeshes[i], textures.at(i), textureLocation, colorLocation);

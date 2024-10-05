@@ -24,7 +24,13 @@ void GameOver::OnEntry()
 {
 	textShader2D->Use();
 }
-SwitchState GameOver::Tick()
+void GameOver::Draw()
+{
+	scoreTextBox->Draw();
+	scoreValueTextBox->Draw();
+	mainMenuTextBox->Draw();
+}
+SwitchState GameOver::Tick(size_t time)
 {
 	//close hover/click logic
 	if (mainMenuTextBox->InBounds(*cursorPos)) //if hovering
@@ -41,10 +47,6 @@ SwitchState GameOver::Tick()
 	else {
 		mainMenuTextBox->colorMask = glm::vec4(1, 1, 1, 1); //not hovering, so set its color back to normal
 	}
-
-	scoreTextBox->Draw();
-	scoreValueTextBox->Draw();
-	mainMenuTextBox->Draw();
 
 	return SwitchState{UNCHANGED,0};
 }

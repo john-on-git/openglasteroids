@@ -14,7 +14,13 @@ void MainMenu::OnEntry()
 {
 	textShader2D->Use();
 }
-SwitchState MainMenu::Tick()
+
+void MainMenu::Draw()
+{
+	newGameRenderer->Draw();
+}
+
+SwitchState MainMenu::Tick(size_t time)
 {
 	//new game hover/click logic
 	if (newGameRenderer->InBounds(*cursorPos)) //if hovering
@@ -31,7 +37,6 @@ SwitchState MainMenu::Tick()
 	else {
 		newGameRenderer->colorMask = glm::vec4(1, 1, 1, 1); //not hovering, so set its color back to normal
 	}
-	newGameRenderer->Draw();
 
 	//high scores hover/click logic
 	//if (highScoresRenderer->InBounds(*cursorPos)) //if hovering

@@ -10,7 +10,7 @@
 * @param qPosition the position of q relative to the start of e
 * @return true if the line intersects the model, else false
 */
-static bool LineIntersectsPolygon(glm::mat2x4 edge, vector<glm::vec4>* faces)
+static bool LineIntersectsPolygon(glm::mat2x4 edge, glm::vec4* faces, size_t nFaces)
 {
 	//TODO, there's actually no class containing the vector positions as this info is stored on the GPU
 	//so this data needs to be added to q/its components
@@ -18,15 +18,21 @@ static bool LineIntersectsPolygon(glm::mat2x4 edge, vector<glm::vec4>* faces)
 
 	//based on Eric Haines - Fast Ray-Convex Polyhedron Intersection
 
+	auto dif = glm::vec3(edge[1] - edge[0]);
+
 	double tNear = 0;
-	double tFar = glm::length(glm::vec3(edge[1] - edge[0])); //which is glm::length(rayDirection);
+	double tFar = glm::length(dif); //which is glm::length(rayDirection);
 
 	auto rayOrigin = glm::vec3(edge[0]);
-	auto rayDirection = glm::normalize(glm::vec3(edge[1] - edge[0]));
 
-	for (size_t i = 0; i < faces->size(); i++) //for each face of q 
+
+	//auto rayDirection = glm::normalize(glm::vec3(edge[1] - edge[0]));
+	//actually, manually normalize the vector to re-use the expensive magnitude calculation we just performed
+	auto rayDirection = glm::vec3(dif.x/tFar, dif.y/tFar, dif.z/tFar);
+
+	for (size_t i = 0; i < nFaces; i++) //for each face of q 
 	{
-		glm::vec4 pn = faces->at(i);
+		glm::vec4 pn = faces[i];
 		auto vd = glm::dot(glm::vec3(pn), rayDirection);
 		auto vn = glm::dot(glm::vec3(pn), rayOrigin) + pn.w;
 		if (vd == 0)
@@ -79,32 +85,36 @@ static bool GetFineCollision(WorldObject* p, WorldObject* q)
 	//one issue is that the edges aren't scaled. Fixed!
 
 	//README! Currently trying to go case-by case on the first call. edge 18 of p intersects (but not really). rayDirection is NaN for it.
-	std::vector<glm::mat2x4> edges;
-	std::vector<glm::vec4> faces;
+	glm::mat2x4* edges;
+	glm::vec4* faces;
 
 	//the objects are intersecting if any of the edges of p intersect q
 	edges = p->calcEdges();
 	faces = q->calcFaces();
-	for (size_t i = 0; i < edges.size(); i++)
+	for (size_t i = 0; i < p->model->nEdges; i++)
 	{
 		//return true if this edge intersects the polygon, transforming everything so the start of the edge is the origin
-		if (LineIntersectsPolygon(edges.at(i), &faces)) //TODO
+		if (LineIntersectsPolygon(edges[i], faces, q->model->nFaces)) //TODO
 		{
 			return true;
 		}
 	}
+	delete[] edges;
+	delete[] faces;
 
 	//or if any of the edges of q intersect p
 	edges = q->calcEdges();
 	faces = p->calcFaces();
-	for (size_t i = 0; i < edges.size(); i++)
+	for (size_t i = 0; i < q->model->nEdges; i++)
 	{
 		//return true if this edge intersects the polygon, transforming everything so the start of the edge is the origin
-		if (LineIntersectsPolygon(edges.at(i), &faces)) //TODO
+		if (LineIntersectsPolygon(edges[i], faces, p->model->nFaces)) //TODO
 		{
 			return true;
 		}
 	}
+	delete[] edges;
+	delete[] faces;
 
 	//TODO special case for identical & aligned shapes
 

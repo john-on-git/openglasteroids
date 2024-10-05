@@ -88,7 +88,6 @@ static void mouse_button_callback(GLFWwindow* window, int button, int action, in
 
 int main()
 {
-	
 	srand(time(NULL)); //initialize random
 
 	//initialize glfw
@@ -97,13 +96,13 @@ int main()
 		OutputDebugStringW(L"FATAL: failed to initialize glfw\n");
 		exit(1);
 	}
-	//initialize window5
+	//initialize window
 	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
 	const GLFWvidmode* mode = glfwGetVideoMode(monitor);
 	glm::vec2 windowDimensions = glm::vec2(mode->width, mode->height); //TODO update whenever window size changes (should pass pointers in that case as well)
 
 	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
-	GLFWwindow* window = glfwCreateWindow(windowDimensions.x, windowDimensions.y, WINDOW_TITLE, NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(windowDimensions.x, windowDimensions.y, WINDOW_TITLE, monitor, NULL);
 	if (window == nullptr)
 	{
 		OutputDebugStringW(L"FATAL: failed to initialize glfw window\n");
@@ -298,11 +297,11 @@ int main()
 	stbi_set_flip_vertically_on_load(true);
 	//textures (from file)
 	auto whiteTex = Texture("textures/white.png");
-	auto cubeTex = Texture("textures/noiseCube.png");
+	auto asteroidTex = Texture("textures/noise.png");
 	
 	//texture (from texture atlas)
 	auto charAtlasTex = Texture(charAtlasBuffer, charAtlasWidth, charAtlasRows);
-	delete charAtlasBuffer;
+	delete[] charAtlasBuffer;
 	//2d renderers
 	
 	auto newGameTextBox = TextBox(std::string("NEW GAME"), charAtlasTex.handle, textureLocation2D, translationLocation2D, colorMaskLocation2D, glm::vec2(-0.9, 0.9), glm::vec2(0.05, 0.05), &windowDimensions);
@@ -313,11 +312,25 @@ int main()
 	auto mainMenuTextBox = TextBox(std::string("MAIN MENU"), charAtlasTex.handle, textureLocation2D, translationLocation2D, colorMaskLocation2D, glm::vec2(-0.9, -0.9), glm::vec2(0.05, 0.05), &windowDimensions);
 
 	//model
-	auto asteroidModel = Model(
-		"Models/cube.obj",
+	auto asteroidWatermelonModel = Model(
+		"Models/asteroid_watermelon.obj",
 		textureLocation,
 		colorMaskLocation,
-		std::vector<GLuint>{ cubeTex.handle },
+		std::vector<GLuint>{ asteroidTex.handle },
+		1
+	);
+	auto asteroidDaggerModel = Model(
+		"Models/asteroid_dagger.obj",
+		textureLocation,
+		colorMaskLocation,
+		std::vector<GLuint>{ asteroidTex.handle },
+		1
+	);
+	auto asteroidBoxModel = Model(
+		"Models/asteroid_box.obj",
+		textureLocation,
+		colorMaskLocation,
+		std::vector<GLuint>{ asteroidTex.handle },
 		1
 	);
 	auto projectileModel = Model(
@@ -341,27 +354,46 @@ int main()
 		std::vector<GLuint>{ whiteTex.handle },
 		1
 	);
+	Model* asteroidModels[NUM_ASTEROID_TYPES] = {&asteroidWatermelonModel, &asteroidDaggerModel, &asteroidBoxModel};
 
 	AppState* appState = new MainMenu(&cursorPos, mousePressed, &newGameTextBox, &highScoresTextBox, &textShader2D);
 	appState->OnEntry();
 
+	size_t time = 0;
+	constexpr size_t max = std::numeric_limits<size_t>::max();
 	while (!glfwWindowShouldClose(window)) //window
 	{
+		time++;
+		time %= max;
 		//clear framebuffers
 		glad_glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		//change state if the current state calls for it
-		SwitchState switchState = appState->Tick();
-		AppState* oldState = nullptr;
-		switch (switchState.nextState)
+		if (time % DRAW_EVERY == 0) {
+			appState->Draw();
+
+			//clear any errors from memory (they are printed using glad's callback system, this is just to remove them from memory)
+			while (glad_glGetError() != GL_NO_ERROR)
+				continue;
+
+			//glfw stuff
+			glfwSwapBuffers(window);
+			glfwPollEvents();
+		}
+		if (time % TICK_EVERY == 0)
 		{
+			SwitchState switchState = appState->Tick(time);
+
+			AppState* oldState = nullptr;
+			switch (switchState.nextState)
+			{
 			case MAIN_MENU:
 				oldState = appState;
 				appState = new MainMenu(&cursorPos, mousePressed, &newGameTextBox, &highScoresTextBox, &textShader2D);
 				break;
 			case GAME_IN_PROGRESS:
 				oldState = appState;
-				appState = new GameInProgress(keyPressed, &cursorPos, mousePressed, &asteroidModel, &projectileModel, &shipModel, &alienModel, colorLocation, modelViewLocation, &texturedColoredShader, &blockColorShader, &textShader2D, charAtlasTex.handle, textureLocation2D, translationLocation2D, colorMaskLocation2D, &windowDimensions);
+				appState = new GameInProgress(keyPressed, &cursorPos, mousePressed, asteroidModels, &projectileModel, &shipModel, &alienModel, colorLocation, modelViewLocation, &texturedColoredShader, &blockColorShader, &textShader2D, charAtlasTex.handle, textureLocation2D, translationLocation2D, colorMaskLocation2D, &windowDimensions);
 				break;
 			case GAME_OVER:
 				oldState = appState;
@@ -369,38 +401,29 @@ int main()
 				//TODO
 				//appState = new GameOver(keyPressed, &cursorPos, mousePressed, &asteroidModel, &shipProjectileModel, &shipModel, &alienModel, &alienProjectileModel, colorLocation, modelViewLocation, &texturedColoredShader, &blockColorShader, &textShader2D, charAtlasTex.handle, textureLocation2D, translationLocation2D, colorMaskLocation2D, &windowDimensions);
 				break;
-		}
-		if (switchState.nextState!=UNCHANGED) //if the state changed
-		{
-			//clear any GL state the old AppState left over
-			glad_glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			glfwSwapBuffers(window);
-			glad_glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			}
+			if (switchState.nextState != UNCHANGED) //if the state changed
+			{
+				//clear any GL state the old AppState left over
+				glad_glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+				glfwSwapBuffers(window);
+				glad_glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-			delete oldState;
-			appState->OnEntry();
+				delete oldState;
+				appState->OnEntry();
+			}
 		}
-
 		//handle esc press
 		if (keyPressed[GLFW_KEY_ESCAPE])
 		{
 			glfwSetWindowShouldClose(window, true);
 		}
 
-		//clear any errors from memory (they are printed using glad's callback system, this is just to remove them from memory)
-		while (glad_glGetError() != GL_NO_ERROR)
-			continue;
-
-		//glfw stuff
-		glfwSwapBuffers(window);
-		glfwPollEvents();
-
-		Sleep(FRAME_DELAY); //FPS cap
+		Sleep(UPDATE_DELAY); //rate cap
 	}
 
 	//free resources
 		//glfw
-		glfwDestroyWindow(window);
 		glfwTerminate();
 		//vertex buffer
 		//vertex array

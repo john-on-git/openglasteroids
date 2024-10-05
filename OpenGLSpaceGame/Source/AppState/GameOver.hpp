@@ -21,6 +21,7 @@ class GameOver : public AppState
 		~GameOver();
 		// Inherited via AppState
 		virtual void OnEntry() override;
-		virtual SwitchState Tick() override;
+		virtual void Draw() override;
+		virtual SwitchState Tick(size_t time) override;
 };
 
