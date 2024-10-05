@@ -159,10 +159,6 @@ int main()
 		"Shaders/TexturedColoredTransform/texturedColoredTransform.frag",
 		"Shaders/TexturedColoredTransform/texturedColoredTransform.vert"
 	);
-	Program blockColorShader(
-		"Shaders/BlockColor/blockColor.frag",
-		"Shaders/BlockColor/blockColor.vert"
-	);
 	Program textShader2D(
 		"Shaders/TextShader2D/textShader2D.frag",
 		"Shaders/TextShader2D/textShader2D.vert"
@@ -173,9 +169,6 @@ int main()
 		textureLocation2D = glad_glGetUniformLocation(textShader2D.handle, "tex"),
 		translationLocation2D = glad_glGetUniformLocation(textShader2D.handle, "translation"),
 		colorMaskLocation2D = glad_glGetUniformLocation(textShader2D.handle, "colorMask");
-
-	blockColorShader.Use();
-	GLuint colorLocation = glad_glGetUniformLocation(blockColorShader.handle, "color");
 
 	texturedColoredShader.Use();
 	GLuint
@@ -393,7 +386,7 @@ int main()
 				break;
 			case GAME_IN_PROGRESS:
 				oldState = appState;
-				appState = new GameInProgress(keyPressed, &cursorPos, mousePressed, asteroidModels, &projectileModel, &shipModel, &alienModel, colorLocation, modelViewLocation, &texturedColoredShader, &blockColorShader, &textShader2D, charAtlasTex.handle, textureLocation2D, translationLocation2D, colorMaskLocation2D, &windowDimensions);
+				appState = new GameInProgress(keyPressed, &cursorPos, mousePressed, asteroidModels, &projectileModel, &shipModel, &alienModel, modelViewLocation, &texturedColoredShader, &textShader2D, charAtlasTex.handle, textureLocation2D, translationLocation2D, colorMaskLocation2D, &windowDimensions);
 				break;
 			case GAME_OVER:
 				oldState = appState;

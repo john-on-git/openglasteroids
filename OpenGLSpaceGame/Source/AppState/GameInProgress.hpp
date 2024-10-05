@@ -22,14 +22,12 @@ class GameInProgress : public AppState
 
 
 		GLuint textureAtlasHandle;
-		
 		GLuint textureLocation2D; 
 		GLuint translationLocation2D; 
 		GLuint colorMaskLocation2D;
+		GLuint modelViewLocation;
 		glm::vec2* windowDimensions;
 		
-		GLuint colorLocation;
-		GLuint modelViewLocation;
 
 		Program* texturedColoredShader;
 		Program* blockColorShader;
@@ -45,14 +43,11 @@ class GameInProgress : public AppState
 		unsigned char numTargetAliens;
 		unsigned char alienSide;
 
-		unsigned char showDebugInfoToggleDelay;
-		bool showDebugInfo;
-
 		unsigned short score;
 
 		QuadTreeCollisionHandler* collisionHandler;
 	public:
-		GameInProgress(bool keyPressed[360], glm::vec2* cursorPos, bool mousePressed[8], Model** asteroidModels, Model* projectileModel, Model* shipModel, Model* alienModel, GLuint colorLocation, GLuint modelViewLocation, Program* texturedColoredShader, Program* blockColorShader, Program* textShader2D, GLuint textureAtlasHandle, GLuint textureLocation2D, GLuint translationLocation2D, GLuint colorMaskLocation2D, glm::vec2* windowDimensions);
+		GameInProgress(bool keyPressed[360], glm::vec2* cursorPos, bool mousePressed[8], Model** asteroidModels, Model* projectileModel, Model* shipModel, Model* alienModel, GLuint modelViewLocation, Program* texturedColoredShader, Program* textShader2D, GLuint textureAtlasHandle, GLuint textureLocation2D, GLuint translationLocation2D, GLuint colorMaskLocation2D, glm::vec2* windowDimensions);
 		~GameInProgress();
 		virtual void OnEntry() override;
 		virtual void Draw() override;

@@ -25,196 +25,11 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <map>
 
-//Debug logic for visualizing the quadtree. Not very efficient but doesn't really matter
-static void DrawQuadTree(bool drawAllRegions, bool drawShipRegion, bool drawShipOABB, WorldObject* ship, QuadTreeCollisionHandler* collisionHandler, Program* texturedColoredShader, Program* blockColorShader, GLuint colorLocation) {
-	blockColorShader->Use();
-	int STRIDE = 2;
-	size_t COORDS_LEN = 8;
-	size_t INDICES_LEN = 8;
-	glad_glUniform4fv(colorLocation, 1, glm::value_ptr(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)));
-	unsigned int vertIndices[]{ 0, 1, 1, 2, 2, 3, 3, 0 };
-	if (drawAllRegions) {
-		glad_glLineWidth(1);
-		vector<glm::vec2*> flattened;
-		collisionHandler->GetAllBounds(&flattened);
-		while (!flattened.empty()) {
-			glm::vec2* bounds = flattened.back();
-			//set up line quadtree debugger
-			float verts[] = {
-				bounds[0].x, bounds[1].y, //topleft
-				bounds[1].x, bounds[1].y, //topright
-				bounds[1].x, bounds[0].y, //bottomright
-				bounds[0].x, bounds[0].y, //bottomleft
-			};
-			//generate vertex array object
-			GLuint quadtreeVAO;
-			glad_glGenVertexArrays(1, &quadtreeVAO);
-			glad_glBindVertexArray(quadtreeVAO);
-			//generate buffers and copy over data
-			GLuint buffers[2]; //vertex buffer, and vertex index buffer
-			glad_glGenBuffers(2, buffers); //19.5.21, first argument is the number of buffers, not the size of the buffer. corrupted the heap?
-
-			glad_glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
-			glad_glBufferData( //add verts to buffer
-				GL_ARRAY_BUFFER,
-				COORDS_LEN * sizeof(float),
-				verts,
-				GL_STATIC_DRAW
-			);
-
-			glad_glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers[1]);
-			glad_glBufferData( //add verts to buffer
-				GL_ELEMENT_ARRAY_BUFFER,
-				INDICES_LEN * sizeof(unsigned int),
-				vertIndices,
-				GL_STATIC_DRAW
-			);
-
-			//set vertex attrib pointers OK
-			glad_glEnableVertexAttribArray(0);
-			glad_glVertexAttribPointer( //position
-				0,
-				2,
-				GL_FLOAT,
-				GL_FALSE,
-				STRIDE * sizeof(float),
-				nullptr
-			);
-
-			glad_glBindVertexArray(quadtreeVAO);
-			glad_glDrawElements(
-				GL_LINES,
-				INDICES_LEN,
-				GL_UNSIGNED_INT,
-				nullptr
-			);
-			glad_glDeleteBuffers(2, buffers);
-			glad_glDeleteVertexArrays(1, &quadtreeVAO);
-			flattened.pop_back();
-		}
-	}
-	if (drawShipRegion) {
-		glad_glLineWidth(10);
-		//set up line quadtree debugger
-		auto bounds = collisionHandler->GetNodeBoundsForObject(ship);
-		float verts[] = {
-			bounds[0].x, bounds[1].y, //topleft
-			bounds[1].x, bounds[1].y, //topright
-			bounds[1].x, bounds[0].y, //bottomright
-			bounds[0].x, bounds[0].y, //bottomleft
-		};
-		//generate vertex array object
-		GLuint quadtreeVAO;
-		glad_glGenVertexArrays(1, &quadtreeVAO);
-		glad_glBindVertexArray(quadtreeVAO);
-		//generate buffers and copy over data
-		GLuint buffers[2]; //vertex buffer, and vertex index buffer
-		glad_glGenBuffers(2, buffers); //19.5.21, first argument is the number of buffers, not the size of the buffer. corrupted the heap?
-
-		glad_glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
-		glad_glBufferData( //add verts to buffer
-			GL_ARRAY_BUFFER,
-			COORDS_LEN * sizeof(float),
-			verts,
-			GL_STATIC_DRAW
-		);
-
-		glad_glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers[1]);
-		glad_glBufferData( //add verts to buffer
-			GL_ELEMENT_ARRAY_BUFFER,
-			INDICES_LEN * sizeof(unsigned int),
-			vertIndices,
-			GL_STATIC_DRAW
-		);
-
-
-		//set vertex attrib pointers OK
-		glad_glEnableVertexAttribArray(0);
-		glad_glVertexAttribPointer( //position
-			0,
-			2,
-			GL_FLOAT,
-			GL_FALSE,
-			STRIDE * sizeof(float),
-			nullptr
-		);
-
-		glad_glBindVertexArray(quadtreeVAO);
-		glad_glDrawElements(
-			GL_LINES,
-			INDICES_LEN,
-			GL_UNSIGNED_INT,
-			nullptr
-		);
-		glad_glDeleteBuffers(2, buffers);
-		glad_glDeleteVertexArrays(1, &quadtreeVAO);
-	}
-
-	if (drawShipOABB)
-	{
-		glad_glUniform4fv(colorLocation, 1, glm::value_ptr(glm::vec4(0.0f, 0.0f, 1.0f, 1.0f)));
-		glad_glLineWidth(5);
-		//set up line quadtree debugger
-		glm::vec3* bounds = ship->getOrientedBoundingBox();
-		float verts[] = {
-			bounds[0].x, bounds[0].y, //topleft
-			bounds[1].x, bounds[1].y, //topright
-			bounds[7].x, bounds[7].y, //bottomright
-			bounds[6].x, bounds[6].y, //bottomleft
-		};
-		//generate vertex array object
-		GLuint quadtreeVAO;
-		glad_glGenVertexArrays(1, &quadtreeVAO);
-		glad_glBindVertexArray(quadtreeVAO);
-		//generate buffers and copy over data
-		GLuint buffers[2]; //vertex buffer, and vertex index buffer
-		glad_glGenBuffers(2, buffers); //19.5.21, first argument is the number of buffers, not the size of the buffer. corrupted the heap?
-
-		glad_glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
-		glad_glBufferData( //add verts to buffer
-			GL_ARRAY_BUFFER,
-			COORDS_LEN * sizeof(float),
-			verts,
-			GL_STATIC_DRAW
-		);
-
-		glad_glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers[1]);
-		glad_glBufferData( //add verts to buffer
-			GL_ELEMENT_ARRAY_BUFFER,
-			INDICES_LEN * sizeof(unsigned int),
-			vertIndices,
-			GL_STATIC_DRAW
-		);
-
-		//set vertex attrib pointers OK
-		glad_glEnableVertexAttribArray(0);
-		glad_glVertexAttribPointer( //position
-			0,
-			2,
-			GL_FLOAT,
-			GL_FALSE,
-			STRIDE * sizeof(float),
-			nullptr
-		);
-
-		glad_glBindVertexArray(quadtreeVAO);
-		glad_glDrawElements(
-			GL_LINES,
-			INDICES_LEN,
-			GL_UNSIGNED_INT,
-			nullptr
-		);
-		glad_glDeleteBuffers(2, buffers);
-		glad_glDeleteVertexArrays(1, &quadtreeVAO);
-	}
-	texturedColoredShader->Use();
-}
-
 constexpr auto SCORE_COUNTER_SIZE = glm::vec2(0.05f, 0.05f);
 constexpr auto SCORE_COUNTER_POSITION = glm::vec2(-0.9f, -0.9f);
 constexpr auto COLLISION_EVERY = 3;
 
-GameInProgress::GameInProgress(bool keyPressed[360], glm::vec2* cursorPos, bool mousePressed[8], Model** asteroidModels, Model* projectileModel, Model* shipModel, Model* alienModel, GLuint colorLocation, GLuint modelViewLocation, Program* texturedColoredShader, Program* blockColorShader, Program* textShader2D, GLuint textureAtlasHandle, GLuint textureLocation2D, GLuint translationLocation2D, GLuint colorMaskLocation2D, glm::vec2* windowDimensions) : AppState(SetState, keyPressed, cursorPos, mousePressed)
+GameInProgress::GameInProgress(bool keyPressed[360], glm::vec2* cursorPos, bool mousePressed[8], Model** asteroidModels, Model* projectileModel, Model* shipModel, Model* alienModel, GLuint modelViewLocation, Program* texturedColoredShader, Program* textShader2D, GLuint textureAtlasHandle, GLuint textureLocation2D, GLuint translationLocation2D, GLuint colorMaskLocation2D, glm::vec2* windowDimensions) : AppState(SetState, keyPressed, cursorPos, mousePressed)
 {
 	this->asteroidModels = asteroidModels;
 	this->projectileModel = projectileModel;
@@ -231,7 +46,6 @@ GameInProgress::GameInProgress(bool keyPressed[360], glm::vec2* cursorPos, bool 
 
 	this->windowDimensions = windowDimensions;
 
-	this->colorLocation = colorLocation;
 	this->modelViewLocation = modelViewLocation;
 
 	this->texturedColoredShader = texturedColoredShader;
@@ -277,9 +91,6 @@ GameInProgress::GameInProgress(bool keyPressed[360], glm::vec2* cursorPos, bool 
 	auto shipAngleTarget = WorldObjectAngleTarget(ship);
 
 	std::unordered_set<WorldObject*> stunned = {};
-
-	showDebugInfo = false;
-	showDebugInfoToggleDelay = 0;
 }
 void GameInProgress::OnEntry()
 {
@@ -301,13 +112,6 @@ void GameInProgress::Draw()
 	auto cameraPosition = glm::vec3(0, 0, -5);// +;
 	auto centerPosition = glm::vec3(0, 0, 0);
 	glm::mat4 viewMatrix(glm::lookAt(cameraPosition, centerPosition, glm::vec3(0, 1, 0))); //calculate view matrix
-
-	//draw debug info
-	if (showDebugInfo)
-	{
-		//draw the bounds of the quadtree, highlighting the node that the ship is in
-		DrawQuadTree(true, true, true, ship, collisionHandler, texturedColoredShader, blockColorShader, colorLocation);
-	}
 
 	//draw text
 	textShader2D->Use();
@@ -486,15 +290,6 @@ SwitchState GameInProgress::Tick(size_t time)
 			ship->fireDelay = SHIP_FIRE_DELAY; //reset fire delay
 		}
 	}
-
-	//toggle debug info
-	if (showDebugInfoToggleDelay > 0) { showDebugInfoToggleDelay--; }
-	if (keyPressed[GLFW_KEY_F5] && showDebugInfoToggleDelay == 0)
-	{
-		showDebugInfo = !showDebugInfo;
-		showDebugInfoToggleDelay = SHOW_DEBUG_INFO_TOGGLE_DELAY;
-	}
-
 
 	vector<SpaceGameObject*> toAdd = vector<SpaceGameObject*>();
 	for (auto object : objects)
