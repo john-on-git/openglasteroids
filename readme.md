@@ -7,4 +7,4 @@
 	
 	
 - Testing whether the video embeds.
--  [![Gameplay Footage](https://github.com/john-on-git/openglasteroids/blob/master/OpenGLSpaceGame/Docs/spacegameplay.mp4)
+-  ![Gameplay Footage](https://github.com/john-on-git/openglasteroids/blob/master/OpenGLSpaceGame/Docs/spacegameplay.mp4)
