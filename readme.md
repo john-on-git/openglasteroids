@@ -5,6 +5,4 @@
 	- Rendering (shaders).
 	- Collision detection. The game uses a quadtree as the first layer of collision detection, as all the is confined to a 2D plane. After than it uses full 3D collision.
 	
-	
-- Testing whether the video embeds.
--  ![Gameplay Footage](https://github.com/john-on-git/openglasteroids/raw/refs/heads/master/OpenGLSpaceGame/Docs/spacegameplay.mp4)
+https://github.com/user-attachments/assets/2c0040e9-d26b-4ec0-a45e-63a360a47552
